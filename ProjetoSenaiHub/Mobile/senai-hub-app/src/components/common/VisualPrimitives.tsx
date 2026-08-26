@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { PressableProps, StyleProp, TextStyle, ViewStyle } from 'react-native';
 import {
   ActivityIndicator,
@@ -22,7 +22,9 @@ import {
   XCircle,
 } from 'lucide-react-native';
 import { colors } from '@/constants/colors';
+import { interaction, radius, shadow, spacing, touchTarget } from '@/constants/designTokens';
 import { useI18n } from '@/hooks/useI18n';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 type Tone = 'light' | 'dark';
@@ -46,17 +48,25 @@ function softAccent(accent: string) {
 }
 
 function useRevealAnimation(delay = 0) {
+  const { shouldAnimate } = useMotionPreference();
   const progress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.timing(progress, {
+    progress.stopAnimation();
+    if (!shouldAnimate) {
+      progress.setValue(1);
+      return;
+    }
+    const animation = Animated.timing(progress, {
       toValue: 1,
       duration: 260,
       delay,
       easing: Easing.out(Easing.cubic),
       useNativeDriver: true,
-    }).start();
-  }, [delay, progress]);
+    });
+    animation.start();
+    return () => animation.stop();
+  }, [delay, progress, shouldAnimate]);
 
   return {
     opacity: progress,
@@ -83,14 +93,19 @@ export function AnimatedPressable({
   disabled,
   onPressIn,
   onPressOut,
-  pressScale = 0.97,
+  pressScale = interaction.pressScale,
   style,
   wrapperStyle,
   ...props
 }: AnimatedPressableProps) {
+  const { shouldAnimate } = useMotionPreference();
   const scale = useRef(new Animated.Value(1)).current;
 
   const animate = (value: number) => {
+    if (!shouldAnimate) {
+      scale.setValue(1);
+      return;
+    }
     Animated.spring(scale, {
       toValue: value,
       friction: 7,
@@ -100,7 +115,7 @@ export function AnimatedPressable({
   };
 
   return (
-    <Animated.View style={[wrapperStyle, { transform: [{ scale }], opacity: disabled ? 0.62 : 1 }]}>
+    <Animated.View style={[wrapperStyle, { transform: [{ scale }], opacity: disabled ? interaction.disabledOpacity : 1 }]}>
       <Pressable
         {...props}
         disabled={disabled}
@@ -192,10 +207,16 @@ interface LoadingStateProps {
 export function LoadingState({ label = 'Carregando informações...', tone = 'light' }: LoadingStateProps) {
   const theme = useThemeColors();
   const { t } = useI18n();
+  const { shouldAnimate } = useMotionPreference();
   const dark = tone === 'dark';
   const pulse = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    pulse.stopAnimation();
+    if (!shouldAnimate) {
+      pulse.setValue(0.55);
+      return;
+    }
     const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(pulse, {
@@ -215,7 +236,7 @@ export function LoadingState({ label = 'Carregando informações...', tone = 'li
 
     animation.start();
     return () => animation.stop();
-  }, [pulse]);
+  }, [pulse, shouldAnimate]);
 
   const pulseOpacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.25, 0.8] });
 
@@ -431,6 +452,7 @@ export function SearchField({ placeholder, value, onChangeText, tone = 'light' }
   const theme = useThemeColors();
   const { t } = useI18n();
   const dark = tone === 'dark' || theme.isDark;
+  const [focused, setFocused] = useState(false);
 
   return (
     <View
@@ -438,17 +460,20 @@ export function SearchField({ placeholder, value, onChangeText, tone = 'light' }
         styles.search,
         {
           backgroundColor: dark ? theme.input : colors.white,
-          borderColor: dark ? theme.line : colors.border,
+          borderColor: focused ? theme.inputFocused : dark ? theme.line : colors.border,
         },
       ]}
     >
       <Search size={17} color={dark ? theme.textSubtle : colors.grayText} />
       <TextInput
+        accessibilityLabel={t(placeholder)}
         style={[styles.searchInput, { color: dark ? theme.text : colors.navy }]}
         placeholder={t(placeholder)}
         placeholderTextColor={dark ? theme.textSubtle : colors.grayText}
         value={value}
         onChangeText={onChangeText}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
       />
     </View>
   );
@@ -729,13 +754,13 @@ export function FieldPreview({ label, value }: { label: string; value: string })
 
 const styles = StyleSheet.create({
   appButton: {
-    minHeight: 46,
-    borderRadius: 8,
+    minHeight: touchTarget.min,
+    borderRadius: radius.md,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   appButtonSecondary: {
     backgroundColor: colors.white,
@@ -789,16 +814,12 @@ const styles = StyleSheet.create({
   },
   surface: {
     backgroundColor: colors.panel,
-    borderRadius: 8,
+    borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
-    padding: 14,
-    marginBottom: 12,
-    shadowColor: colors.black,
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 2,
+    padding: spacing.lg,
+    marginBottom: spacing.md,
+    ...shadow.sm,
   },
   surfaceDark: {
     backgroundColor: colors.darkPanel,
@@ -866,8 +887,8 @@ const styles = StyleSheet.create({
   },
   pillText: { fontSize: 10, fontWeight: '800' },
   search: {
-    minHeight: 42,
-    borderRadius: 8,
+    minHeight: touchTarget.min,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.white,
@@ -893,7 +914,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    borderRadius: 8,
+    borderRadius: radius.md,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.white,

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ShieldCheck, UserCheck, UserPlus, Users } from 'lucide-react-native';
 import { CrudModal, type CrudField } from '@/components/common/CrudModal';
+import { AdvancedFilterPanel, FilterChoice } from '@/components/common/AdvancedFilters';
 import { FeedbackMessage, ListRow, MetricTile, SearchField, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { ModuleScreen } from '@/components/screens/ModuleScreen';
 import { colors, connectTheme } from '@/constants/colors';
@@ -53,6 +54,8 @@ export default function UsuariosConnectScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<HubUsuario | null>(null);
   const [search, setSearch] = useState('');
+  const [draftFilters, setDraftFilters] = useState({ role: '', status: '' });
+  const [appliedFilters, setAppliedFilters] = useState(draftFilters);
   const { items, loading, submitting, error, createItem, updateItem, deleteItem } =
     useCrudResource<HubUsuario, Record<string, string>>({
       load: gridService.listUsuarios,
@@ -62,8 +65,13 @@ export default function UsuariosConnectScreen() {
     });
 
   const connectUsers = items.filter(isConnectAdminUser);
+  const connectRoleOptions = USER_ROLE_OPTIONS.filter((option) =>
+    CONNECT_ADMIN_ROLES.includes(option.value as typeof CONNECT_ADMIN_ROLES[number])
+  );
   const filtered = connectUsers.filter((usuario) =>
-    `${usuario.nome} ${usuario.email_institucional} ${usuario.tipo}`.toLowerCase().includes(search.toLowerCase())
+    `${usuario.nome} ${usuario.email_institucional} ${usuario.tipo}`.toLowerCase().includes(search.toLowerCase()) &&
+    (!appliedFilters.role || usuario.tipo === appliedFilters.role) &&
+    (!appliedFilters.status || usuario.status === appliedFilters.status)
   );
 
   return (
@@ -87,6 +95,20 @@ export default function UsuariosConnectScreen() {
         </View>
 
         <SearchField placeholder="Buscar usuário, e-mail ou perfil..." value={search} onChangeText={setSearch} />
+
+        <AdvancedFilterPanel
+          resultCount={filtered.length}
+          activeCount={Object.values(appliedFilters).filter(Boolean).length}
+          onApply={() => setAppliedFilters(draftFilters)}
+          onClear={() => {
+            const cleared = { role: '', status: '' };
+            setDraftFilters(cleared);
+            setAppliedFilters(cleared);
+          }}
+        >
+          <FilterChoice label="Papel" value={draftFilters.role} options={connectRoleOptions} onChange={(role) => setDraftFilters((current) => ({ ...current, role }))} />
+          <FilterChoice label="Status" value={draftFilters.status} options={USER_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
+        </AdvancedFilterPanel>
 
         <SurfaceCard title="Equipe administrativa" subtitle="Usuários com acesso ao SENAI Connect">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}

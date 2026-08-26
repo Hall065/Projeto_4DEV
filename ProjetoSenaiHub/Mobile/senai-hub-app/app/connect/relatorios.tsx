@@ -202,11 +202,14 @@ export default function RelatoriosConnectScreen() {
   const attendanceCounts = countAttendance(filteredAttendance);
   const attendanceRate = percent(attendanceCounts.present, filteredAttendance.length);
 
-  const attendanceChart = [
-    { label: 'Presencas', value: attendanceCounts.present, color: colors.green },
-    { label: 'Justificadas', value: attendanceCounts.justified, color: colors.orange },
-    { label: 'Injustificadas', value: attendanceCounts.unjustified, color: colors.red },
-  ];
+  const attendanceChart = useMemo(
+    () => [
+      { label: 'Presencas', value: attendanceCounts.present, color: colors.green },
+      { label: 'Justificadas', value: attendanceCounts.justified, color: colors.orange },
+      { label: 'Injustificadas', value: attendanceCounts.unjustified, color: colors.red },
+    ],
+    [attendanceCounts.justified, attendanceCounts.present, attendanceCounts.unjustified]
+  );
   const studentsByCourse = topGroups(
     filteredStudents,
     (student) => student.curso_nome ?? cursos.find((course) => course.id === student.curso_id)?.nome,

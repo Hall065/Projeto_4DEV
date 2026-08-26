@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SkeletonCard } from '@/components/common/SkeletonCard';
+import { Reveal } from '@/components/common/MotionPrimitives';
 import { AppButton } from '@/components/common/VisualPrimitives';
 import { EmptyState } from '@/components/common/EmptyState';
 import { colors } from '@/constants/colors';
@@ -42,24 +43,26 @@ export function ModuleScreen({
       contentContainerStyle={styles.content}
       showsVerticalScrollIndicator={false}
     >
-      <View style={styles.heading}>
-        <View style={styles.headingText}>
-          {kicker ? <Text style={[styles.kicker, dark && styles.kickerDark]}>{t(kicker)}</Text> : null}
-          <Text style={[styles.title, { color: dark ? theme.text : colors.navy }]}>{t(title)}</Text>
-          <Text style={[styles.description, { color: dark ? theme.textMuted : colors.grayText }]}>{t(description)}</Text>
+      <Reveal>
+        <View style={styles.heading}>
+          <View style={styles.headingText}>
+            {kicker ? <Text style={[styles.kicker, dark && styles.kickerDark]}>{t(kicker)}</Text> : null}
+            <Text style={[styles.title, { color: dark ? theme.text : colors.navy }]}>{t(title)}</Text>
+            <Text style={[styles.description, { color: dark ? theme.textMuted : colors.grayText }]}>{t(description)}</Text>
+          </View>
+          {actionLabel ? (
+            <AppButton
+              label={actionLabel}
+              onPress={onActionPress}
+              disabled={!onActionPress}
+              accent={dark ? colors.green : colors.red}
+              tone={tone}
+              style={styles.actionButton}
+              textStyle={styles.actionButtonText}
+            />
+          ) : null}
         </View>
-        {actionLabel ? (
-          <AppButton
-            label={actionLabel}
-            onPress={onActionPress}
-            disabled={!onActionPress}
-            accent={dark ? colors.green : colors.red}
-            tone={tone}
-            style={styles.actionButton}
-            textStyle={styles.actionButtonText}
-          />
-        ) : null}
-      </View>
+      </Reveal>
 
       {isLoading ? (
         <View style={styles.loadingStack}>
@@ -70,7 +73,7 @@ export function ModuleScreen({
       ) : isEmpty ? (
         <EmptyState title={emptyTitle} description="Os dados aparecerão após conectar o Supabase." />
       ) : (
-        <View style={styles.body}>{children}</View>
+        <Reveal delay={80} style={styles.body}>{children}</Reveal>
       )}
     </ScrollView>
   );

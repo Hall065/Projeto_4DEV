@@ -33,6 +33,7 @@ export default function AlunoLayout() {
         title="SENAI Aluno"
         brandArea="connect"
         showMenu={false}
+        profileRoute="/aluno/perfil"
         accentColor={theme.isDark ? theme.connectHeader : connectTheme.primary}
         notificationCount={notifications.unreadCount}
         onNotificationsPress={() => setNotificationsOpen(true)}
@@ -51,6 +52,9 @@ export default function AlunoLayout() {
         visible={notificationsOpen}
         notifications={notifications.notifications}
         loading={notifications.loading}
+        error={notifications.error}
+        pendingIds={notifications.pendingIds}
+        markingAll={notifications.markingAll}
         onClose={() => setNotificationsOpen(false)}
         onMarkAsRead={notifications.markAsRead}
         onMarkAllAsRead={notifications.markAllAsRead}

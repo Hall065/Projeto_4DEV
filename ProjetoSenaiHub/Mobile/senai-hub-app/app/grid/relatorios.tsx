@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {
-  AlertTriangle,
   CheckCircle2,
   CircleDot,
   ClipboardList,
@@ -174,13 +173,16 @@ export default function RelatoriosGridScreen() {
     0
   );
 
-  const ticketStatusChart = [
-    { label: 'Abertos', value: filteredTickets.filter((ticket) => normalizeTicketStatus(ticket.status) === 'aberto').length, color: colors.orange },
-    { label: 'Aguardando', value: filteredTickets.filter((ticket) => normalizeTicketStatus(ticket.status) === 'aguardando').length, color: colors.purple },
-    { label: 'Em andamento', value: inProgressTickets, color: colors.blue },
-    { label: 'Concluidos', value: finishedTickets, color: colors.green },
-    { label: 'Cancelados', value: filteredTickets.filter((ticket) => normalizeTicketStatus(ticket.status) === 'cancelado').length, color: colors.grayText },
-  ];
+  const ticketStatusChart = useMemo(
+    () => [
+      { label: 'Abertos', value: filteredTickets.filter((ticket) => normalizeTicketStatus(ticket.status) === 'aberto').length, color: colors.orange },
+      { label: 'Aguardando', value: filteredTickets.filter((ticket) => normalizeTicketStatus(ticket.status) === 'aguardando').length, color: colors.purple },
+      { label: 'Em andamento', value: inProgressTickets, color: colors.blue },
+      { label: 'Concluidos', value: finishedTickets, color: colors.green },
+      { label: 'Cancelados', value: filteredTickets.filter((ticket) => normalizeTicketStatus(ticket.status) === 'cancelado').length, color: colors.grayText },
+    ],
+    [filteredTickets, finishedTickets, inProgressTickets]
+  );
   const ticketTrend = buildDateTrend(
     filteredTickets,
     ['criado_em', 'created_at', 'data_abertura'],

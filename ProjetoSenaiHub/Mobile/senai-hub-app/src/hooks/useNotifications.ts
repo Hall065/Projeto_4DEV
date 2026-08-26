@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { notificationService, type Notificacao } from '@/services/notification.service';
 
@@ -8,21 +8,34 @@ const makeChannelName = (prefix: string, id: string) =>
 export function useNotifications(userId?: string | null) {
   const [notifications, setNotifications] = useState<Notificacao[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [pendingIds, setPendingIds] = useState<string[]>([]);
+  const [markingAll, setMarkingAll] = useState(false);
+  const requestSequence = useRef(0);
 
   const reload = useCallback(async () => {
     if (!userId) {
+      requestSequence.current += 1;
       setNotifications([]);
-      return;
+      setLoading(false);
+      setError(null);
+      return false;
     }
 
+    const sequence = ++requestSequence.current;
     setLoading(true);
     try {
       const data = await notificationService.listByUser(userId);
+      if (sequence !== requestSequence.current) return false;
       setNotifications(data);
+      setError(null);
+      return true;
     } catch {
-      setNotifications([]);
+      if (sequence !== requestSequence.current) return false;
+      setError('Nao foi possivel atualizar as notificacoes. Tente novamente.');
+      return false;
     } finally {
-      setLoading(false);
+      if (sequence === requestSequence.current) setLoading(false);
     }
   }, [userId]);
 
@@ -43,7 +56,7 @@ export function useNotifications(userId?: string | null) {
         table: 'notificacoes',
         filter: `usuario_id=eq.${userId}`,
       },
-      () => reload()
+      () => void reload()
     );
 
     channel.subscribe();
@@ -60,24 +73,63 @@ export function useNotifications(userId?: string | null) {
 
   const markAsRead = useCallback(
     async (id: string) => {
-      await notificationService.markAsRead(id);
-      await reload();
+      if (!userId) return false;
+      const previous = notifications.find((item) => item.id === id);
+      if (!previous || previous.lida || pendingIds.includes(id)) return Boolean(previous);
+
+      setPendingIds((current) => [...current, id]);
+      setNotifications((current) =>
+        current.map((item) => (item.id === id ? { ...item, lida: true } : item))
+      );
+      setError(null);
+      try {
+        await notificationService.markAsRead(id, userId);
+        await reload();
+        return true;
+      } catch {
+        setNotifications((current) =>
+          current.map((item) => (item.id === id ? previous : item))
+        );
+        setError('Nao foi possivel marcar a notificacao como lida.');
+        return false;
+      } finally {
+        setPendingIds((current) => current.filter((itemId) => itemId !== id));
+      }
     },
-    [reload]
+    [notifications, pendingIds, reload, userId]
   );
 
   const markAllAsRead = useCallback(async () => {
-    if (!userId) return;
-    await notificationService.markAllAsRead(userId);
-    await reload();
-  }, [reload, userId]);
+    if (!userId || markingAll) return false;
+    const previousById = new Map(notifications.map((item) => [item.id, item]));
+    setMarkingAll(true);
+    setNotifications((current) => current.map((item) => ({ ...item, lida: true })));
+    setError(null);
+    try {
+      await notificationService.markAllAsRead(userId);
+      await reload();
+      return true;
+    } catch {
+      setNotifications((current) =>
+        current.map((item) => previousById.get(item.id) ?? item)
+      );
+      setError('Nao foi possivel marcar todas as notificacoes como lidas.');
+      return false;
+    } finally {
+      setMarkingAll(false);
+    }
+  }, [markingAll, notifications, reload, userId]);
 
   return {
     notifications,
     unreadCount,
     loading,
+    error,
+    pendingIds,
+    markingAll,
     reload,
     markAsRead,
     markAllAsRead,
+    clearError: () => setError(null),
   };
 }

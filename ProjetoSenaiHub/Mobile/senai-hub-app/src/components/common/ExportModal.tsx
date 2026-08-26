@@ -3,6 +3,7 @@ import { FileSpreadsheet, FileText, X } from 'lucide-react-native';
 import { AnimatedPressable, AppButton } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
 import { useI18n } from '@/hooks/useI18n';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface ExportModalProps {
@@ -24,8 +25,9 @@ export function ExportModal({
 }: ExportModalProps) {
   const theme = useThemeColors();
   const { t } = useI18n();
+  const { shouldAnimate } = useMotionPreference();
   return (
-    <Modal visible={visible} transparent animationType="fade">
+    <Modal visible={visible} transparent animationType={shouldAnimate ? 'fade' : 'none'} onRequestClose={onClose}>
       <View style={[styles.overlay, { backgroundColor: theme.overlay }]}>
         <View style={[styles.dialog, { backgroundColor: theme.surface }]}>
           <View style={styles.header}>

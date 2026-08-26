@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '@/components/common/EmptyState';
-import { SurfaceCard } from '@/components/common/VisualPrimitives';
+import { FeedbackMessage, LoadingState, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
 import { radius, spacing } from '@/constants/designTokens';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -12,6 +12,8 @@ interface ChartCardProps {
   children: ReactNode;
   empty?: boolean;
   emptyTitle?: string;
+  loading?: boolean;
+  error?: string | null;
   summary?: string;
   tone?: 'light' | 'dark';
 }
@@ -22,6 +24,8 @@ export function ChartCard({
   children,
   empty,
   emptyTitle = 'Nenhum dado para exibir',
+  loading = false,
+  error,
   summary,
   tone = 'light',
 }: ChartCardProps) {
@@ -35,7 +39,15 @@ export function ChartCard({
           <Text style={[styles.summaryText, { color: dark ? theme.textMuted : colors.grayText }]}>{summary}</Text>
         </View>
       ) : null}
-      {empty ? <EmptyState title={emptyTitle} description="Ajuste os filtros ou cadastre novos registros." /> : children}
+      {loading ? (
+        <LoadingState label="Carregando dados do gráfico..." tone={tone} />
+      ) : error ? (
+        <FeedbackMessage message={error} variant="danger" tone={tone} />
+      ) : empty ? (
+        <EmptyState title={emptyTitle} description="Ajuste os filtros ou cadastre novos registros." />
+      ) : (
+        children
+      )}
     </SurfaceCard>
   );
 }

@@ -3,6 +3,7 @@ import { StyleSheet, Text } from 'react-native';
 import { BookOpen, Clock3, Layers } from 'lucide-react-native';
 import { ChartCard, InteractiveBarChart } from '@/components/charts';
 import { CrudModal, type CrudField } from '@/components/common/CrudModal';
+import { AdvancedFilterPanel, FilterChoice } from '@/components/common/AdvancedFilters';
 import { MetricGrid } from '@/components/common/MetricGrid';
 import { FeedbackMessage, ListRow, MetricTile, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { ModuleScreen } from '@/components/screens/ModuleScreen';
@@ -39,6 +40,8 @@ function formValues(curso: Curso): Record<string, string> {
 export default function CursosScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Curso | null>(null);
+  const [draftFilters, setDraftFilters] = useState({ status: '', modalidade: '', periodo: '' });
+  const [appliedFilters, setAppliedFilters] = useState(draftFilters);
   const { items, loading, submitting, error, createItem, updateItem, deleteItem } =
     useCrudResource<Curso, Record<string, string>>({
       load: connectService.listCursos,
@@ -46,11 +49,16 @@ export default function CursosScreen() {
       update: connectService.updateCurso,
       remove: connectService.deleteCurso,
     });
+  const filteredItems = items.filter((curso) =>
+    (!appliedFilters.status || curso.status === appliedFilters.status) &&
+    (!appliedFilters.modalidade || curso.modalidade === appliedFilters.modalidade) &&
+    (!appliedFilters.periodo || curso.periodo === appliedFilters.periodo)
+  );
   const cursosPorPeriodo = [
-    { label: 'Manha', value: items.filter((c) => c.periodo === 'manha').length, color: colors.blue },
-    { label: 'Tarde', value: items.filter((c) => c.periodo === 'tarde').length, color: connectTheme.accent },
-    { label: 'Noite', value: items.filter((c) => c.periodo === 'noite').length, color: colors.orange },
-    { label: 'Integral', value: items.filter((c) => c.periodo === 'integral').length, color: colors.green },
+    { label: 'Manha', value: filteredItems.filter((c) => c.periodo === 'manha').length, color: colors.blue },
+    { label: 'Tarde', value: filteredItems.filter((c) => c.periodo === 'tarde').length, color: connectTheme.accent },
+    { label: 'Noite', value: filteredItems.filter((c) => c.periodo === 'noite').length, color: colors.orange },
+    { label: 'Integral', value: filteredItems.filter((c) => c.periodo === 'integral').length, color: colors.green },
   ];
 
   return (
@@ -72,19 +80,34 @@ export default function CursosScreen() {
           <MetricTile label="Carga media" value={items.length ? Math.round(items.reduce((sum, c) => sum + (c.carga_horaria ?? 0), 0) / items.length) : 0} accent={colors.orange} icon={<Clock3 size={16} color={colors.orange} />} />
         </MetricGrid>
 
+        <AdvancedFilterPanel
+          resultCount={filteredItems.length}
+          activeCount={Object.values(appliedFilters).filter(Boolean).length}
+          onApply={() => setAppliedFilters(draftFilters)}
+          onClear={() => {
+            const cleared = { status: '', modalidade: '', periodo: '' };
+            setDraftFilters(cleared);
+            setAppliedFilters(cleared);
+          }}
+        >
+          <FilterChoice label="Status" value={draftFilters.status} options={USER_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
+          <FilterChoice label="Modalidade" value={draftFilters.modalidade} options={CURSO_MODALIDADE_OPTIONS} onChange={(modalidade) => setDraftFilters((current) => ({ ...current, modalidade }))} />
+          <FilterChoice label="Periodo" value={draftFilters.periodo} options={PERIODO_OPTIONS} onChange={(periodo) => setDraftFilters((current) => ({ ...current, periodo }))} />
+        </AdvancedFilterPanel>
+
         <ChartCard
           title="Cursos por periodo"
           subtitle="Distribuicao do catalogo atual"
-          empty={items.length === 0}
-          summary={`${items.length} cursos cadastrados`}
+          empty={filteredItems.length === 0}
+          summary={`${filteredItems.length} cursos nos filtros atuais`}
         >
           <InteractiveBarChart data={cursosPorPeriodo} />
         </ChartCard>
 
         <SurfaceCard title="Catalogo" subtitle="Cursos cadastrados">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}
-          {items.length === 0 ? <Text style={styles.empty}>Nenhum curso encontrado.</Text> : null}
-          {items.map((curso) => (
+          {filteredItems.length === 0 ? <Text style={styles.empty}>Nenhum curso encontrado.</Text> : null}
+          {filteredItems.map((curso) => (
             <ListRow
               key={curso.id}
               title={curso.nome}

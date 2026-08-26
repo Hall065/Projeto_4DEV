@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import {
   AlertTriangle,
@@ -18,16 +18,17 @@ import {
   SearchField,
   SurfaceCard,
 } from '@/components/common/VisualPrimitives';
+import { AdvancedFilterPanel, FilterChoice, FilterTextField } from '@/components/common/AdvancedFilters';
 import { CampusMap3DContainer } from '@/components/maps/CampusMap3D';
 import { ModuleScreen } from '@/components/screens/ModuleScreen';
 import { colors, gridTheme } from '@/constants/colors';
+import { CHAMADO_PRIORIDADE_OPTIONS } from '@/constants/form-options';
 import { ROUTES } from '@/constants/routes';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { supabase } from '@/lib/supabase';
 import { gridService } from '@/services/grid.service';
 import type {
   CampusTicketMarker,
-  CampusTicketMarkerKind,
   CampusTicketMarkerStatus,
 } from '@/types/campusTickets';
 import {
@@ -42,9 +43,9 @@ import {
   countUnmappedGridRecords,
   ticketMarkerColor,
 } from '@/utils/campusTicketMarkers';
+import { normalizeDateToIso } from '@/utils/formatters';
 
-type KindFilter = 'all' | CampusTicketMarkerKind;
-type StatusFilter = 'all' | CampusTicketMarkerStatus;
+const EMPTY_FILTERS = { kind: '', status: '', priority: '', blockId: '', assigneeId: '', categoryId: '', from: '', to: '' };
 
 const makeChannelName = () =>
   `grid-campus-map-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -57,8 +58,9 @@ export default function MapaTarefasScreen() {
   const [tickets, setTickets] = useState<Chamado[]>([]);
   const [tasks, setTasks] = useState<Tarefa[]>([]);
   const [search, setSearch] = useState('');
-  const [kindFilter, setKindFilter] = useState<KindFilter>('all');
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [draftFilters, setDraftFilters] = useState(EMPTY_FILTERS);
+  const [appliedFilters, setAppliedFilters] = useState(EMPTY_FILTERS);
+  const [filterError, setFilterError] = useState<string | null>(null);
   const [selectedMarkerId, setSelectedMarkerId] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
@@ -113,8 +115,9 @@ export default function MapaTarefasScreen() {
   const filteredMarkers = useMemo(() => {
     const query = normalize(search);
     return allMarkers.filter((marker) => {
-      const matchesKind = kindFilter === 'all' || marker.kind === kindFilter;
-      const matchesStatus = statusFilter === 'all' || marker.status === statusFilter;
+      const markerDate = normalizeDateToIso(marker.createdAt ?? '').slice(0, 10);
+      const matchesKind = !appliedFilters.kind || marker.kind === appliedFilters.kind;
+      const matchesStatus = !appliedFilters.status || marker.rawStatus === appliedFilters.status;
       const matchesSearch =
         !query ||
         normalize(
@@ -129,9 +132,15 @@ export default function MapaTarefasScreen() {
             .filter(Boolean)
             .join(' ')
         ).includes(query);
-      return matchesKind && matchesStatus && matchesSearch;
+      return matchesKind && matchesStatus && matchesSearch &&
+        (!appliedFilters.priority || marker.priority === appliedFilters.priority) &&
+        (!appliedFilters.blockId || marker.blockId === appliedFilters.blockId) &&
+        (!appliedFilters.assigneeId || marker.assigneeId === appliedFilters.assigneeId) &&
+        (!appliedFilters.categoryId || marker.categoryId === appliedFilters.categoryId) &&
+        (!appliedFilters.from || (markerDate && markerDate >= appliedFilters.from)) &&
+        (!appliedFilters.to || (markerDate && markerDate <= appliedFilters.to));
     });
-  }, [allMarkers, kindFilter, search, statusFilter]);
+  }, [allMarkers, appliedFilters, search]);
 
   useEffect(() => {
     if (
@@ -144,9 +153,37 @@ export default function MapaTarefasScreen() {
 
   const selectedMarker =
     allMarkers.find((marker) => marker.id === selectedMarkerId) ?? null;
-  const statusTotals = countTicketsByStatus(allMarkers);
-  const kindTotals = countTicketsByKind(allMarkers);
+  const statusTotals = countTicketsByStatus(filteredMarkers);
+  const kindTotals = countTicketsByKind(filteredMarkers);
   const unmappedCount = countUnmappedGridRecords(tasks, tickets);
+  const kindOptions = [
+    { value: 'ticket', label: 'Chamados' },
+    { value: 'task', label: 'Tarefas' },
+  ];
+  const statusOptions = Array.from(new Map(allMarkers.map((marker) => [marker.rawStatus, marker.statusLabel])).entries())
+    .map(([value, label]) => ({ value, label }));
+  const blockOptions = Array.from(new Set(allMarkers.map((marker) => marker.blockId))).sort()
+    .map((value) => ({ value, label: `Bloco ${value}` }));
+  const assigneeOptions = Array.from(
+    new Map(allMarkers.filter((marker) => marker.assigneeId).map((marker) => [marker.assigneeId as string, marker.assignee ?? 'Responsavel'])).entries()
+  ).map(([value, label]) => ({ value, label }));
+  const categoryOptions = Array.from(
+    new Map(allMarkers.filter((marker) => marker.categoryId).map((marker) => [marker.categoryId as string, marker.categoryLabel ?? 'Categoria'])).entries()
+  ).map(([value, label]) => ({ value, label }));
+  const applyFilters = () => {
+    const from = draftFilters.from ? validIsoDate(draftFilters.from) : '';
+    const to = draftFilters.to ? validIsoDate(draftFilters.to) : '';
+    if ((draftFilters.from && !from) || (draftFilters.to && !to)) {
+      setFilterError('Use datas validas em DD/MM/AAAA ou AAAA-MM-DD.');
+      return;
+    }
+    if (from && to && from > to) {
+      setFilterError('A data inicial deve ser anterior ou igual a data final.');
+      return;
+    }
+    setFilterError(null);
+    setAppliedFilters({ ...draftFilters, from: from ?? '', to: to ?? '' });
+  };
 
   return (
     <ModuleScreen
@@ -168,7 +205,7 @@ export default function MapaTarefasScreen() {
       <View style={styles.metricGrid}>
         <MetricTile
           label="No mapa"
-          value={allMarkers.length}
+          value={filteredMarkers.length}
           hint={`${kindTotals.ticket} chamados | ${kindTotals.task} tarefas`}
           accent={gridTheme.accent}
           icon={<MapPin size={16} color={gridTheme.accent} />}
@@ -217,68 +254,28 @@ export default function MapaTarefasScreen() {
           value={search}
           onChangeText={setSearch}
         />
-
-        <Text style={[styles.filterLabel, { color: theme.text }]}>Tipo</Text>
-        <View style={styles.filterRow}>
-          <AppButton
-            label="Todos"
-            variant={kindFilter === 'all' ? 'primary' : 'secondary'}
-            accent={gridTheme.accent}
-            onPress={() => setKindFilter('all')}
-            wrapperStyle={styles.filterButton}
-          />
-          <AppButton
-            label="Chamados"
-            variant={kindFilter === 'ticket' ? 'primary' : 'secondary'}
-            accent={gridTheme.accent}
-            icon={
-              <ClipboardList
-                size={15}
-                color={kindFilter === 'ticket' ? colors.white : gridTheme.accent}
-              />
-            }
-            onPress={() => setKindFilter('ticket')}
-            wrapperStyle={styles.filterButton}
-          />
-          <AppButton
-            label="Tarefas"
-            variant={kindFilter === 'task' ? 'primary' : 'secondary'}
-            accent={gridTheme.accent}
-            icon={
-              <Wrench
-                size={15}
-                color={kindFilter === 'task' ? colors.white : gridTheme.accent}
-              />
-            }
-            onPress={() => setKindFilter('task')}
-            wrapperStyle={styles.filterButton}
-          />
-        </View>
-
-        <Text style={[styles.filterLabel, { color: theme.text }]}>Status</Text>
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.statusFilters}
-        >
-          {[
-            { value: 'all' as const, label: 'Todos', color: gridTheme.accent },
-            { value: 'open' as const, label: 'Abertos', color: colors.red },
-            { value: 'in_progress' as const, label: 'Em andamento', color: colors.blue },
-            { value: 'completed' as const, label: 'Concluidos', color: colors.green },
-          ].map((option) => (
-            <AppButton
-              key={option.value}
-              label={option.label}
-              variant={statusFilter === option.value ? 'primary' : 'secondary'}
-              accent={option.color}
-              onPress={() => setStatusFilter(option.value)}
-              wrapperStyle={styles.statusButton}
-              style={styles.compactButton}
-            />
-          ))}
-        </ScrollView>
       </SurfaceCard>
+
+      <AdvancedFilterPanel
+        resultCount={filteredMarkers.length}
+        activeCount={Object.values(appliedFilters).filter(Boolean).length}
+        error={filterError}
+        onApply={applyFilters}
+        onClear={() => {
+          setDraftFilters(EMPTY_FILTERS);
+          setAppliedFilters(EMPTY_FILTERS);
+          setFilterError(null);
+        }}
+      >
+        <FilterChoice label="Tipo" value={draftFilters.kind} options={kindOptions} onChange={(kind) => setDraftFilters((current) => ({ ...current, kind }))} />
+        <FilterChoice label="Status ou etapa" value={draftFilters.status} options={statusOptions} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
+        <FilterChoice label="Prioridade" value={draftFilters.priority} options={CHAMADO_PRIORIDADE_OPTIONS} onChange={(priority) => setDraftFilters((current) => ({ ...current, priority }))} />
+        <FilterChoice label="Bloco" value={draftFilters.blockId} options={blockOptions} onChange={(blockId) => setDraftFilters((current) => ({ ...current, blockId }))} />
+        <FilterChoice label="Responsavel" value={draftFilters.assigneeId} options={assigneeOptions} onChange={(assigneeId) => setDraftFilters((current) => ({ ...current, assigneeId }))} />
+        <FilterChoice label="Categoria do chamado" value={draftFilters.categoryId} options={categoryOptions} onChange={(categoryId) => setDraftFilters((current) => ({ ...current, categoryId }))} />
+        <FilterTextField label="Periodo inicial" value={draftFilters.from} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(from) => setDraftFilters((current) => ({ ...current, from }))} />
+        <FilterTextField label="Periodo final" value={draftFilters.to} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(to) => setDraftFilters((current) => ({ ...current, to }))} />
+      </AdvancedFilterPanel>
 
       {selectedMarker ? (
         <SelectedMarkerCard
@@ -378,6 +375,14 @@ function normalize(value: string) {
     .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .trim();
+}
+
+function validIsoDate(value: string) {
+  const normalized = normalizeDateToIso(value);
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(normalized)) return null;
+  const [year, month, day] = normalized.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.toISOString().slice(0, 10) === normalized ? normalized : null;
 }
 
 function statusVariant(status: CampusTicketMarkerStatus) {

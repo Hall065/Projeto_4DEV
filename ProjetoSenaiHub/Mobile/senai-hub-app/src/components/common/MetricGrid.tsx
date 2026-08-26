@@ -1,7 +1,8 @@
 import { Children, type ReactNode } from 'react';
 import type { DimensionValue } from 'react-native';
 import { StyleSheet, View, useWindowDimensions } from 'react-native';
-import { spacing } from '@/constants/designTokens';
+import { Reveal } from '@/components/common/MotionPrimitives';
+import { motion, spacing } from '@/constants/designTokens';
 
 interface MetricGridProps {
   children: ReactNode;
@@ -20,8 +21,15 @@ export function MetricGrid({ children }: MetricGridProps) {
 
   return (
     <View style={styles.grid}>
-      {Children.map(children, (child) => (
-        <View style={[styles.item, { width: itemWidth }]}>{child}</View>
+      {Children.map(children, (child, index) => (
+        <Reveal
+          key={index}
+          enabled={index < 6}
+          delay={index * motion.stagger}
+          style={[styles.item, { width: itemWidth }]}
+        >
+          {child}
+        </Reveal>
       ))}
     </View>
   );

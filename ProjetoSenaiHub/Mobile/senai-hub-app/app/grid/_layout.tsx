@@ -69,6 +69,9 @@ export default function GridLayout() {
         visible={notificationsOpen}
         notifications={notifications.notifications}
         loading={notifications.loading}
+        error={notifications.error}
+        pendingIds={notifications.pendingIds}
+        markingAll={notifications.markingAll}
         onClose={() => setNotificationsOpen(false)}
         onMarkAsRead={notifications.markAsRead}
         onMarkAllAsRead={notifications.markAllAsRead}

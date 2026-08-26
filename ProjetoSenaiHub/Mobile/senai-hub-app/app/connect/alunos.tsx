@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { UserCheck, UserPlus, Users } from 'lucide-react-native';
 import { CrudModal, type CrudField, type CrudOption } from '@/components/common/CrudModal';
+import { AdvancedFilterPanel, FilterChoice } from '@/components/common/AdvancedFilters';
 import {
   FeedbackMessage,
   ListRow,
@@ -88,6 +89,8 @@ function formValues(aluno: Aluno): Record<string, string> {
 export default function AlunosScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Aluno | null>(null);
+  const [draftFilters, setDraftFilters] = useState({ status: '', cursoId: '', turmaId: '', empresaId: '' });
+  const [appliedFilters, setAppliedFilters] = useState(draftFilters);
   const { search, setSearch } = useFilterStore();
   const session = useAuthStore((s) => s.session);
   const { options, error: optionsError } = useSelectOptions(alunoOptionLoaders);
@@ -100,9 +103,17 @@ export default function AlunosScreen() {
       remove: connectService.deleteAluno,
     });
 
-  const filtered = items.filter((aluno) =>
-    `${aluno.nome} ${aluno.rm ?? ''} ${aluno.email ?? ''}`.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = items.filter((aluno) => {
+    const matchesSearch = `${aluno.nome} ${aluno.rm ?? ''} ${aluno.email ?? ''}`
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    return matchesSearch &&
+      (!appliedFilters.status || aluno.status === appliedFilters.status) &&
+      (!appliedFilters.cursoId || aluno.curso_id === appliedFilters.cursoId) &&
+      (!appliedFilters.turmaId || aluno.turma_id === appliedFilters.turmaId) &&
+      (!appliedFilters.empresaId || aluno.empresa_id === appliedFilters.empresaId);
+  });
+  const activeFilterCount = Object.values(appliedFilters).filter(Boolean).length;
   const activeCount = items.filter((aluno) => aluno.status === 'ativo').length;
 
   const openCreate = () => {
@@ -154,6 +165,22 @@ export default function AlunosScreen() {
           value={search}
           onChangeText={setSearch}
         />
+
+        <AdvancedFilterPanel
+          resultCount={filtered.length}
+          activeCount={activeFilterCount}
+          onApply={() => setAppliedFilters(draftFilters)}
+          onClear={() => {
+            const cleared = { status: '', cursoId: '', turmaId: '', empresaId: '' };
+            setDraftFilters(cleared);
+            setAppliedFilters(cleared);
+          }}
+        >
+          <FilterChoice label="Status" value={draftFilters.status} options={USER_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
+          <FilterChoice label="Curso" value={draftFilters.cursoId} options={options.cursos ?? []} onChange={(cursoId) => setDraftFilters((current) => ({ ...current, cursoId }))} />
+          <FilterChoice label="Turma" value={draftFilters.turmaId} options={options.turmas ?? []} onChange={(turmaId) => setDraftFilters((current) => ({ ...current, turmaId }))} />
+          <FilterChoice label="Empresa" value={draftFilters.empresaId} options={options.empresas ?? []} onChange={(empresaId) => setDraftFilters((current) => ({ ...current, empresaId }))} />
+        </AdvancedFilterPanel>
 
         <SurfaceCard title="Lista de alunos" subtitle="Dados principais e situação acadêmica">
           {error || optionsError ? <FeedbackMessage variant="danger" message={error ?? optionsError ?? ''} /> : null}

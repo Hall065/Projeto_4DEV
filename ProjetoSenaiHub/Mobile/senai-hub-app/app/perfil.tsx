@@ -1,8 +1,9 @@
 import { useState } from 'react';
+import Constants from 'expo-constants';
 import * as ImagePicker from 'expo-image-picker';
 import { Image, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { ArrowLeft, Camera, Check, ChevronDown, KeyRound, Languages, LogOut, Moon, Sun, X } from 'lucide-react-native';
+import { ArrowLeft, Camera, Check, ChevronDown, KeyRound, Languages, LogOut, Moon, ShieldCheck, Sun, X } from 'lucide-react-native';
 import { AppButton, FeedbackMessage, ListRow, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
 import { preloadTranslationsForLanguage, useI18n } from '@/hooks/useI18n';
@@ -39,6 +40,8 @@ export default function PerfilScreen() {
   const perfil = session?.perfil;
   const currentLanguage = getAppLanguageOption(language);
   const draftLanguage = getAppLanguageOption(selectedLanguage);
+  const appVersion = Constants.expoConfig?.version ?? '1.0.0';
+  const applications = session?.aplicacoes ?? [];
   const initials = perfil?.nome?.split(' ').filter(Boolean).slice(0, 2).map((part) => part[0]).join('').toUpperCase() ?? 'SH';
 
   const refreshSession = async () => {
@@ -171,14 +174,14 @@ export default function PerfilScreen() {
           <View style={styles.profileTop}>
             <View style={[styles.avatar, { backgroundColor: theme.isDark ? theme.surfaceSoft : colors.navy }]}>
               {perfil?.foto_url ? (
-                <Image source={{ uri: perfil.foto_url }} style={styles.avatarImage} />
+                <Image source={{ uri: perfil.foto_url }} style={styles.avatarImage} accessibilityLabel="Foto de perfil" />
               ) : (
                 <Text style={styles.avatarText}>{initials}</Text>
               )}
             </View>
             <View style={styles.profileBody}>
-              <Text style={[styles.name, { color: theme.text }]}>{perfil?.nome}</Text>
-              <Text style={[styles.role, { color: theme.textMuted }]}>{t(perfil?.tipo)}</Text>
+              <Text style={[styles.name, { color: theme.text }]}>{perfil?.nome ?? t('Usuario')}</Text>
+              <Text style={[styles.role, { color: theme.textMuted }]}>{perfil?.tipo ? t(perfil.tipo) : 'Sem perfil'}</Text>
               <AppButton
                 label="Trocar foto"
                 variant="secondary"
@@ -254,10 +257,23 @@ export default function PerfilScreen() {
         </SurfaceCard>
 
         <SurfaceCard title="Informacoes do sistema" subtitle="Acesso e versao">
-          <ListRow title="Perfil de acesso" meta={perfil?.tipo} initials="PA" accent={colors.blue} />
-          <ListRow title="Ultimo login" meta="Sessao atual" initials="UL" accent={colors.green} />
-          <ListRow title="Versao do app" meta="1.0.0" initials="VS" accent={colors.orange} />
-          <ListRow title="Conta protegida" subtitle="Confirmacao por senha ativa" initials="OK" accent={colors.green} />
+          <ListRow title="Perfil de acesso" meta={perfil?.tipo ? t(perfil.tipo) : 'Nao informado'} initials="PA" accent={colors.primary} />
+          <ListRow title="Versao do app" meta={appVersion} initials="VS" accent={colors.orange} />
+        </SurfaceCard>
+
+        <SurfaceCard title="Aplicacoes liberadas" subtitle="Acessos vinculados a sua conta">
+          {applications.length > 0 ? (
+            <View style={styles.applicationList}>
+              {applications.map((application) => (
+                <View key={application.id} style={[styles.applicationChip, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}>
+                  <ShieldCheck size={15} color={colors.primary} />
+                  <Text style={[styles.applicationText, { color: theme.text }]}>{application.aplicacao_nome}</Text>
+                </View>
+              ))}
+            </View>
+          ) : (
+            <Text style={[styles.emptyText, { color: theme.textMuted }]}>Nenhuma aplicacao vinculada.</Text>
+          )}
         </SurfaceCard>
 
         <SurfaceCard title="Conta" subtitle="Sessao atual">
@@ -518,4 +534,8 @@ const styles = StyleSheet.create({
   },
   modalActions: { flexDirection: 'row', gap: 10, marginTop: 12 },
   modalAction: { flex: 1 },
+  applicationList: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  applicationChip: { minHeight: 38, flexDirection: 'row', alignItems: 'center', gap: 7, borderWidth: 1, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 8 },
+  applicationText: { fontSize: 12, fontWeight: '800' },
+  emptyText: { fontSize: 12, fontWeight: '700' },
 });

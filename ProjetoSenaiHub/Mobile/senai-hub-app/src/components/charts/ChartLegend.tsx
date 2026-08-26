@@ -6,9 +6,11 @@ import type { ChartDatum } from './types';
 
 interface ChartLegendProps {
   data: ChartDatum[];
+  formatValue?: (value: number) => string;
+  showValue?: boolean;
 }
 
-export function ChartLegend({ data }: ChartLegendProps) {
+export function ChartLegend({ data, formatValue = (value) => String(value), showValue = false }: ChartLegendProps) {
   const theme = useThemeColors();
 
   return (
@@ -19,6 +21,7 @@ export function ChartLegend({ data }: ChartLegendProps) {
           <Text numberOfLines={1} style={[styles.label, { color: theme.textMuted }]}>
             {item.label}
           </Text>
+          {showValue ? <Text style={[styles.value, { color: theme.text }]}>{formatValue(item.value)}</Text> : null}
         </View>
       ))}
     </View>
@@ -50,5 +53,9 @@ const styles = StyleSheet.create({
     maxWidth: 120,
     fontSize: 11,
     fontWeight: '800',
+  },
+  value: {
+    fontSize: 11,
+    fontWeight: '900',
   },
 });

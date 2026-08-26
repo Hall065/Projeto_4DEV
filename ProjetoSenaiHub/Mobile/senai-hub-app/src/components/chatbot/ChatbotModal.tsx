@@ -10,13 +10,14 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { BotMessageSquare, RefreshCw, X } from 'lucide-react-native';
+import { Archive, BotMessageSquare, RefreshCw, X } from 'lucide-react-native';
 import { AnimatedPressable, FeedbackMessage } from '@/components/common/VisualPrimitives';
 import { ChatInput } from '@/components/chatbot/ChatInput';
 import { ChatMessageBubble } from '@/components/chatbot/ChatMessageBubble';
 import { ConversationList } from '@/components/chatbot/ConversationList';
 import { colors } from '@/constants/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { useChatbotStore } from '@/stores/chatbot.store';
 
 const SUGGESTIONS = [
@@ -31,6 +32,7 @@ export function ChatbotModal() {
   const theme = useThemeColors();
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
+  const { confirm } = useConfirmDialog();
   const isWide = width >= 720;
   const {
     isOpen,
@@ -40,13 +42,17 @@ export function ChatbotModal() {
     loadingConversations,
     loadingMessages,
     isSending,
+    archivingConversationId,
     error,
+    success,
     close,
     loadConversations,
     selectConversation,
     createConversation,
+    archiveActiveConversation,
     sendMessage,
     clearError,
+    clearSuccess,
   } = useChatbotStore();
 
   useEffect(() => {
@@ -60,6 +66,22 @@ export function ChatbotModal() {
       setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
     }
   }, [isOpen, messages.length, isSending]);
+
+  useEffect(() => {
+    if (!success) return undefined;
+    const timer = setTimeout(clearSuccess, 4500);
+    return () => clearTimeout(timer);
+  }, [clearSuccess, success]);
+
+  const handleArchive = async () => {
+    if (!activeConversationId) return;
+    const confirmed = await confirm({
+      title: 'Arquivar conversa',
+      message: 'A conversa saira do historico ativo, mas suas mensagens nao serao apagadas definitivamente.',
+      confirmLabel: 'Arquivar',
+    });
+    if (confirmed) await archiveActiveConversation();
+  };
 
   return (
     <Modal visible={isOpen} transparent animationType="slide" onRequestClose={close}>
@@ -89,6 +111,22 @@ export function ChatbotModal() {
               </View>
             </View>
             <View style={styles.actions}>
+              {activeConversationId ? (
+                <AnimatedPressable
+                  accessibilityRole="button"
+                  accessibilityLabel="Arquivar conversa ativa"
+                  accessibilityState={{ disabled: Boolean(archivingConversationId || isSending) }}
+                  disabled={Boolean(archivingConversationId || isSending)}
+                  style={[styles.iconButton, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}
+                  onPress={() => void handleArchive()}
+                >
+                  {archivingConversationId ? (
+                    <ActivityIndicator size="small" color={theme.textMuted} />
+                  ) : (
+                    <Archive size={17} color={colors.orange} />
+                  )}
+                </AnimatedPressable>
+              ) : null}
               <AnimatedPressable
                 accessibilityRole="button"
                 accessibilityLabel="Atualizar conversas"
@@ -115,11 +153,13 @@ export function ChatbotModal() {
             conversations={conversations}
             activeConversationId={activeConversationId}
             loading={loadingConversations}
+            disabled={Boolean(archivingConversationId || isSending)}
             onCreate={() => void createConversation()}
             onSelect={(id) => void selectConversation(id)}
           />
 
           {error ? <FeedbackMessage variant="warning" message={error} /> : null}
+          {success ? <FeedbackMessage variant="success" message={success} /> : null}
 
           <ScrollView
             ref={scrollRef}
@@ -167,7 +207,10 @@ export function ChatbotModal() {
             ) : null}
           </ScrollView>
 
-          <ChatInput disabled={isSending} onSend={(message) => void sendMessage(message)} />
+          <ChatInput
+            disabled={Boolean(isSending || loadingMessages || archivingConversationId)}
+            onSend={sendMessage}
+          />
         </View>
       </KeyboardAvoidingView>
     </Modal>

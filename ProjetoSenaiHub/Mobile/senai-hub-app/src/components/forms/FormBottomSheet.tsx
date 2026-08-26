@@ -2,6 +2,8 @@ import { Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { X } from 'lucide-react-native';
 import { AnimatedPressable } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
+import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface FormBottomSheetProps {
   visible: boolean;
@@ -11,14 +13,17 @@ interface FormBottomSheetProps {
 }
 
 export function FormBottomSheet({ visible, title, onClose, children }: FormBottomSheetProps) {
+  const theme = useThemeColors();
+  const { shouldAnimate } = useMotionPreference();
+
   return (
-    <Modal visible={visible} animationType="slide" transparent>
-      <View style={styles.overlay}>
-        <View style={styles.sheet}>
+    <Modal visible={visible} animationType={shouldAnimate ? 'slide' : 'none'} transparent onRequestClose={onClose}>
+      <View style={[styles.overlay, { backgroundColor: theme.overlay }]}>
+        <View style={[styles.sheet, { backgroundColor: theme.surface }]}>
           <View style={styles.header}>
-            <Text style={styles.title}>{title}</Text>
-            <AnimatedPressable style={styles.closeButton} onPress={onClose}>
-              <X size={18} color={colors.navy} />
+            <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+            <AnimatedPressable style={[styles.closeButton, { backgroundColor: theme.surfaceSoft }]} onPress={onClose}>
+              <X size={18} color={theme.text} />
             </AnimatedPressable>
           </View>
           <ScrollView style={styles.content}>{children}</ScrollView>

@@ -9,6 +9,7 @@ interface ConversationListProps {
   conversations: ChatConversation[];
   activeConversationId: string | null;
   loading?: boolean;
+  disabled?: boolean;
   onSelect: (id: string) => void;
   onCreate: () => void;
 }
@@ -22,6 +23,7 @@ export function ConversationList({
   conversations,
   activeConversationId,
   loading,
+  disabled,
   onSelect,
   onCreate,
 }: ConversationListProps) {
@@ -35,6 +37,7 @@ export function ConversationList({
           accessibilityRole="button"
           accessibilityLabel="Criar nova conversa"
           style={[styles.newButton, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}
+          disabled={disabled}
           onPress={onCreate}
         >
           <MessageSquarePlus size={16} color={theme.text} />
@@ -52,6 +55,8 @@ export function ConversationList({
             <AnimatedPressable
               key={conversation.id}
               accessibilityRole="button"
+              accessibilityState={{ selected: active, disabled }}
+              disabled={disabled}
               style={[
                 styles.item,
                 {

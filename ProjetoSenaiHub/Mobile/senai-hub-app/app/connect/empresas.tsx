@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { BriefcaseBusiness, Building2, Mail, UserCheck } from 'lucide-react-native';
 import { CrudModal, type CrudField } from '@/components/common/CrudModal';
+import { AdvancedFilterPanel, FilterChoice } from '@/components/common/AdvancedFilters';
 import { FeedbackMessage, ListRow, MetricTile, SearchField, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { ModuleScreen } from '@/components/screens/ModuleScreen';
 import { colors, connectTheme } from '@/constants/colors';
@@ -92,6 +93,8 @@ export default function EmpresasScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Empresa | null>(null);
   const [search, setSearch] = useState('');
+  const [draftStatus, setDraftStatus] = useState('');
+  const [appliedStatus, setAppliedStatus] = useState('');
   const fields = useMemo(() => getFields(Boolean(editing)), [editing]);
   const { items, loading, submitting, error, createItem, updateItem, deleteItem } =
     useCrudResource<Empresa, Record<string, string>>({
@@ -102,7 +105,8 @@ export default function EmpresasScreen() {
     });
 
   const filtered = items.filter((empresa) =>
-    `${empresa.nome} ${empresa.cnpj ?? ''} ${empresa.responsavel_nome ?? ''}`.toLowerCase().includes(search.toLowerCase())
+    `${empresa.nome} ${empresa.cnpj ?? ''} ${empresa.responsavel_nome ?? ''}`.toLowerCase().includes(search.toLowerCase()) &&
+    (!appliedStatus || empresa.status === appliedStatus)
   );
 
   return (
@@ -126,6 +130,18 @@ export default function EmpresasScreen() {
         </View>
 
         <SearchField placeholder="Buscar empresa, CNPJ ou responsavel..." value={search} onChangeText={setSearch} />
+
+        <AdvancedFilterPanel
+          resultCount={filtered.length}
+          activeCount={appliedStatus ? 1 : 0}
+          onApply={() => setAppliedStatus(draftStatus)}
+          onClear={() => {
+            setDraftStatus('');
+            setAppliedStatus('');
+          }}
+        >
+          <FilterChoice label="Status" value={draftStatus} options={EMPRESA_STATUS_OPTIONS} onChange={setDraftStatus} />
+        </AdvancedFilterPanel>
 
         <SurfaceCard title="Empresas cadastradas" subtitle="Dados usados nos contratos">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}

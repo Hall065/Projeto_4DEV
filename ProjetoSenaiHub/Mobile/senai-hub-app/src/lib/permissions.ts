@@ -2,6 +2,9 @@ import type { UserRole } from '@/constants/roles';
 import { ROLE_APPLICATION_ACCESS } from '@/constants/roles';
 import { ROUTES } from '@/constants/routes';
 import type { AuthSession, HubUsuario, UsuarioAplicacao } from '@/types/auth.types';
+import { isStudentRole } from '@/lib/studentRole';
+
+export { isStudentRole } from '@/lib/studentRole';
 
 export type Permission = string;
 
@@ -250,10 +253,6 @@ export function canApprovePurchase(role: UserRole, valor: number): boolean {
 
 export function isEmpresaRole(role: UserRole | undefined) {
   return role === 'empresa' || role === 'connect_empresa';
-}
-
-export function isStudentRole(role: UserRole | undefined) {
-  return role === 'aluno' || role === 'connect_aluno';
 }
 
 export function isProfessorRole(role: UserRole | undefined) {

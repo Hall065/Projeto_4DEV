@@ -15,7 +15,12 @@ export interface CampusTicketMarker {
   priority: ChamadoPrioridade;
   status: CampusTicketMarkerStatus;
   statusLabel: string;
+  rawStatus: string;
   assignee?: string;
+  assigneeId?: string;
+  categoryId?: string;
+  categoryLabel?: string;
+  createdAt?: string;
   detail?: string;
 }
 

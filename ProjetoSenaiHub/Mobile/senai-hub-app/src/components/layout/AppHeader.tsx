@@ -5,6 +5,7 @@ import { Bell, Menu } from 'lucide-react-native';
 import { AnimatedPressable } from '@/components/common/VisualPrimitives';
 import { getBrandAsset, type BrandArea } from '@/constants/brandAssets';
 import { colors } from '@/constants/colors';
+import { radius, shadow, touchTarget } from '@/constants/designTokens';
 import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useAppStore } from '@/stores/app.store';
@@ -18,6 +19,7 @@ interface AppHeaderProps {
   onNotificationsPress?: () => void;
   accentColor?: string;
   brandArea?: BrandArea;
+  profileRoute?: string;
 }
 
 export function AppHeader({
@@ -28,6 +30,7 @@ export function AppHeader({
   onNotificationsPress,
   accentColor = colors.navy,
   brandArea,
+  profileRoute = '/perfil',
 }: AppHeaderProps) {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -107,7 +110,7 @@ export function AppHeader({
           {notificationCount > 0 ? (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>
-                {notificationCount > 9 ? '9+' : notificationCount}
+                {notificationCount > 99 ? '99+' : notificationCount}
               </Text>
             </View>
           ) : null}
@@ -116,7 +119,7 @@ export function AppHeader({
           accessibilityLabel="Abrir perfil"
           accessibilityRole="button"
           style={styles.profile}
-          onPress={() => router.push('/perfil' as never)}
+          onPress={() => router.push(profileRoute as never)}
           hitSlop={8}
         >
           <View style={[styles.avatar, { backgroundColor: avatarBackground }]}>
@@ -141,18 +144,14 @@ const styles = StyleSheet.create({
     paddingBottom: 11,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(255,255,255,0.08)',
-    shadowColor: colors.black,
-    shadowOpacity: 0.14,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    ...shadow.md,
   },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   spacer: { width: 36 },
   iconButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
+    width: touchTarget.min,
+    height: touchTarget.min,
+    borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.1)',
@@ -172,13 +171,14 @@ const styles = StyleSheet.create({
     top: 3,
     right: 4,
     backgroundColor: colors.red,
-    borderRadius: 5,
-    minWidth: 10,
-    height: 10,
+    borderRadius: 9,
+    minWidth: 18,
+    height: 18,
+    paddingHorizontal: 4,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  badgeText: { color: colors.white, fontSize: 7, fontWeight: '900' },
+  badgeText: { color: colors.white, fontSize: 9, fontWeight: '900' },
   profile: {
     maxWidth: 72,
     alignItems: 'center',

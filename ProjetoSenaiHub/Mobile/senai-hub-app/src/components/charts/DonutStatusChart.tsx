@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
 import { colors } from '@/constants/colors';
-import { radius, spacing } from '@/constants/designTokens';
+import { chartPalette, radius, spacing } from '@/constants/designTokens';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { notifySelection } from '@/utils/feedback';
+import { ApexChart } from './ApexChart';
+import { toApexDonut } from './apex/adapters';
 import { ChartLegend } from './ChartLegend';
 import type { ChartDatum } from './types';
 
@@ -15,18 +17,51 @@ interface DonutStatusChartProps {
   tone?: 'light' | 'dark';
 }
 
-export function DonutStatusChart({ data, size = 176, formatValue = (value) => String(value), tone = 'light' }: DonutStatusChartProps) {
+export function DonutStatusChart({
+  data,
+  size = 176,
+  formatValue = (value) => String(value),
+  tone = 'light',
+}: DonutStatusChartProps) {
   const theme = useThemeColors();
+  const { reduceMotion, shouldAnimate } = useMotionPreference();
   const dark = tone === 'dark' || theme.isDark;
-  const visibleData = data.filter((item) => item.value > 0);
+  const visibleData = useMemo(
+    () =>
+      data
+        .map((item, index) => ({
+          ...item,
+          value: Number.isFinite(item.value) ? Math.max(0, item.value) : 0,
+          color: item.color ?? chartPalette[index % chartPalette.length],
+        }))
+        .filter((item) => item.value > 0),
+    [data]
+  );
   const total = useMemo(() => visibleData.reduce((sum, item) => sum + item.value, 0), [visibleData]);
   const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
   const selected = visibleData.find((item) => item.label === selectedLabel) ?? visibleData[0];
-  const strokeWidth = 18;
-  const center = size / 2;
-  const radiusValue = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radiusValue;
-  let consumed = 0;
+  const model = useMemo(
+    () =>
+      toApexDonut(visibleData, {
+        title: 'Distribuicao',
+        shouldAnimate,
+        theme: {
+          dark,
+          text: theme.text,
+          textMuted: theme.textMuted,
+          line: theme.line,
+          surface: theme.surface,
+          surfaceSoft: theme.surfaceSoft,
+        },
+      }),
+    [dark, shouldAnimate, theme.line, theme.surface, theme.surfaceSoft, theme.text, theme.textMuted, visibleData]
+  );
+
+  const selectLabel = (label: string | undefined) => {
+    if (!label) return;
+    setSelectedLabel(label);
+    void notifySelection();
+  };
 
   if (!visibleData.length) {
     return <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum dado para exibir.</Text>;
@@ -34,48 +69,17 @@ export function DonutStatusChart({ data, size = 176, formatValue = (value) => St
 
   return (
     <View style={styles.wrap}>
-      <View style={styles.donutArea}>
-        <Svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-          <Circle
-            cx={center}
-            cy={center}
-            r={radiusValue}
-            stroke={dark ? theme.surfaceSoft : colors.panelSoft}
-            strokeWidth={strokeWidth}
-            fill="none"
-          />
-          {visibleData.map((item) => {
-            const segment = total ? (item.value / total) * circumference : 0;
-            const dashOffset = -consumed;
-            consumed += segment;
-
-            return (
-              <Circle
-                key={item.label}
-                cx={center}
-                cy={center}
-                r={radiusValue}
-                stroke={item.color ?? colors.red}
-                strokeWidth={selected?.label === item.label ? strokeWidth + 2 : strokeWidth}
-                fill="none"
-                strokeLinecap="round"
-                strokeDasharray={`${segment} ${circumference}`}
-                strokeDashoffset={dashOffset}
-                transform={`rotate(-90 ${center} ${center})`}
-                onPress={() => {
-                  setSelectedLabel(item.label);
-                  void notifySelection();
-                }}
-              />
-            );
-          })}
-        </Svg>
-        <View pointerEvents="none" style={styles.centerText}>
-          <Text style={[styles.centerValue, { color: theme.text }]}>{formatValue(selected?.value ?? total)}</Text>
-          <Text numberOfLines={2} style={[styles.centerLabel, { color: theme.textMuted }]}>
-            {selected?.label ?? 'Total'}
-          </Text>
-        </View>
+      <ApexChart
+        model={model}
+        height={Math.max(220, size + 44)}
+        reduceMotion={reduceMotion}
+        onSelect={(index) => selectLabel(visibleData[index]?.label)}
+      />
+      <View style={[styles.currentValue, { backgroundColor: dark ? theme.surfaceSoft : colors.panelSoft, borderColor: theme.line }]}>
+        <Text style={[styles.centerValue, { color: theme.text }]}>{formatValue(selected?.value ?? total)}</Text>
+        <Text numberOfLines={1} style={[styles.centerLabel, { color: theme.textMuted }]}>
+          {selected?.label ?? 'Total'}
+        </Text>
       </View>
 
       <View style={styles.selectedBox}>
@@ -87,64 +91,44 @@ export function DonutStatusChart({ data, size = 176, formatValue = (value) => St
             <Pressable
               key={item.label}
               accessibilityRole="button"
-              accessibilityLabel={`${item.label}: ${formatValue(item.value)}, ${percent}%`}
-              onPress={() => {
-                setSelectedLabel(item.label);
-                void notifySelection();
-              }}
+              accessibilityLabel={item.label + ': ' + formatValue(item.value) + ', ' + percent + '%'}
+              onPress={() => selectLabel(item.label)}
               style={[
                 styles.statusRow,
                 {
-                  borderColor: active ? item.color ?? colors.red : theme.line,
+                  borderColor: active ? item.color : theme.line,
                   backgroundColor: active ? (dark ? theme.surfaceSoft : colors.panelSoft) : 'transparent',
                 },
               ]}
             >
-              <View style={[styles.dot, { backgroundColor: item.color ?? colors.red }]} />
+              <View style={[styles.dot, { backgroundColor: item.color }]} />
               <Text numberOfLines={1} style={[styles.statusLabel, { color: theme.text }]}>
                 {item.label}
               </Text>
-              <Text style={[styles.statusValue, { color: item.color ?? colors.red }]}>{percent}%</Text>
+              <Text style={[styles.statusValue, { color: item.color }]}>{percent}%</Text>
             </Pressable>
           );
         })}
       </View>
-      <ChartLegend data={visibleData} />
+      <ChartLegend data={visibleData} formatValue={formatValue} showValue />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    alignItems: 'center',
-  },
-  donutArea: {
-    width: 176,
-    height: 176,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  centerText: {
-    position: 'absolute',
+  wrap: { alignItems: 'center' },
+  currentValue: {
+    minWidth: 132,
+    minHeight: 48,
+    borderRadius: radius.md,
+    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 96,
+    paddingHorizontal: spacing.md,
   },
-  centerValue: {
-    fontSize: 23,
-    fontWeight: '900',
-  },
-  centerLabel: {
-    marginTop: 3,
-    fontSize: 10,
-    fontWeight: '800',
-    textAlign: 'center',
-  },
-  selectedBox: {
-    alignSelf: 'stretch',
-    gap: spacing.sm,
-    marginTop: spacing.lg,
-  },
+  centerValue: { fontSize: 23, fontWeight: '900' },
+  centerLabel: { marginTop: 3, fontSize: 10, fontWeight: '800', textAlign: 'center' },
+  selectedBox: { alignSelf: 'stretch', gap: spacing.sm, marginTop: spacing.lg },
   statusRow: {
     minHeight: 44,
     borderRadius: radius.md,
@@ -154,22 +138,8 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingHorizontal: spacing.md,
   },
-  dot: {
-    width: 9,
-    height: 9,
-    borderRadius: radius.pill,
-  },
-  statusLabel: {
-    flex: 1,
-    fontSize: 12,
-    fontWeight: '900',
-  },
-  statusValue: {
-    fontSize: 12,
-    fontWeight: '900',
-  },
-  empty: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
+  dot: { width: 9, height: 9, borderRadius: radius.pill },
+  statusLabel: { flex: 1, fontSize: 12, fontWeight: '900' },
+  statusValue: { fontSize: 12, fontWeight: '900' },
+  empty: { fontSize: 12, fontWeight: '700' },
 });

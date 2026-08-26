@@ -40,26 +40,12 @@ const campusFloors: CampusFloor[] = [
   { id: '7', label: '7', source: require('../../../assets/maps/7.png') },
 ];
 
-const fallbackSpots = [
-  { x: 21, y: 16 },
-  { x: 55, y: 16 },
-  { x: 29, y: 27 },
-  { x: 62, y: 29 },
-  { x: 31, y: 42 },
-  { x: 56, y: 44 },
-  { x: 34, y: 57 },
-  { x: 63, y: 59 },
-  { x: 38, y: 72 },
-  { x: 58, y: 76 },
-  { x: 45, y: 88 },
-];
-
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
 function locationId(location: LocalizacaoAluno) {
-  return location.id ?? location.aluno_id;
+  return location.aluno_id;
 }
 
 function getInitials(name: string) {
@@ -69,52 +55,32 @@ function getInitials(name: string) {
   return `${first}${second}`.toUpperCase();
 }
 
-function hashString(value: string) {
-  let hash = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 31 + value.charCodeAt(index)) % 9973;
-  }
-  return hash;
-}
-
-function projectCoordinates(location: LocalizacaoAluno, index: number) {
-  const id = locationId(location);
-  const hash = hashString(id);
-
-  if (Number.isFinite(location.latitude) && Number.isFinite(location.longitude)) {
-    const latitude = Number(location.latitude);
-    const longitude = Number(location.longitude);
-    const metersPerLatitude = 111_320;
-    const metersPerLongitude = 111_320 * Math.cos((senaiCampus.latitude * Math.PI) / 180);
-    const eastMeters = (longitude - senaiCampus.longitude) * metersPerLongitude;
-    const northMeters = (latitude - senaiCampus.latitude) * metersPerLatitude;
-    const radius = Math.max(senaiCampus.radiusMeters, 1);
-    const jitterAngle = ((hash % 360) * Math.PI) / 180;
-    const jitter = 1.6 + (index % 4) * 0.65;
-
-    return {
-      x: clamp(50 + (eastMeters / radius) * 40 + Math.cos(jitterAngle) * jitter, 7, 93),
-      y: clamp(52 - (northMeters / radius) * 45 + Math.sin(jitterAngle) * jitter, 7, 93),
-    };
-  }
-
-  const fallback = fallbackSpots[index % fallbackSpots.length];
-  const driftX = (hash % 9) - 4;
-  const driftY = ((hash >> 2) % 7) - 3;
-
+function projectCoordinates(location: LocalizacaoAluno) {
+  const latitude = Number(location.latitude);
+  const longitude = Number(location.longitude);
+  const metersPerLatitude = 111_320;
+  const metersPerLongitude = 111_320 * Math.cos((senaiCampus.latitude * Math.PI) / 180);
+  const eastMeters = (longitude - senaiCampus.longitude) * metersPerLongitude;
+  const northMeters = (latitude - senaiCampus.latitude) * metersPerLatitude;
+  const radius = Math.max(senaiCampus.radiusMeters, 1);
   return {
-    x: clamp(fallback.x + driftX * 0.8, 7, 93),
-    y: clamp(fallback.y + driftY * 0.8, 7, 93),
+    x: clamp(50 + (eastMeters / radius) * 40, 7, 93),
+    y: clamp(52 - (northMeters / radius) * 45, 7, 93),
   };
 }
 
 function buildPins(locations: LocalizacaoAluno[]): LocationPin[] {
-  return locations.map((location, index) => {
+  return locations
+    .filter((location) =>
+      location.latitude != null && location.longitude != null &&
+      Number.isFinite(Number(location.latitude)) && Number.isFinite(Number(location.longitude))
+    )
+    .map((location) => {
     const id = locationId(location);
     const label = location.aluno_nome ?? location.aluno_id ?? 'Aluno';
-    const point = projectCoordinates(location, index);
-    const inside = location.dentro_perimetro ?? location.dentro_do_senai ?? true;
-    const color = !inside ? colors.red : location.em_aula ? colors.blue : colors.green;
+    const point = projectCoordinates(location);
+    const inside = location.dentro_perimetro ?? location.dentro_do_senai;
+    const color = inside === false ? colors.red : inside === true ? (location.em_aula ? colors.blue : colors.green) : colors.orange;
 
     return {
       id,
@@ -124,7 +90,7 @@ function buildPins(locations: LocalizacaoAluno[]): LocationPin[] {
       location,
       ...point,
     };
-  });
+    });
 }
 
 export function CampusMap25D({ locations, selectedId, onSelect }: CampusMap25DProps) {

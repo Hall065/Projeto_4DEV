@@ -1,10 +1,12 @@
-import { useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import Svg, { Circle, Line, Polyline } from 'react-native-svg';
+import { useEffect, useMemo, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '@/constants/colors';
 import { radius, spacing } from '@/constants/designTokens';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { notifySelection } from '@/utils/feedback';
+import { ApexChart } from './ApexChart';
+import { toApexArea } from './apex/adapters';
 import type { TimeSeriesDatum } from './types';
 
 interface TrendLineChartProps {
@@ -14,71 +16,88 @@ interface TrendLineChartProps {
   tone?: 'light' | 'dark';
 }
 
-export function TrendLineChart({ data, color = colors.blue, formatValue = (value) => String(value), tone = 'light' }: TrendLineChartProps) {
+export function TrendLineChart({
+  data,
+  color = colors.blue,
+  formatValue = (value) => String(value),
+  tone = 'light',
+}: TrendLineChartProps) {
   const theme = useThemeColors();
+  const { reduceMotion, shouldAnimate } = useMotionPreference();
   const dark = tone === 'dark' || theme.isDark;
   const [selectedIndex, setSelectedIndex] = useState(Math.max(0, data.length - 1));
-  const chart = useMemo(() => {
-    const width = 320;
-    const height = 154;
-    const padding = 22;
-    const max = Math.max(1, ...data.map((item) => item.value));
-    const min = Math.min(0, ...data.map((item) => item.value));
-    const range = Math.max(1, max - min);
-    const points = data.map((item, index) => {
-      const x = padding + (index * (width - padding * 2)) / Math.max(1, data.length - 1);
-      const y = height - padding - ((item.value - min) / range) * (height - padding * 2);
-      return { ...item, x, y };
-    });
+  const normalizedData = useMemo(
+    () => data.map((item) => ({ ...item, value: Number.isFinite(item.value) ? item.value : 0 })),
+    [data]
+  );
 
-    return {
-      width,
-      height,
-      points,
-      value: points.map((point) => `${point.x},${point.y}`).join(' '),
-    };
-  }, [data]);
+  useEffect(() => {
+    setSelectedIndex((current) => Math.max(0, Math.min(current, normalizedData.length - 1)));
+  }, [normalizedData.length]);
 
-  if (!data.length) {
+  const model = useMemo(
+    () =>
+      toApexArea(normalizedData, {
+        title: 'Evolucao',
+        color,
+        shouldAnimate,
+        theme: {
+          dark,
+          text: theme.text,
+          textMuted: theme.textMuted,
+          line: theme.line,
+          surface: theme.surface,
+          surfaceSoft: theme.surfaceSoft,
+        },
+      }),
+    [color, dark, normalizedData, shouldAnimate, theme.line, theme.surface, theme.surfaceSoft, theme.text, theme.textMuted]
+  );
+
+  if (!normalizedData.length) {
     return <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum dado para exibir.</Text>;
   }
 
-  const selected = chart.points[selectedIndex] ?? chart.points[chart.points.length - 1];
+  const selected = normalizedData[selectedIndex] ?? normalizedData[normalizedData.length - 1];
+  const selectIndex = (index: number) => {
+    setSelectedIndex(index);
+    void notifySelection();
+  };
 
   return (
     <View style={styles.wrap}>
-      <Svg width="100%" height={chart.height} viewBox={`0 0 ${chart.width} ${chart.height}`}>
-        <Line x1={22} x2={chart.width - 22} y1={chart.height - 22} y2={chart.height - 22} stroke={dark ? theme.line : colors.border} strokeWidth={1} />
-        <Line x1={22} x2={22} y1={18} y2={chart.height - 22} stroke={dark ? theme.line : colors.border} strokeWidth={1} />
-        <Polyline points={chart.value} fill="none" stroke={color} strokeWidth={4} strokeLinecap="round" strokeLinejoin="round" />
-        {chart.points.map((point, index) => (
-          <Circle
-            key={`${point.label}-${index}`}
-            cx={point.x}
-            cy={point.y}
-            r={index === selectedIndex ? 7 : 5}
-            fill={index === selectedIndex ? color : theme.surface}
-            stroke={color}
-            strokeWidth={3}
-            onPress={() => {
-              setSelectedIndex(index);
-              void notifySelection();
-            }}
-          />
-        ))}
-      </Svg>
+      <ApexChart model={model} height={230} reduceMotion={reduceMotion} onSelect={selectIndex} />
       <View style={[styles.tooltip, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}>
         <Text style={[styles.tooltipLabel, { color: theme.textMuted }]}>{selected.label}</Text>
         <Text style={[styles.tooltipValue, { color }]}>{formatValue(selected.value)}</Text>
+      </View>
+      <View accessibilityRole="radiogroup" style={styles.pointControls}>
+        {normalizedData.map((point, index) => (
+          <Pressable
+            key={point.label + '-control-' + index}
+            accessibilityRole="radio"
+            accessibilityState={{ selected: index === selectedIndex }}
+            accessibilityLabel={point.label + ': ' + formatValue(point.value)}
+            onPress={() => selectIndex(index)}
+            style={[
+              styles.pointControl,
+              {
+                borderColor: index === selectedIndex ? color : theme.line,
+                backgroundColor: index === selectedIndex ? theme.surfaceSoft : 'transparent',
+              },
+            ]}
+          >
+            <Text style={[styles.pointControlText, { color: index === selectedIndex ? color : theme.textMuted }]}>
+              {point.label}
+            </Text>
+          </Pressable>
+        ))}
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    gap: spacing.md,
-  },
+  wrap: { gap: spacing.md },
   tooltip: {
     minHeight: 44,
     borderWidth: 1,
@@ -89,17 +108,16 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingHorizontal: spacing.md,
   },
-  tooltipLabel: {
-    flex: 1,
-    fontSize: 12,
-    fontWeight: '800',
+  tooltipLabel: { flex: 1, fontSize: 12, fontWeight: '800' },
+  tooltipValue: { fontSize: 13, fontWeight: '900' },
+  pointControls: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
+  pointControl: {
+    minHeight: 34,
+    borderWidth: 1,
+    borderRadius: radius.pill,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.sm,
   },
-  tooltipValue: {
-    fontSize: 13,
-    fontWeight: '900',
-  },
-  empty: {
-    fontSize: 12,
-    fontWeight: '700',
-  },
+  pointControlText: { fontSize: 10, fontWeight: '800' },
+  empty: { fontSize: 12, fontWeight: '700' },
 });

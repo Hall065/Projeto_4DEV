@@ -16,6 +16,7 @@ import { Camera, Check, ChevronDown, X } from 'lucide-react-native';
 import { AnimatedPressable, AppButton, FeedbackMessage } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
 import { useI18n } from '@/hooks/useI18n';
+import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import {
   applyInputMask,
@@ -93,6 +94,7 @@ export function CrudModal({
 }: CrudModalProps) {
   const theme = useThemeColors();
   const { t } = useI18n();
+  const { shouldAnimate } = useMotionPreference();
   const [values, setValues] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const [openSelect, setOpenSelect] = useState<string | null>(null);
@@ -156,7 +158,7 @@ export function CrudModal({
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent>
+    <Modal visible={visible} animationType={shouldAnimate ? 'slide' : 'none'} transparent onRequestClose={onClose}>
       <KeyboardAvoidingView
         style={[styles.overlay, { backgroundColor: theme.overlay }]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}

@@ -61,7 +61,9 @@ export default function GridDashboard() {
       .finally(() => setLoading(false));
   }, []);
 
-  const itensCriticos = estoque.filter((item) => item.status === 'indisponivel');
+  const itensCriticos = estoque.filter(
+    (item) => item.quantidade_disponivel <= item.quantidade_minima
+  );
   const prioridades = [
     { label: 'Baixa', value: chamados.filter((c) => c.prioridade === 'baixa').length, color: colors.green },
     { label: 'Media', value: chamados.filter((c) => c.prioridade === 'media').length, color: colors.blue },
@@ -79,12 +81,27 @@ export default function GridDashboard() {
     { label: 'Em andamento', status: 'em_andamento', color: colors.orange },
     { label: 'Concluidas', status: ['concluido', 'concluida'], color: colors.green },
   ]);
-  const estoquePorStatus = countByStatus(estoque, [
-    { label: 'Disponivel', status: 'disponivel', color: colors.green },
-    { label: 'Baixo', status: 'estoque_baixo', color: colors.orange },
-    { label: 'Indisponivel', status: ['indisponivel', 'esgotado'], color: colors.red },
-    { label: 'Reservado', status: 'reservado', color: colors.blue },
-  ]);
+  const estoquePorStatus = [
+    {
+      label: 'Disponivel',
+      value: estoque.filter(
+        (item) => item.status === 'disponivel' && item.quantidade_disponivel > item.quantidade_minima
+      ).length,
+      color: colors.green,
+    },
+    {
+      label: 'Estoque baixo',
+      value: estoque.filter(
+        (item) => item.status === 'disponivel' && item.quantidade_disponivel <= item.quantidade_minima
+      ).length,
+      color: colors.orange,
+    },
+    {
+      label: 'Indisponivel',
+      value: estoque.filter((item) => item.status === 'indisponivel').length,
+      color: colors.red,
+    },
+  ];
   const chamadosTrend = buildDateTrend(chamados, ['data_abertura', 'criado_em', 'created_at'], { limit: 6 });
   const estoquePorCategoria = topGroups(estoque, (item) => item.categoria_nome, { limit: 5, fallbackLabel: 'Sem categoria' });
   const tarefasAbertas = tarefas.filter((tarefa) => tarefa.status === 'a_fazer' || tarefa.status === 'em_andamento').length;
@@ -175,7 +192,7 @@ export default function GridDashboard() {
       </SurfaceCard>
 
       <ChartCard
-        title="Tarefas por prioridade"
+        title="Chamados por prioridade"
         subtitle="Distribuição real dos chamados"
         empty={chamados.length === 0}
         summary={`${chamados.length} chamados analisados por prioridade`}

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { BookOpen, CalendarDays, GraduationCap, Users } from 'lucide-react-native';
 import { CrudModal, type CrudField, type CrudOption } from '@/components/common/CrudModal';
+import { AdvancedFilterPanel, FilterChoice } from '@/components/common/AdvancedFilters';
 import { FeedbackMessage, ListRow, MetricTile, SearchField, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { ModuleScreen } from '@/components/screens/ModuleScreen';
 import { colors, connectTheme } from '@/constants/colors';
@@ -52,6 +53,8 @@ export default function TurmasScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Turma | null>(null);
   const [search, setSearch] = useState('');
+  const [draftFilters, setDraftFilters] = useState({ status: '', periodo: '', cursoId: '', professorId: '' });
+  const [appliedFilters, setAppliedFilters] = useState(draftFilters);
   const [selectedTurma, setSelectedTurma] = useState<Turma | null>(null);
   const [alunoSearch, setAlunoSearch] = useState('');
   const [alunos, setAlunos] = useState<Aluno[]>([]);
@@ -92,8 +95,16 @@ export default function TurmasScreen() {
       .finally(() => setLoadingAlunos(false));
   }, [selectedTurma?.id]);
 
+  const visibleCourseIds = new Set(items.map((item) => item.curso_id).filter(Boolean));
+  const visibleProfessorIds = new Set(items.map((item) => item.professor_responsavel_id).filter(Boolean));
+  const courseFilterOptions = (options.cursos ?? []).filter((option) => visibleCourseIds.has(option.value));
+  const professorFilterOptions = (options.professores ?? []).filter((option) => visibleProfessorIds.has(option.value));
   const filtered = items.filter((turma) =>
-    `${turma.nome} ${turma.curso_nome ?? ''} ${turma.professor_nome ?? ''} ${turma.periodo ?? ''}`.toLowerCase().includes(search.toLowerCase())
+    `${turma.nome} ${turma.curso_nome ?? ''} ${turma.professor_nome ?? ''} ${turma.periodo ?? ''}`.toLowerCase().includes(search.toLowerCase()) &&
+    (!appliedFilters.status || turma.status === appliedFilters.status) &&
+    (!appliedFilters.periodo || turma.periodo === appliedFilters.periodo) &&
+    (!appliedFilters.cursoId || turma.curso_id === appliedFilters.cursoId) &&
+    (!appliedFilters.professorId || turma.professor_responsavel_id === appliedFilters.professorId)
   );
   const filteredAlunos = alunos.filter((aluno) =>
     `${aluno.nome} ${aluno.rm ?? ''} ${aluno.email_institucional ?? aluno.email ?? ''}`.toLowerCase().includes(alunoSearch.toLowerCase())
@@ -120,6 +131,22 @@ export default function TurmasScreen() {
         </View>
 
         <SearchField placeholder="Pesquisar turma, curso, professor ou período..." value={search} onChangeText={setSearch} />
+
+        <AdvancedFilterPanel
+          resultCount={filtered.length}
+          activeCount={Object.values(appliedFilters).filter(Boolean).length}
+          onApply={() => setAppliedFilters(draftFilters)}
+          onClear={() => {
+            const cleared = { status: '', periodo: '', cursoId: '', professorId: '' };
+            setDraftFilters(cleared);
+            setAppliedFilters(cleared);
+          }}
+        >
+          <FilterChoice label="Status" value={draftFilters.status} options={TURMA_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
+          <FilterChoice label="Periodo" value={draftFilters.periodo} options={PERIODO_OPTIONS} onChange={(periodo) => setDraftFilters((current) => ({ ...current, periodo }))} />
+          <FilterChoice label="Curso" value={draftFilters.cursoId} options={courseFilterOptions} onChange={(cursoId) => setDraftFilters((current) => ({ ...current, cursoId }))} />
+          <FilterChoice label="Professor responsavel" value={draftFilters.professorId} options={professorFilterOptions} onChange={(professorId) => setDraftFilters((current) => ({ ...current, professorId }))} />
+        </AdvancedFilterPanel>
 
         <SurfaceCard title="Turmas" subtitle="Turmas ativas e período de aulas">
           {error || optionsError ? <FeedbackMessage variant="danger" message={error ?? optionsError ?? ''} /> : null}

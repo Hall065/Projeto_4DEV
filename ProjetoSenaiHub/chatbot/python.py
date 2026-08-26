@@ -217,6 +217,11 @@ def is_student(ctx: UserContext) -> bool:
     return ctx.tipo in {"aluno", "connect_aluno"}
 
 
+def require_chatbot_access(ctx: UserContext) -> None:
+    if is_student(ctx):
+        raise HTTPException(status_code=403, detail="O assistente nao esta disponivel para perfis de aluno.")
+
+
 def is_professor(ctx: UserContext) -> bool:
     return ctx.tipo in {"professor", "connect_professor"}
 
@@ -509,6 +514,8 @@ def ensure_conversation(ctx: UserContext, conversation_id: str | None, title: st
         )
         if not conversation:
             raise HTTPException(status_code=404, detail="Conversa nao encontrada.")
+        if conversation.get("status") != "ativa":
+            raise HTTPException(status_code=409, detail="Esta conversa esta arquivada. Inicie uma nova conversa.")
         return conversation
 
     return create_conversation(ctx, title)
@@ -620,10 +627,12 @@ def health() -> dict[str, str]:
 @app.get("/conversations")
 def conversations(authorization: str | None = Header(default=None)) -> list[dict[str, Any]]:
     ctx = get_user_context(authorization)
+    require_chatbot_access(ctx)
     return execute_data(
         table("hub", "chatbot_conversas")
         .select("*")
         .eq("usuario_id", ctx.usuario_id)
+        .eq("status", "ativa")
         .order("updated_at", desc=True)
     )
 
@@ -634,6 +643,7 @@ def new_conversation(
     authorization: str | None = Header(default=None),
 ) -> dict[str, Any]:
     ctx = get_user_context(authorization)
+    require_chatbot_access(ctx)
     return create_conversation(ctx, payload.titulo)
 
 
@@ -643,6 +653,7 @@ def conversation_messages(
     authorization: str | None = Header(default=None),
 ) -> list[dict[str, Any]]:
     ctx = get_user_context(authorization)
+    require_chatbot_access(ctx)
     return list_conversation_messages(ctx, conversation_id)
 
 
@@ -652,19 +663,25 @@ def archive_conversation(
     authorization: str | None = Header(default=None),
 ) -> dict[str, str]:
     ctx = get_user_context(authorization)
-    execute_data(
+    require_chatbot_access(ctx)
+    rows = execute_data(
         table("hub", "chatbot_conversas")
         .update({"status": "arquivada", "updated_at": now_iso()})
         .eq("id", conversation_id)
         .eq("usuario_id", ctx.usuario_id)
+        .eq("status", "ativa")
+        .select("id")
         .execute()
     )
+    if not rows:
+        raise HTTPException(status_code=404, detail="Conversa ativa nao encontrada.")
     return {"status": "arquivada"}
 
 
 @app.post("/chat")
 def chat(payload: ChatRequest, authorization: str | None = Header(default=None)) -> dict[str, Any]:
     ctx = get_user_context(authorization)
+    require_chatbot_access(ctx)
     question = payload.message.strip()
     if not question:
         raise HTTPException(status_code=400, detail="Mensagem vazia.")

@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import type { CampusBlockId } from '@/constants/campusBlocks';
+import { senaiCampus } from '@/lib/geofence';
+import type { CampusGeoCoordinate } from '@/types/campusPeople';
 
 export interface PinMarkerBlock {
   id: CampusBlockId;
@@ -21,7 +23,7 @@ export function anchorOnBlock(box: THREE.Box3, seed: number): THREE.Vector3 {
 
 export function createCampusPinMarker(config: {
   markerId: string;
-  blockId: CampusBlockId;
+  blockId?: CampusBlockId;
   anchor: THREE.Vector3;
   markerScale: number;
   color: string;
@@ -29,7 +31,7 @@ export function createCampusPinMarker(config: {
   const { markerId, blockId, anchor, markerScale, color: colorHex } = config;
   const group = new THREE.Group();
   group.userData.markerId = markerId;
-  group.userData.blockId = blockId;
+  if (blockId) group.userData.blockId = blockId;
   group.position.copy(anchor);
 
   const color = new THREE.Color(colorHex);
@@ -101,7 +103,7 @@ export function disposePinMarkerGroup(group: THREE.Group) {
 }
 
 export function buildBlockPinMarkers<
-  T extends { id: string; blockId: CampusBlockId; position?: { x: number; y: number; z: number } },
+  T extends { id: string; blockId?: CampusBlockId; position?: { x: number; y: number; z: number } },
 >(
   items: T[],
   blocks: PinMarkerBlock[],
@@ -137,13 +139,94 @@ export function buildBlockPinMarkers<
       root.add(
         createCampusPinMarker({
           markerId: item.id,
-          blockId: item.blockId,
+          blockId: block.id,
           anchor,
           markerScale,
           color: getColor(item),
         })
       );
     }
+  }
+
+  return root;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
+}
+
+export function projectGeographicCoordinate(
+  coordinate: CampusGeoCoordinate,
+  campusBox: THREE.Box3
+): THREE.Vector3 {
+  const metersPerLatitude = 111_320;
+  const metersPerLongitude =
+    metersPerLatitude * Math.cos((senaiCampus.latitude * Math.PI) / 180);
+  const eastMeters = (coordinate.longitude - senaiCampus.longitude) * metersPerLongitude;
+  const northMeters = (coordinate.latitude - senaiCampus.latitude) * metersPerLatitude;
+  const radius = Math.max(senaiCampus.radiusMeters, 1);
+  const normalizedEast = clamp(eastMeters / radius, -1.12, 1.12);
+  const normalizedNorth = clamp(northMeters / radius, -1.12, 1.12);
+  const center = campusBox.getCenter(new THREE.Vector3());
+  const size = campusBox.getSize(new THREE.Vector3());
+
+  return new THREE.Vector3(
+    center.x + normalizedEast * size.x * 0.46,
+    campusBox.min.y,
+    center.z - normalizedNorth * size.z * 0.46
+  );
+}
+
+function anchorOnCampusSurface(
+  coordinate: CampusGeoCoordinate,
+  campusBox: THREE.Box3,
+  blocks: PinMarkerBlock[]
+) {
+  const anchor = projectGeographicCoordinate(coordinate, campusBox);
+  const size = campusBox.getSize(new THREE.Vector3());
+  const raycaster = new THREE.Raycaster(
+    new THREE.Vector3(anchor.x, campusBox.max.y + Math.max(size.y, 10), anchor.z),
+    new THREE.Vector3(0, -1, 0)
+  );
+  const intersections = raycaster.intersectObjects(
+    blocks.map((block) => block.group),
+    true
+  );
+
+  anchor.y = intersections[0]?.point.y ?? campusBox.min.y;
+  return anchor;
+}
+
+export function buildGeographicPinMarkers<
+  T extends { id: string; geo?: CampusGeoCoordinate },
+>(
+  items: T[],
+  blocks: PinMarkerBlock[],
+  campusBox: THREE.Box3,
+  markerScale: number,
+  getColor: (item: T) => string
+): THREE.Group {
+  const root = new THREE.Group();
+  root.name = 'geographic-pin-markers';
+
+  for (const item of items) {
+    const coordinate = item.geo;
+    if (
+      !coordinate ||
+      !Number.isFinite(coordinate.latitude) ||
+      !Number.isFinite(coordinate.longitude)
+    ) {
+      continue;
+    }
+
+    root.add(
+      createCampusPinMarker({
+        markerId: item.id,
+        anchor: anchorOnCampusSurface(coordinate, campusBox, blocks),
+        markerScale,
+        color: getColor(item),
+      })
+    );
   }
 
   return root;

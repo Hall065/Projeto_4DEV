@@ -8,14 +8,27 @@ export interface CampusWorldPosition {
   z: number;
 }
 
+export interface CampusGeoCoordinate {
+  latitude: number;
+  longitude: number;
+  accuracyMeters?: number | null;
+}
+
 export interface CampusPersonLocation {
   id: string;
   name: string;
   role: CampusPersonRole;
-  blockId: CampusBlockId;
+  blockId?: CampusBlockId;
   room?: string;
   detail?: string;
   position?: CampusWorldPosition;
+  geo?: CampusGeoCoordinate;
+  markerColor?: string;
+}
+
+export interface CampusPersonLegendItem {
+  label: string;
+  color: string;
 }
 
 export const CAMPUS_PERSON_ROLE_LABELS: Record<CampusPersonRole, string> = {

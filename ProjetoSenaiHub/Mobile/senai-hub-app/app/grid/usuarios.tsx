@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { ShieldCheck, UserCheck, UserPlus, Users } from 'lucide-react-native';
 import { CrudModal, type CrudField } from '@/components/common/CrudModal';
+import { AdvancedFilterPanel, FilterChoice, FilterTextField } from '@/components/common/AdvancedFilters';
 import { FeedbackMessage, ListRow, MetricTile, SearchField, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { ModuleScreen } from '@/components/screens/ModuleScreen';
 import { colors, gridTheme } from '@/constants/colors';
@@ -12,6 +13,17 @@ import { isMaintenanceRole } from '@/lib/permissions';
 import { gridService } from '@/services/grid.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { HubUsuario } from '@/types/auth.types';
+import { normalizeDateToIso } from '@/utils/formatters';
+
+const EMPTY_FILTERS = { role: '', status: '', createdFrom: '', createdTo: '', updatedFrom: '', updatedTo: '' };
+
+function validIsoDate(value: string) {
+  const normalized = normalizeDateToIso(value);
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(normalized)) return null;
+  const [year, month, day] = normalized.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.toISOString().slice(0, 10) === normalized ? normalized : null;
+}
 
 const GRID_USER_ROLE_OPTIONS = USER_ROLE_OPTIONS.filter((option) =>
   ['grid_funcionario', 'grid_chefe', 'manutencao', 'gerente_manutencao'].includes(option.value)
@@ -57,6 +69,9 @@ export default function UsuariosGridScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<HubUsuario | null>(null);
   const [search, setSearch] = useState('');
+  const [draftFilters, setDraftFilters] = useState(EMPTY_FILTERS);
+  const [appliedFilters, setAppliedFilters] = useState(EMPTY_FILTERS);
+  const [filterError, setFilterError] = useState<string | null>(null);
   const role = useAuthStore((s) => s.session?.perfil?.tipo);
   const managerOnly = role === 'gerente_manutencao' || role === 'grid_chefe';
   const fields = getFields(managerOnly);
@@ -71,9 +86,39 @@ export default function UsuariosGridScreen() {
   const visibleItems = managerOnly
     ? items.filter((usuario) => usuario.tipo === 'manutencao' || usuario.tipo === 'grid_funcionario')
     : items;
-  const filtered = visibleItems.filter((usuario) =>
-    `${usuario.nome} ${usuario.email_institucional} ${usuario.tipo}`.toLowerCase().includes(search.toLowerCase())
-  );
+  const visibleRoles = new Set(visibleItems.map((usuario) => usuario.tipo));
+  const roleFilterOptions = GRID_USER_ROLE_OPTIONS.filter((option) => visibleRoles.has(option.value as HubUsuario['tipo']));
+  const filtered = visibleItems.filter((usuario) => {
+    const created = usuario.created_at?.slice(0, 10) ?? '';
+    const updated = usuario.updated_at?.slice(0, 10) ?? '';
+    return `${usuario.nome} ${usuario.email_institucional} ${usuario.tipo}`.toLowerCase().includes(search.toLowerCase()) &&
+      (!appliedFilters.role || usuario.tipo === appliedFilters.role) &&
+      (!appliedFilters.status || usuario.status === appliedFilters.status) &&
+      (!appliedFilters.createdFrom || (created && created >= appliedFilters.createdFrom)) &&
+      (!appliedFilters.createdTo || (created && created <= appliedFilters.createdTo)) &&
+      (!appliedFilters.updatedFrom || (updated && updated >= appliedFilters.updatedFrom)) &&
+      (!appliedFilters.updatedTo || (updated && updated <= appliedFilters.updatedTo));
+  });
+  const applyFilters = () => {
+    const dateKeys = ['createdFrom', 'createdTo', 'updatedFrom', 'updatedTo'] as const;
+    const normalized = { ...draftFilters };
+    for (const key of dateKeys) {
+      const value = draftFilters[key];
+      const parsed = value ? validIsoDate(value) : '';
+      if (value && !parsed) {
+        setFilterError('Use datas validas em DD/MM/AAAA ou AAAA-MM-DD.');
+        return;
+      }
+      normalized[key] = parsed ?? '';
+    }
+    if ((normalized.createdFrom && normalized.createdTo && normalized.createdFrom > normalized.createdTo) ||
+        (normalized.updatedFrom && normalized.updatedTo && normalized.updatedFrom > normalized.updatedTo)) {
+      setFilterError('A data inicial deve ser anterior ou igual a data final.');
+      return;
+    }
+    setFilterError(null);
+    setAppliedFilters(normalized);
+  };
 
   return (
     <>
@@ -96,6 +141,25 @@ export default function UsuariosGridScreen() {
         </View>
 
         <SearchField placeholder="Buscar usuário, e-mail, cargo ou permissão..." value={search} onChangeText={setSearch} />
+
+        <AdvancedFilterPanel
+          resultCount={filtered.length}
+          activeCount={Object.values(appliedFilters).filter(Boolean).length}
+          error={filterError}
+          onApply={applyFilters}
+          onClear={() => {
+            setDraftFilters(EMPTY_FILTERS);
+            setAppliedFilters(EMPTY_FILTERS);
+            setFilterError(null);
+          }}
+        >
+          <FilterChoice label="Papel" value={draftFilters.role} options={roleFilterOptions} onChange={(roleValue) => setDraftFilters((current) => ({ ...current, role: roleValue }))} />
+          <FilterChoice label="Status" value={draftFilters.status} options={USER_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
+          <FilterTextField label="Criado a partir de" value={draftFilters.createdFrom} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(createdFrom) => setDraftFilters((current) => ({ ...current, createdFrom }))} />
+          <FilterTextField label="Criado ate" value={draftFilters.createdTo} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(createdTo) => setDraftFilters((current) => ({ ...current, createdTo }))} />
+          <FilterTextField label="Atualizado a partir de" value={draftFilters.updatedFrom} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(updatedFrom) => setDraftFilters((current) => ({ ...current, updatedFrom }))} />
+          <FilterTextField label="Atualizado ate" value={draftFilters.updatedTo} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(updatedTo) => setDraftFilters((current) => ({ ...current, updatedTo }))} />
+        </AdvancedFilterPanel>
 
         <SurfaceCard title="Equipe cadastrada" subtitle="Usuários internos e níveis de acesso">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}

@@ -52,6 +52,7 @@ export function buildCampusTicketMarkers(
 ): CampusTicketMarker[] {
   const markers: CampusTicketMarker[] = [];
   const seen = new Set<string>();
+  const ticketsById = new Map(tickets.map((ticket) => [ticket.id, ticket]));
 
   for (const ticket of tickets) {
     if (ticket.status === 'cancelado') continue;
@@ -74,7 +75,12 @@ export function buildCampusTicketMarkers(
       priority: ticket.prioridade,
       status: ticketStatus(ticket.status),
       statusLabel: statusLabel(ticket.status),
+      rawStatus: ticket.status,
       assignee: ticket.responsavel_nome ?? undefined,
+      assigneeId: ticket.responsavel_id ?? undefined,
+      categoryId: ticket.categoria_id ?? undefined,
+      categoryLabel: ticket.categoria_nome ?? undefined,
+      createdAt: ticket.criado_em ?? ticket.created_at ?? ticket.data_abertura ?? undefined,
       detail: ticket.categoria_nome ?? ticket.descricao,
     });
   }
@@ -87,6 +93,7 @@ export function buildCampusTicketMarkers(
     const id = `task-${task.id}`;
     if (seen.has(id)) continue;
     seen.add(id);
+    const linkedTicket = ticketsById.get(task.chamado_id);
     markers.push({
       id,
       sourceId: task.id,
@@ -98,7 +105,12 @@ export function buildCampusTicketMarkers(
       priority: task.prioridade ?? 'media',
       status: taskStatus(task.status),
       statusLabel: task.status_label ?? statusLabel(task.status),
+      rawStatus: task.status,
       assignee: task.responsavel_nome ?? undefined,
+      assigneeId: task.responsavel_id ?? undefined,
+      categoryId: linkedTicket?.categoria_id ?? undefined,
+      categoryLabel: linkedTicket?.categoria_nome ?? undefined,
+      createdAt: task.criado_em ?? task.created_at ?? task.aberto_em ?? linkedTicket?.criado_em ?? linkedTicket?.created_at,
       detail: task.item_nome ?? task.descricao,
     });
   }

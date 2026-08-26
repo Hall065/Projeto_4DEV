@@ -28,9 +28,9 @@ export default function AlunoDashboardScreen() {
 
   const aluno = data?.aluno;
   const frequencias = data?.frequencias ?? [];
-  const presentes = frequencias.filter((item) => item.status === 'presente').length;
-  const justificadas = frequencias.filter((item) => item.status === 'falta_justificada').length;
-  const injustificadas = frequencias.filter((item) => item.status === 'falta_injustificada').length;
+  const presentes = frequencias.filter((item) => ['presente', 'p'].includes(item.status.toLowerCase())).length;
+  const justificadas = frequencias.filter((item) => ['falta_justificada', 'fj'].includes(item.status.toLowerCase())).length;
+  const injustificadas = frequencias.filter((item) => ['falta_injustificada', 'fi'].includes(item.status.toLowerCase())).length;
   const frequenciaPerc = frequencias.length ? Math.round((presentes / frequencias.length) * 100) : 0;
   const dentro = Boolean(data?.localizacao?.dentro_do_senai ?? data?.localizacao?.dentro_perimetro);
   const frequenciaData = [
@@ -39,15 +39,16 @@ export default function AlunoDashboardScreen() {
     { label: 'Injustificadas', value: injustificadas, color: colors.red },
   ];
   const presencasTrend = buildDateTrend(
-    frequencias.filter((item) => item.status === 'presente'),
+    frequencias.filter((item) => ['presente', 'p'].includes(item.status.toLowerCase())),
     ['data_aula', 'data'],
     { limit: 6 }
   );
   const salario = data?.salario;
+  const descontos = salario?.desconto ?? salario?.deductions ?? salario?.outros_descontos ?? 0;
   const salarioData = [
     { label: 'Base', value: Math.round(salario?.salario_base ?? 0), color: colors.blue },
-    { label: 'Desconto', value: Math.round(salario?.desconto ?? 0), color: colors.red },
-    { label: 'Final', value: Math.round(salario?.salario_final ?? 0), color: connectTheme.accent },
+    { label: 'Bonus', value: Math.round(salario?.bonuses ?? 0), color: colors.green },
+    { label: 'Descontos', value: Math.round(descontos), color: colors.red },
   ];
 
   return (
@@ -94,10 +95,10 @@ export default function AlunoDashboardScreen() {
       </ChartCard>
 
       <ChartCard
-        title="Composicao salarial"
-        subtitle="Base, descontos e valor final"
+        title="Componentes salariais"
+        subtitle="Base, bonus e descontos"
         empty={!salario}
-        summary={salario ? `Referencia ${salario.mes_referencia ?? salario.mes ?? 'atual'}` : 'Nenhum calculo salarial encontrado'}
+        summary={salario ? `Liquido: R$ ${Math.round(salario.salario_final ?? 0).toLocaleString('pt-BR')} - referencia ${salario.mes_referencia ?? salario.mes ?? 'atual'}` : 'Nenhum calculo salarial encontrado'}
       >
         <InteractiveBarChart data={salarioData} formatValue={(value) => `R$ ${value.toLocaleString('pt-BR')}`} />
       </ChartCard>

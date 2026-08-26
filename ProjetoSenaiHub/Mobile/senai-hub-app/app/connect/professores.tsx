@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { GraduationCap, UserCheck, Users } from 'lucide-react-native';
 import { CrudModal, type CrudField } from '@/components/common/CrudModal';
+import { AdvancedFilterPanel, FilterChoice } from '@/components/common/AdvancedFilters';
 import { FeedbackMessage, ListRow, MetricTile, SearchField, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { ModuleScreen } from '@/components/screens/ModuleScreen';
 import { colors, connectTheme } from '@/constants/colors';
@@ -48,6 +49,8 @@ export default function ProfessoresScreen() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Professor | null>(null);
   const [search, setSearch] = useState('');
+  const [draftFilters, setDraftFilters] = useState({ status: '', especialidade: '' });
+  const [appliedFilters, setAppliedFilters] = useState(draftFilters);
   const { items, loading, submitting, error, createItem, updateItem, deleteItem } =
     useCrudResource<Professor, Record<string, string>>({
       load: connectService.listProfessores,
@@ -56,8 +59,13 @@ export default function ProfessoresScreen() {
       remove: connectService.deleteProfessor,
     });
 
+  const especialidadeOptions = Array.from(
+    new Set(items.map((item) => item.especialidade).filter((value): value is string => Boolean(value)))
+  ).sort().map((value) => ({ value, label: value }));
   const filtered = items.filter((item) =>
-    `${item.nome} ${item.email ?? ''} ${item.especialidade ?? ''}`.toLowerCase().includes(search.toLowerCase())
+    `${item.nome} ${item.email ?? ''} ${item.especialidade ?? ''}`.toLowerCase().includes(search.toLowerCase()) &&
+    (!appliedFilters.status || item.status === appliedFilters.status) &&
+    (!appliedFilters.especialidade || item.especialidade === appliedFilters.especialidade)
   );
 
   return (
@@ -80,6 +88,20 @@ export default function ProfessoresScreen() {
         </View>
 
         <SearchField placeholder="Buscar por nome, e-mail ou CPF..." value={search} onChangeText={setSearch} />
+
+        <AdvancedFilterPanel
+          resultCount={filtered.length}
+          activeCount={Object.values(appliedFilters).filter(Boolean).length}
+          onApply={() => setAppliedFilters(draftFilters)}
+          onClear={() => {
+            const cleared = { status: '', especialidade: '' };
+            setDraftFilters(cleared);
+            setAppliedFilters(cleared);
+          }}
+        >
+          <FilterChoice label="Status" value={draftFilters.status} options={USER_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
+          <FilterChoice label="Especialidade" value={draftFilters.especialidade} options={especialidadeOptions} onChange={(especialidade) => setDraftFilters((current) => ({ ...current, especialidade }))} />
+        </AdvancedFilterPanel>
 
         <SurfaceCard title="Professores cadastrados" subtitle="Equipe docente ativa">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}

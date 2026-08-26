@@ -14,6 +14,7 @@ import {
   LogOut,
 } from 'lucide-react-native';
 import { AnimatedPressable, FeedbackMessage } from '@/components/common/VisualPrimitives';
+import { Reveal, StaggerList } from '@/components/common/MotionPrimitives';
 import { AppHeader } from '@/components/layout/AppHeader';
 import { NotificationsModal } from '@/components/notifications/NotificationsModal';
 import { getBrandAsset } from '@/constants/brandAssets';
@@ -120,33 +121,37 @@ export default function HubScreen() {
         contentContainerStyle={[styles.content, { backgroundColor: theme.appBackground }]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.titleRow}>
-          <View style={styles.titleCopy}>
-            <Text style={[styles.eyebrow, { color: theme.textMuted }]}>{t('Bem-vindo')}, {session.perfil.nome.split(' ')[0]}</Text>
-            <Text style={[styles.hubTitle, { color: theme.text }]}>{t('Hub de Aplicações')}</Text>
-            <Text style={[styles.description, { color: theme.textMuted }]}>{t('Acesse os sistemas disponíveis para o seu perfil.')}</Text>
+        <Reveal>
+          <View style={styles.titleRow}>
+            <View style={styles.titleCopy}>
+              <Text style={[styles.eyebrow, { color: theme.textMuted }]}>{t('Bem-vindo')}, {session.perfil.nome.split(' ')[0]}</Text>
+              <Text style={[styles.hubTitle, { color: theme.text }]}>{t('Hub de Aplicações')}</Text>
+              <Text style={[styles.description, { color: theme.textMuted }]}>{t('Acesse os sistemas disponíveis para o seu perfil.')}</Text>
+            </View>
+            <AnimatedPressable
+              accessibilityLabel="Sair da conta"
+              accessibilityRole="button"
+              style={[styles.logoutAction, { backgroundColor: theme.surface, borderColor: theme.line }]}
+              onPress={async () => {
+                await logout();
+                router.replace('/login');
+              }}
+              hitSlop={8}
+            >
+              <LogOut size={19} color={theme.textMuted} />
+            </AnimatedPressable>
           </View>
-          <AnimatedPressable
-            accessibilityLabel="Sair da conta"
-            accessibilityRole="button"
-            style={[styles.logoutAction, { backgroundColor: theme.surface, borderColor: theme.line }]}
-            onPress={async () => {
-              await logout();
-              router.replace('/login');
-            }}
-            hitSlop={8}
-          >
-            <LogOut size={19} color={theme.textMuted} />
-          </AnimatedPressable>
-        </View>
+        </Reveal>
 
-        <FeedbackMessage
-          variant="info"
-          message="Os aplicativos exibidos abaixo dependem do seu perfil e permissões de acesso."
-          style={styles.infoBox}
-        />
+        <Reveal delay={40}>
+          <FeedbackMessage
+            variant="info"
+            message="Os aplicativos exibidos abaixo dependem do seu perfil e permissões de acesso."
+            style={styles.infoBox}
+          />
+        </Reveal>
 
-        <View style={styles.cards}>
+        <StaggerList style={styles.cards}>
           {apps.map((app) => (
             <AppCard
               key={app.key}
@@ -158,7 +163,7 @@ export default function HubScreen() {
               onPress={() => router.push(app.route)}
             />
           ))}
-        </View>
+        </StaggerList>
 
         {apps.length === 0 ? (
           <FeedbackMessage
@@ -173,6 +178,9 @@ export default function HubScreen() {
         visible={notificationsOpen}
         notifications={notifications.notifications}
         loading={notifications.loading}
+        error={notifications.error}
+        pendingIds={notifications.pendingIds}
+        markingAll={notifications.markingAll}
         onClose={() => setNotificationsOpen(false)}
         onMarkAsRead={notifications.markAsRead}
         onMarkAllAsRead={notifications.markAllAsRead}

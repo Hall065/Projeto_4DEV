@@ -22,6 +22,7 @@ import { colors } from '@/constants/colors';
 import {
   CAMPUS_PERSON_ROLE_COLORS,
   CAMPUS_PERSON_ROLE_LABELS,
+  type CampusPersonLegendItem,
   type CampusPersonLocation,
 } from '@/types/campusPeople';
 import {
@@ -33,6 +34,7 @@ import {
 import { ticketMarkerColor } from '@/utils/campusTicketMarkers';
 import {
   buildBlockPinMarkers,
+  buildGeographicPinMarkers,
   disposePinMarkerGroup,
   type PinMarkerBlock,
 } from './campusPinMarker3d';
@@ -264,6 +266,7 @@ function distanceBetweenTouches(event: GestureResponderEvent) {
 
 interface CampusMap3DViewerProps {
   people?: CampusPersonLocation[];
+  personLegend?: CampusPersonLegendItem[];
   ticketMarkers?: CampusTicketMarker[];
   selectedBlockId: CampusBlockId | null;
   selectedPersonId: string | null;
@@ -281,6 +284,7 @@ interface CampusMap3DViewerProps {
 
 export function CampusMap3DViewer({
   people = [],
+  personLegend,
   ticketMarkers = [],
   selectedBlockId,
   selectedPersonId,
@@ -309,6 +313,7 @@ export function CampusMap3DViewer({
   const mapReadyRef = useRef(false);
   const markerRadiusRef = useRef(10);
   const campusCenterRef = useRef(new THREE.Vector3());
+  const campusBoundsRef = useRef(new THREE.Box3());
   const campusDistanceRef = useRef(40);
   const campusRadiusRef = useRef(40);
   const raycasterRef = useRef(new THREE.Raycaster());
@@ -382,13 +387,28 @@ export function CampusMap3DViewer({
     const markerRoot = new THREE.Group();
     markerRoot.name = 'campus-map-markers';
 
-    if (peopleRef.current.length > 0) {
+    const geographicPeople = peopleRef.current.filter((person) => person.geo);
+    const blockPeople = peopleRef.current.filter((person) => !person.geo && person.blockId);
+
+    if (geographicPeople.length > 0 && !campusBoundsRef.current.isEmpty()) {
+      markerRoot.add(
+        buildGeographicPinMarkers(
+          geographicPeople,
+          blocksRef.current as PinMarkerBlock[],
+          campusBoundsRef.current,
+          markerRadiusRef.current,
+          (person) => person.markerColor ?? CAMPUS_PERSON_ROLE_COLORS[person.role]
+        )
+      );
+    }
+
+    if (blockPeople.length > 0) {
       markerRoot.add(
         buildBlockPinMarkers(
-          peopleRef.current,
+          blockPeople,
           blocksRef.current as PinMarkerBlock[],
           markerRadiusRef.current,
-          (person) => CAMPUS_PERSON_ROLE_COLORS[person.role]
+          (person) => person.markerColor ?? CAMPUS_PERSON_ROLE_COLORS[person.role]
         )
       );
     }
@@ -435,6 +455,29 @@ export function CampusMap3DViewer({
     applyCameraOrbit(camera, orbitRef.current);
   }, []);
 
+  const focusMarker = useCallback((markerId: string) => {
+    const camera = cameraRef.current;
+    const markers = markersGroupRef.current;
+    if (!camera || !markers) return;
+
+    let selectedMarker: THREE.Object3D | null = null;
+    markers.traverse((entry) => {
+      if (!selectedMarker && entry.userData.markerId === markerId) selectedMarker = entry;
+    });
+    if (!selectedMarker) return;
+
+    const target = (selectedMarker as THREE.Object3D).getWorldPosition(new THREE.Vector3());
+    orbitRef.current.target.copy(target);
+    orbitRef.current.distance = clamp(
+      markerRadiusRef.current * 11,
+      orbitRef.current.minDistance,
+      orbitRef.current.maxDistance
+    );
+    orbitRef.current.yaw = DEFAULT_CAMERA_YAW;
+    orbitRef.current.pitch = DEFAULT_CAMERA_PITCH;
+    applyCameraOrbit(camera, orbitRef.current);
+  }, []);
+
   const handleResetView = useCallback(() => {
     onSelectBlock(null);
     onSelectPerson(null);
@@ -461,8 +504,9 @@ export function CampusMap3DViewer({
           if (person) {
             onSelectPerson(person.id);
             onSelectTicket?.(null);
-            onSelectBlock(person.blockId);
-            focusBlock(person.blockId);
+            onSelectBlock(person.blockId ?? null);
+            if (person.blockId) focusBlock(person.blockId);
+            else focusMarker(person.id);
             return;
           }
           if (ticket) {
@@ -486,7 +530,7 @@ export function CampusMap3DViewer({
       onSelectBlock(blockId);
       if (blockId) focusBlock(blockId);
     },
-    [focusBlock, onSelectBlock, onSelectPerson, onSelectTicket]
+    [focusBlock, focusMarker, onSelectBlock, onSelectPerson, onSelectTicket]
   );
 
   const panResponder = useMemo(
@@ -717,6 +761,7 @@ export function CampusMap3DViewer({
         const radius = maxDim * 0.75;
 
         campusCenterRef.current.copy(center);
+        campusBoundsRef.current.copy(box);
         campusRadiusRef.current = Math.max(radius, 20);
         campusDistanceRef.current = Math.max(computeCampusFitDistance(maxDim, camera.fov), 20);
         markerRadiusRef.current = Math.max(radius * 0.022, 7);
@@ -757,7 +802,9 @@ export function CampusMap3DViewer({
   useEffect(() => {
     selectedPersonRef.current = selectedPersonId;
     applySelectedMarkerScale();
-  }, [applySelectedMarkerScale, selectedPersonId]);
+    const person = peopleRef.current.find((entry) => entry.id === selectedPersonId);
+    if (person?.geo && selectedPersonId) focusMarker(selectedPersonId);
+  }, [applySelectedMarkerScale, focusMarker, selectedPersonId]);
 
   useEffect(() => {
     selectedTicketRef.current = selectedTicketId;
@@ -781,6 +828,7 @@ export function CampusMap3DViewer({
       rendererRef.current = null;
       blocksRef.current = [];
       meshTargetsRef.current = [];
+      campusBoundsRef.current.makeEmpty();
       mapReadyRef.current = false;
     },
     []
@@ -846,15 +894,18 @@ export function CampusMap3DViewer({
                       <Text style={styles.legendText}>{label}</Text>
                     </View>
                   ))
-                : Object.entries(CAMPUS_PERSON_ROLE_LABELS).map(([role, label]) => (
-                    <View key={role} style={styles.legendItem}>
+                : (personLegend ?? Object.entries(CAMPUS_PERSON_ROLE_LABELS).map(([role, label]) => ({
+                    label,
+                    color: CAMPUS_PERSON_ROLE_COLORS[role as keyof typeof CAMPUS_PERSON_ROLE_COLORS],
+                  }))).map((item) => (
+                    <View key={item.label} style={styles.legendItem}>
                       <View
                         style={[
                           styles.legendDot,
-                          { backgroundColor: CAMPUS_PERSON_ROLE_COLORS[role as keyof typeof CAMPUS_PERSON_ROLE_COLORS] },
+                          { backgroundColor: item.color },
                         ]}
                       />
-                      <Text style={styles.legendText}>{label}</Text>
+                      <Text style={styles.legendText}>{item.label}</Text>
                     </View>
                   ))}
             </View>
@@ -866,7 +917,9 @@ export function CampusMap3DViewer({
                 <>
                   <Text numberOfLines={1} style={styles.selectionTitle}>{selectedPerson.name}</Text>
                   <Text numberOfLines={1} style={styles.selectionText}>
-                    {CAMPUS_PERSON_ROLE_LABELS[selectedPerson.role]} - {CAMPUS_BLOCK_BY_ID[selectedPerson.blockId].name}
+                    {CAMPUS_PERSON_ROLE_LABELS[selectedPerson.role]} - {selectedPerson.blockId
+                      ? CAMPUS_BLOCK_BY_ID[selectedPerson.blockId].name
+                      : 'Ponto GPS projetado no campus'}
                   </Text>
                   <Text numberOfLines={1} style={styles.selectionMuted}>
                     {[selectedPerson.room, selectedPerson.detail].filter(Boolean).join(' - ')}
@@ -908,6 +961,7 @@ export function CampusMap3DViewer({
 
 interface CampusMap3DContainerProps {
   people?: CampusPersonLocation[];
+  personLegend?: CampusPersonLegendItem[];
   ticketMarkers?: CampusTicketMarker[];
   highlightPersonId?: string | null;
   highlightTicketId?: string | null;
@@ -921,6 +975,7 @@ interface CampusMap3DContainerProps {
 
 export function CampusMap3DContainer({
   people = [],
+  personLegend,
   ticketMarkers = [],
   highlightPersonId = null,
   highlightTicketId = null,
@@ -942,7 +997,7 @@ export function CampusMap3DContainer({
     const person = people.find((entry) => entry.id === highlightPersonId);
     if (!person) return;
     setSelectedPersonId(person.id);
-    setSelectedBlockId(person.blockId);
+    setSelectedBlockId(person.blockId ?? null);
   }, [highlightPersonId, people]);
 
   useEffect(() => {
@@ -975,6 +1030,7 @@ export function CampusMap3DContainer({
   const renderViewer = (expanded: boolean) => (
     <CampusMap3DViewer
       people={people}
+      personLegend={personLegend}
       ticketMarkers={ticketMarkers}
       selectedBlockId={selectedBlockId}
       selectedPersonId={selectedPersonId}
@@ -994,7 +1050,7 @@ export function CampusMap3DContainer({
     return (
       <View style={styles.fallbackWrap}>
         <View style={styles.fallbackMessage}>
-          <Text style={styles.fallbackText}>{fatalError} Exibindo mapa 2.5D.</Text>
+          <Text style={styles.fallbackText}>{fatalError}</Text>
         </View>
         {fallback}
       </View>

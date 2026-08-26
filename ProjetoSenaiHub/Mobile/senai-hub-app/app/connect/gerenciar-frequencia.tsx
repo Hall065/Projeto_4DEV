@@ -1,18 +1,36 @@
 import { useEffect, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { Download, FileText, TrendingUp, Users } from 'lucide-react-native';
 import { ChartCard, InteractiveBarChart } from '@/components/charts';
 import { ExportModal } from '@/components/common/ExportModal';
+import { AdvancedFilterPanel, FilterChoice, FilterTextField } from '@/components/common/AdvancedFilters';
 import { MetricGrid } from '@/components/common/MetricGrid';
-import { AnimatedPressable, FeedbackMessage, ListRow, MetricTile, ProgressBar, SurfaceCard } from '@/components/common/VisualPrimitives';
+import { FeedbackMessage, ListRow, MetricTile, ProgressBar, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { ModuleScreen } from '@/components/screens/ModuleScreen';
 import { colors, connectTheme } from '@/constants/colors';
+import { FREQUENCIA_STATUS_OPTIONS } from '@/constants/form-options';
 import { useEmpresaContext } from '@/hooks/useEmpresaContext';
 import { listFrequenciasByEmpresaId } from '@/services/empresa.service';
 import { connectService } from '@/services/connect.service';
 import { exportService } from '@/services/export.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { FrequenciaRegistro } from '@/types/connect.types';
+import { normalizeDateToIso } from '@/utils/formatters';
+
+function normalizeAttendanceStatus(status: FrequenciaRegistro['status']) {
+  if (status === 'P') return 'presente';
+  if (status === 'FJ') return 'falta_justificada';
+  if (status === 'FI') return 'falta_injustificada';
+  return status;
+}
+
+function validIsoDate(value: string) {
+  const normalized = normalizeDateToIso(value);
+  if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(normalized)) return null;
+  const [year, month, day] = normalized.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.toISOString().slice(0, 10) === normalized ? normalized : null;
+}
 
 export default function GerenciarFrequenciaScreen() {
   const session = useAuthStore((s) => s.session);
@@ -20,7 +38,10 @@ export default function GerenciarFrequenciaScreen() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState<FrequenciaRegistro[]>([]);
   const [exportOpen, setExportOpen] = useState(false);
-  const [alunoFilter, setAlunoFilter] = useState('all');
+  const emptyFilters = { alunoId: '', status: '', turmaId: '', from: '', to: '' };
+  const [draftFilters, setDraftFilters] = useState(emptyFilters);
+  const [appliedFilters, setAppliedFilters] = useState(emptyFilters);
+  const [filterError, setFilterError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
@@ -60,11 +81,40 @@ export default function GerenciarFrequenciaScreen() {
     return Array.from(unique.entries()).map(([value, label]) => ({ value, label }));
   }, [items]);
 
-  const filteredItems = items.filter((item) => alunoFilter === 'all' || item.aluno_id === alunoFilter);
-  const presentes = filteredItems.filter((item) => item.status === 'presente').length;
+  const turmaOptions = useMemo(() => {
+    const unique = new Map<string, string>();
+    items.forEach((item) => {
+      if (item.turma_id) unique.set(item.turma_id, item.turma_nome ?? item.turma_id);
+    });
+    return Array.from(unique.entries()).map(([value, label]) => ({ value, label }));
+  }, [items]);
+
+  const filteredItems = items.filter((item) => {
+    const itemDate = normalizeDateToIso(item.data_aula ?? item.data ?? '').slice(0, 10);
+    return (!appliedFilters.alunoId || item.aluno_id === appliedFilters.alunoId) &&
+      (!appliedFilters.status || normalizeAttendanceStatus(item.status) === appliedFilters.status) &&
+      (!appliedFilters.turmaId || item.turma_id === appliedFilters.turmaId) &&
+      (!appliedFilters.from || itemDate >= appliedFilters.from) &&
+      (!appliedFilters.to || itemDate <= appliedFilters.to);
+  });
+  const presentes = filteredItems.filter((item) => normalizeAttendanceStatus(item.status) === 'presente').length;
   const faltas = filteredItems.length - presentes;
   const presenca = filteredItems.length ? Math.round((presentes / filteredItems.length) * 100) : 0;
   const screenLoading = loading || (isEmpresa && empresaLoading);
+  const applyFilters = () => {
+    const from = draftFilters.from ? validIsoDate(draftFilters.from) : '';
+    const to = draftFilters.to ? validIsoDate(draftFilters.to) : '';
+    if ((draftFilters.from && !from) || (draftFilters.to && !to)) {
+      setFilterError('Use uma data valida em DD/MM/AAAA ou AAAA-MM-DD.');
+      return;
+    }
+    if (from && to && from > to) {
+      setFilterError('A data inicial deve ser anterior ou igual a data final.');
+      return;
+    }
+    setFilterError(null);
+    setAppliedFilters({ ...draftFilters, from: from ?? '', to: to ?? '' });
+  };
 
   return (
     <ModuleScreen
@@ -93,21 +143,23 @@ export default function GerenciarFrequenciaScreen() {
         <MetricTile label="Faltas" value={faltas} accent={colors.orange} icon={<Download size={16} color={colors.orange} />} />
       </MetricGrid>
 
-      {alunoOptions.length > 0 ? (
-        <SurfaceCard title="Filtrar por aprendiz" subtitle="Somente alunos com contrato na empresa">
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filterRow}>
-            <FilterChip label="Todos" active={alunoFilter === 'all'} onPress={() => setAlunoFilter('all')} />
-            {alunoOptions.map((option) => (
-              <FilterChip
-                key={option.value}
-                label={option.label}
-                active={alunoFilter === option.value}
-                onPress={() => setAlunoFilter(option.value)}
-              />
-            ))}
-          </ScrollView>
-        </SurfaceCard>
-      ) : null}
+      <AdvancedFilterPanel
+        resultCount={filteredItems.length}
+        activeCount={Object.values(appliedFilters).filter(Boolean).length}
+        error={filterError}
+        onApply={applyFilters}
+        onClear={() => {
+          setDraftFilters(emptyFilters);
+          setAppliedFilters(emptyFilters);
+          setFilterError(null);
+        }}
+      >
+        <FilterChoice label="Aprendiz" value={draftFilters.alunoId} options={alunoOptions} onChange={(alunoId) => setDraftFilters((current) => ({ ...current, alunoId }))} />
+        <FilterChoice label="Status" value={draftFilters.status} options={FREQUENCIA_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
+        <FilterChoice label="Turma" value={draftFilters.turmaId} options={turmaOptions} onChange={(turmaId) => setDraftFilters((current) => ({ ...current, turmaId }))} />
+        <FilterTextField label="Data inicial" value={draftFilters.from} placeholder="DD/MM/AAAA" onChangeText={(from) => setDraftFilters((current) => ({ ...current, from }))} keyboardType="numeric" />
+        <FilterTextField label="Data final" value={draftFilters.to} placeholder="DD/MM/AAAA" onChangeText={(to) => setDraftFilters((current) => ({ ...current, to }))} keyboardType="numeric" />
+      </AdvancedFilterPanel>
 
       <ChartCard
         title="Evolucao da frequencia"
@@ -165,14 +217,6 @@ export default function GerenciarFrequenciaScreen() {
   );
 }
 
-function FilterChip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
-  return (
-    <AnimatedPressable onPress={onPress} style={[styles.filterChip, active ? styles.filterChipActive : null]}>
-      <Text style={[styles.filterChipText, active ? styles.filterChipTextActive : null]}>{label}</Text>
-    </AnimatedPressable>
-  );
-}
-
 function toRows(items: FrequenciaRegistro[]) {
   return items.map((item) => ({
     aluno: item.aluno_nome ?? item.aluno_id,
@@ -184,20 +228,5 @@ function toRows(items: FrequenciaRegistro[]) {
 }
 
 const styles = StyleSheet.create({
-  filterRow: { flexDirection: 'row', gap: 8, paddingVertical: 4 },
-  filterChip: {
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.panelSoft,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
-  filterChipActive: {
-    borderColor: connectTheme.accent,
-    backgroundColor: 'rgba(227,6,19,0.08)',
-  },
-  filterChipText: { color: colors.grayText, fontSize: 12, fontWeight: '700' },
-  filterChipTextActive: { color: connectTheme.accent },
   progressStack: { gap: 14, paddingVertical: 8 },
 });
