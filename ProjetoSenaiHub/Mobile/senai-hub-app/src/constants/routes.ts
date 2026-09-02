@@ -31,6 +31,13 @@ export const ROUTES = {
     mapaTarefas: '/grid/mapa-tarefas',
     usuarios: '/grid/usuarios',
   },
+  safe: {
+    root: '/safe',
+    index: '/safe',
+    autorizacoes: '/safe/autorizacoes',
+    aprovacoes: '/safe/aprovacoes',
+    portaria: '/safe/portaria',
+  },
   aluno: {
     dashboard: '/aluno/dashboard',
     frequencia: '/aluno/frequencia',

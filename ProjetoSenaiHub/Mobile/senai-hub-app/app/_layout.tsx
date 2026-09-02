@@ -63,6 +63,7 @@ export default function RootLayout() {
               <Stack.Screen name="hub" />
               <Stack.Screen name="connect" />
               <Stack.Screen name="grid" />
+              <Stack.Screen name="safe" />
               <Stack.Screen name="aluno" />
               <Stack.Screen name="perfil" />
             </Stack>

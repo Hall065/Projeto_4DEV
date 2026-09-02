@@ -1,6 +1,6 @@
 import type { ImageSourcePropType } from 'react-native';
 
-export type BrandArea = 'hub' | 'connect' | 'grid';
+export type BrandArea = 'hub' | 'connect' | 'grid' | 'safe';
 export type BrandKind = 'icon' | 'slogan';
 
 type ThemeAssets = {
@@ -37,6 +37,16 @@ const brandAssets: Record<BrandArea, Record<BrandKind, ThemeAssets>> = {
     slogan: {
       light: require('../../assets/brand/logo_slogan_preto_grid.png'),
       dark: require('../../assets/brand/logo_slogan_branco_grid.png'),
+    },
+  },
+  safe: {
+    icon: {
+      light: require('../../assets/brand/logo_preto_safe.png'),
+      dark: require('../../assets/brand/logo_branco_safe.png'),
+    },
+    slogan: {
+      light: require('../../assets/brand/logo_slogan_preto_safe.png'),
+      dark: require('../../assets/brand/logo_slogan_branco_safe.png'),
     },
   },
 };

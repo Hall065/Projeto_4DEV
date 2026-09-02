@@ -22,11 +22,12 @@ import { colors } from '@/constants/colors';
 import { useI18n } from '@/hooks/useI18n';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useThemeColors } from '@/hooks/useThemeColors';
-import { canAccessConnect, canAccessGrid } from '@/lib/permissions';
+import { canAccessConnect, canAccessGrid, canAccessSafe } from '@/lib/permissions';
 import { useAuthStore } from '@/stores/auth.store';
 
 const connectCardImage = require('../assets/brand/hub-connect-card.png');
 const gridCardImage = require('../assets/brand/hub-grid-card.png');
+const safeCardImage = require('../assets/brand/hub-safe-card.png');
 
 interface AppCardProps {
   title: string;
@@ -105,6 +106,17 @@ export default function HubScreen() {
       image: gridCardImage,
     });
   }
+  if (canAccessSafe(session.perfil, session.aplicacoes)) {
+    apps.push({
+      key: 'safe',
+      title: 'SENAI Safe',
+      description: 'Controle de autorizacoes de entrada e saida com aprovacao do professor e portaria.',
+      accent: colors.purple,
+      route: '/safe' as const,
+      logo: getBrandAsset('safe', 'icon', theme.isDark),
+      image: safeCardImage,
+    });
+  }
 
   return (
     <View style={[styles.container, { backgroundColor: theme.appBackground }]}>
@@ -160,7 +172,7 @@ export default function HubScreen() {
               accent={app.accent}
               logo={app.logo}
               image={app.image}
-              onPress={() => router.push(app.route)}
+              onPress={() => router.push(app.route as never)}
             />
           ))}
         </StaggerList>

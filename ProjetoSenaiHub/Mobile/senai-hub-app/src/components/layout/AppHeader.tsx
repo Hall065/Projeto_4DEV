@@ -53,15 +53,19 @@ export function AppHeader({
       ? 'Gestão de manutenção e infraestrutura'
       : title.includes('Connect')
         ? 'Ensino conectado e gestão acadêmica'
+        : title.includes('Safe')
+          ? 'Controle seguro de entradas e saídas'
         : 'Hub Unificado de Infraestrutura e Serviços');
   const resolvedBrandArea =
-    brandArea ?? (title.includes('Grid') ? 'grid' : title.includes('Connect') || title.includes('Aluno') ? 'connect' : 'hub');
+    brandArea ?? (title.includes('Grid') ? 'grid' : title.includes('Connect') || title.includes('Aluno') ? 'connect' : title.includes('Safe') ? 'safe' : 'hub');
   const brandLogo = getBrandAsset(resolvedBrandArea, 'slogan', theme.isDark);
   const headerColor = theme.isDark
     ? title.includes('Grid')
       ? '#052E16'
       : title.includes('Connect') || title.includes('Aluno')
         ? '#450A0A'
+        : title.includes('Safe')
+          ? '#450A0A'
         : '#020617'
     : theme.surface;
   const headerBorderColor = theme.isDark ? 'rgba(255,255,255,0.08)' : theme.line;

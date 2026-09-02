@@ -9,6 +9,7 @@
     "web": "expo start --web",
     "sync:apexcharts": "node scripts/sync-apexcharts-asset.mjs",
     "test:chatbot-access": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types tests/student-role.test.mjs",
+    "test:safe-access": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types tests/safe-role.test.mjs",
     "lint": "expo lint --no-cache"
   },
   "dependencies": {

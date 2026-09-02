@@ -13,6 +13,7 @@ import {
   Map,
   MapPin,
   Package,
+  DoorOpen,
   User,
   UserCheck,
   Users,
@@ -49,6 +50,13 @@ export const GRID_DRAWER_ITEMS: DrawerMenuItem[] = [
   { label: 'Estoque', route: ROUTES.grid.estoque, icon: <Package />, section: 'Recursos' },
   { label: 'Localizacao de chamados', route: ROUTES.grid.mapaTarefas, icon: <Map />, section: 'Recursos' },
   { label: 'Usuários', route: ROUTES.grid.usuarios, icon: <Users />, section: 'Administração' },
+];
+
+export const SAFE_DRAWER_ITEMS: DrawerMenuItem[] = [
+  { label: 'Resumo', route: ROUTES.safe.index, icon: <Home />, section: 'Painel' },
+  { label: 'Autorizacoes', route: ROUTES.safe.autorizacoes, icon: <ClipboardList />, section: 'Operacao AQV' },
+  { label: 'Aprovacoes', route: ROUTES.safe.aprovacoes, icon: <UserCheck />, section: 'Professor' },
+  { label: 'Portaria', route: ROUTES.safe.portaria, icon: <DoorOpen />, section: 'Validacao presencial' },
 ];
 
 export const CONNECT_BOTTOM_NAV: NavItem[] = [

@@ -35,6 +35,9 @@ const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
     'grid.access',
     'grid.tickets.view',
     'grid.tickets.create_own',
+    'safe.access',
+    'safe.dashboard',
+    'safe.approve',
   ],
   connect_professor: [
     'connect.access',
@@ -44,6 +47,9 @@ const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
     'connect.attendance.view',
     'connect.attendance.manage',
     'connect.reports.view',
+    'safe.access',
+    'safe.dashboard',
+    'safe.approve',
   ],
 
   secretaria: [
@@ -152,6 +158,23 @@ const ROLE_PERMISSIONS: Record<UserRole, readonly Permission[]> = {
     'grid.reports.view',
     'grid.spreadsheets',
   ],
+
+  safe_aqv: [
+    'safe.access',
+    'safe.dashboard',
+    'safe.students.view',
+    'safe.authorizations.manage',
+  ],
+  safe_professor: [
+    'safe.access',
+    'safe.dashboard',
+    'safe.approve',
+  ],
+  safe_portaria: [
+    'safe.access',
+    'safe.dashboard',
+    'safe.portaria',
+  ],
 };
 
 const CONNECT_ROUTE_PERMISSIONS: Record<string, readonly Permission[]> = {
@@ -183,6 +206,13 @@ const GRID_ROUTE_PERMISSIONS: Record<string, readonly Permission[]> = {
   [ROUTES.grid.estoque]: ['grid.inventory.view', 'grid.inventory.manage'],
   [ROUTES.grid.mapaTarefas]: ['grid.tasks.manage'],
   [ROUTES.grid.usuarios]: ['grid.users.manage'],
+};
+
+const SAFE_ROUTE_PERMISSIONS: Record<string, readonly Permission[]> = {
+  [ROUTES.safe.index]: ['safe.dashboard'],
+  [ROUTES.safe.autorizacoes]: ['safe.authorizations.manage'],
+  [ROUTES.safe.aprovacoes]: ['safe.approve'],
+  [ROUTES.safe.portaria]: ['safe.portaria'],
 };
 
 const PROFESSOR_CONNECT_ROUTES = new Set<string>([
@@ -237,6 +267,13 @@ export function canAccessGrid(perfil: HubUsuario, aplicacoes: UsuarioAplicacao[]
   return (ROLE_APPLICATION_ACCESS[role]?.grid ?? false) && roleAllowsGrid;
 }
 
+export function canAccessSafe(perfil: HubUsuario, aplicacoes: UsuarioAplicacao[]): boolean {
+  const role = perfil.tipo as UserRole;
+  const roleAllowsSafe = hasPermission(role, 'safe.access');
+  if (hasApplication(aplicacoes, 'senai_safe')) return roleAllowsSafe;
+  return (ROLE_APPLICATION_ACCESS[role]?.safe ?? false) && roleAllowsSafe;
+}
+
 export function hasApplication(aplicacoes: UsuarioAplicacao[], codigo: string): boolean {
   return aplicacoes.some((a) => a.aplicacao_codigo === codigo);
 }
@@ -282,6 +319,13 @@ export function canAccessGridRoute(role: UserRole | undefined, route: string): b
   return hasAnyPermission(role, GRID_ROUTE_PERMISSIONS[route] ?? ['grid.access']);
 }
 
+export function canAccessSafeRoute(role: UserRole | undefined, route: string): boolean {
+  if (role === 'admin' || role === 'direcao') {
+    return route === ROUTES.safe.index || route === ROUTES.safe.autorizacoes;
+  }
+  return hasAnyPermission(role, SAFE_ROUTE_PERMISSIONS[route] ?? ['safe.access']);
+}
+
 export function getDefaultConnectRoute(role: UserRole | undefined) {
   if (role === 'professor' || role === 'connect_professor') return ROUTES.connect.turmas;
   if (isEmpresaRole(role)) return ROUTES.connect.contratos;
@@ -292,6 +336,13 @@ export function getDefaultGridRoute(role: UserRole | undefined) {
   if (role === 'professor') return ROUTES.grid.chamados;
   if (role === 'manutencao' || role === 'grid_funcionario') return ROUTES.grid.tarefas;
   return ROUTES.grid.index;
+}
+
+export function getDefaultSafeRoute(role: UserRole | undefined) {
+  if (hasPermission(role, 'safe.authorizations.manage')) return ROUTES.safe.autorizacoes;
+  if (hasPermission(role, 'safe.approve')) return ROUTES.safe.aprovacoes;
+  if (hasPermission(role, 'safe.portaria')) return ROUTES.safe.portaria;
+  return ROUTES.safe.index;
 }
 
 export function getPostLoginRoute(session: AuthSession | null) {
