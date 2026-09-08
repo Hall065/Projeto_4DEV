@@ -174,14 +174,14 @@ export default function PerfilScreen() {
           <View style={styles.profileTop}>
             <View style={[styles.avatar, { backgroundColor: theme.isDark ? theme.surfaceSoft : colors.navy }]}>
               {perfil?.foto_url ? (
-                <Image source={{ uri: perfil.foto_url }} style={styles.avatarImage} accessibilityLabel="Foto de perfil" />
+                <Image source={{ uri: perfil.foto_url }} style={styles.avatarImage} accessibilityLabel={t("Foto de perfil")} />
               ) : (
                 <Text style={styles.avatarText}>{initials}</Text>
               )}
             </View>
             <View style={styles.profileBody}>
               <Text style={[styles.name, { color: theme.text }]}>{perfil?.nome ?? t('Usuario')}</Text>
-              <Text style={[styles.role, { color: theme.textMuted }]}>{perfil?.tipo ? t(perfil.tipo) : 'Sem perfil'}</Text>
+              <Text style={[styles.role, { color: theme.textMuted }]}>{perfil?.tipo ? t(perfil.tipo) : t("Sem perfil")}</Text>
               <AppButton
                 label="Trocar foto"
                 variant="secondary"
@@ -272,7 +272,7 @@ export default function PerfilScreen() {
               ))}
             </View>
           ) : (
-            <Text style={[styles.emptyText, { color: theme.textMuted }]}>Nenhuma aplicacao vinculada.</Text>
+            <Text style={[styles.emptyText, { color: theme.textMuted }]}>{t("Nenhuma aplicacao vinculada.")}</Text>
           )}
         </SurfaceCard>
 
@@ -311,7 +311,7 @@ export default function PerfilScreen() {
             <View style={styles.modalHeader}>
               <View style={styles.modalTitleWrap}>
                 <Text style={[styles.modalTitle, { color: theme.text }]}>{t('Selecionar idioma')}</Text>
-                <Text style={[styles.modalSubtitle, { color: theme.textMuted }]}>Azure Translator</Text>
+                <Text style={[styles.modalSubtitle, { color: theme.textMuted }]}>{t("Azure Translator")}</Text>
               </View>
               <Pressable
                 accessibilityRole="button"

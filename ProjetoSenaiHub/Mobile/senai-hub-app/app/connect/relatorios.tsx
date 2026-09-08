@@ -41,6 +41,7 @@ import type {
   Turma,
 } from '@/types/connect.types';
 import { buildDateTrend, percent, topGroups } from '@/utils/dashboardAnalytics';
+import { useI18n } from '@/hooks/useI18n';
 
 const CONNECT_PRESETS: MobileReportPreset[] = [
   {
@@ -90,6 +91,7 @@ const CONNECT_PRESETS: MobileReportPreset[] = [
 ];
 
 export default function RelatoriosConnectScreen() {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const [mode, setMode] = useState<'summary' | 'builder'>('summary');
   const [loading, setLoading] = useState(true);
@@ -536,16 +538,14 @@ export default function RelatoriosConnectScreen() {
                       {String(item.turma)}
                     </Text>
                     <Text style={[styles.rankingMeta, { color: theme.textMuted }]}>
-                      {item.presencas} presencas em {item.lancamentos} lancamentos
-                    </Text>
+                      {item.presencas} {' '}{t("presencas em")}{' '}{item.lancamentos} {' '}{t("lancamentos")}</Text>
                   </View>
                   <Text style={[styles.rankingRate, { color: colors.green }]}>{item.taxa}</Text>
                 </View>
               ))
             ) : (
               <Text style={[styles.empty, { color: theme.textMuted }]}>
-                Nenhum lancamento de frequencia encontrado.
-              </Text>
+                {t("Nenhum lancamento de frequencia encontrado.")}</Text>
             )}
           </SurfaceCard>
         </View>
@@ -596,13 +596,13 @@ export default function RelatoriosConnectScreen() {
                   label="Data inicial"
                   value={fromDate}
                   onChangeText={setFromDate}
-                  placeholder="AAAA-MM-DD"
+                  placeholder={t("AAAA-MM-DD")}
                 />
                 <ReportTextField
                   label="Data final"
                   value={toDate}
                   onChangeText={setToDate}
-                  placeholder="AAAA-MM-DD"
+                  placeholder={t("AAAA-MM-DD")}
                 />
               </View>
             </View>

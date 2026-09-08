@@ -141,7 +141,7 @@ export default function HubScreen() {
               <Text style={[styles.description, { color: theme.textMuted }]}>{t('Acesse os sistemas disponíveis para o seu perfil.')}</Text>
             </View>
             <AnimatedPressable
-              accessibilityLabel="Sair da conta"
+              accessibilityLabel={t("Sair da conta")}
               accessibilityRole="button"
               style={[styles.logoutAction, { backgroundColor: theme.surface, borderColor: theme.line }]}
               onPress={async () => {

@@ -37,10 +37,12 @@ import { colors, gridTheme } from '@/constants/colors';
 import { CHAMADO_PRIORIDADE_OPTIONS } from '@/constants/form-options';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { useCrudResource } from '@/hooks/useCrudResource';
+import { useI18n } from '@/hooks/useI18n';
 import { useSelectOptions } from '@/hooks/useSelectOptions';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { gridService } from '@/services/grid.service';
 import { useAuthStore } from '@/stores/auth.store';
+import { formatAppDateTime, formatAppNumber } from '@/utils/locale';
 import type {
   Chamado,
   ChamadoPrioridade,
@@ -198,19 +200,6 @@ function stageIndex(stage: Exclude<TicketStage, 'todos'>) {
   return Math.max(0, order.indexOf(stage));
 }
 
-function formatDate(value?: string | null) {
-  if (!value) return 'Nao informado';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-}
-
 function getErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error) return error.message;
   if (error && typeof error === 'object' && 'message' in error) {
@@ -246,6 +235,7 @@ function TicketCard({
   onDelete: () => void;
 }) {
   const theme = useThemeColors();
+  const { language, t } = useI18n();
   const accent =
     chamado.prioridade === 'urgente' || chamado.prioridade === 'alta'
       ? colors.red
@@ -269,7 +259,7 @@ function TicketCard({
       <AnimatedPressable onPress={onOpen} style={styles.ticketCardMain}>
         <View style={styles.cardHeader}>
           <View style={styles.cardHeading}>
-            <Text style={styles.code}>{chamado.codigo ?? 'CHAMADO'}</Text>
+            <Text style={styles.code}>{chamado.codigo ?? t("CHAMADO")}</Text>
             <Text numberOfLines={2} style={[styles.cardTitle, { color: theme.text }]}>
               {chamado.titulo}
             </Text>
@@ -287,20 +277,20 @@ function TicketCard({
           <View style={styles.cardMeta}>
             <UserRound size={14} color={theme.textMuted} />
             <Text numberOfLines={1} style={[styles.cardMetaText, { color: theme.textMuted }]}>
-              {chamado.solicitante_nome ?? 'Solicitante nao identificado'}
+              {chamado.solicitante_nome ?? t('Solicitante nao identificado')}
             </Text>
           </View>
           <View style={styles.cardMeta}>
             <MapPin size={14} color={theme.textMuted} />
             <Text numberOfLines={1} style={[styles.cardMetaText, { color: theme.textMuted }]}>
               {[chamado.bloco_nome, chamado.sala_nome].filter(Boolean).join(' / ') ||
-                'Local nao informado'}
+                t('Local nao informado')}
             </Text>
           </View>
           <View style={styles.cardMeta}>
             <Wrench size={14} color={theme.textMuted} />
             <Text numberOfLines={1} style={[styles.cardMetaText, { color: theme.textMuted }]}>
-              {chamado.responsavel_nome ?? 'Sem responsavel'}
+              {chamado.responsavel_nome ?? t('Sem responsavel')}
             </Text>
           </View>
         </View>
@@ -316,7 +306,11 @@ function TicketCard({
             ) : null}
           </View>
           <Text style={[styles.cardDate, { color: theme.textSubtle }]}>
-            {formatDate(chamado.data_abertura ?? chamado.created_at ?? chamado.criado_em)}
+            {formatAppDateTime(
+              chamado.data_abertura ?? chamado.created_at ?? chamado.criado_em,
+              language,
+              t('Nao informado')
+            )}
           </Text>
         </View>
 
@@ -324,7 +318,7 @@ function TicketCard({
           <View style={[styles.linkedTask, { backgroundColor: theme.surfaceSoft }]}>
             <ClipboardCheck size={14} color={colors.blue} />
             <Text numberOfLines={1} style={[styles.linkedTaskText, { color: theme.text }]}>
-              {linkedTask.codigo ?? 'Tarefa vinculada'} - {statusTaskLabel(linkedTask.status)}
+              {linkedTask.codigo ?? t('Tarefa vinculada')} - {t(statusTaskLabel(linkedTask.status))}
             </Text>
           </View>
         ) : null}
@@ -384,7 +378,7 @@ function TicketCard({
 
       {canManage ? (
         <AnimatedPressable onPress={onDelete} style={styles.deleteLink}>
-          <Text style={styles.deleteLinkText}>Excluir chamado</Text>
+          <Text style={styles.deleteLinkText}>{t('Excluir chamado')}</Text>
         </AnimatedPressable>
       ) : null}
     </View>
@@ -400,6 +394,7 @@ function statusTaskLabel(status?: TarefaStatus | null) {
 
 export default function ChamadosScreen() {
   const theme = useThemeColors();
+  const { language, t } = useI18n();
   const router = useRouter();
   const { confirm } = useConfirmDialog();
   const [modalOpen, setModalOpen] = useState(false);
@@ -620,7 +615,7 @@ export default function ChamadosScreen() {
         </View>
 
         <SearchField
-          placeholder="Buscar codigo, titulo, local ou responsavel..."
+          placeholder={t("Buscar codigo, titulo, local ou responsavel...")}
           value={search}
           onChangeText={setSearch}
         />
@@ -652,7 +647,7 @@ export default function ChamadosScreen() {
                       { color: selectedPriority ? colors.white : theme.textMuted },
                     ]}
                   >
-                    {item === 'todas' ? 'Todas prioridades' : priorityLabel(item)}
+                    {t(item === 'todas' ? 'Todas prioridades' : priorityLabel(item))}
                   </Text>
                 </AnimatedPressable>
               );
@@ -671,11 +666,12 @@ export default function ChamadosScreen() {
         <View style={styles.listHeader}>
           <Text style={[styles.listTitle, { color: theme.text }]}>
             {activeStage === 'todos'
-              ? 'Fila completa'
-              : tabs.find((tab) => tab.id === activeStage)?.label}
+              ? t('Fila completa')
+              : t(tabs.find((tab) => tab.id === activeStage)?.label)}
           </Text>
           <Text style={[styles.listSubtitle, { color: theme.textMuted }]}>
-            {visibleTickets.length} chamado(s)
+            {formatAppNumber(visibleTickets.length, language)}{' '}
+            {t(visibleTickets.length === 1 ? 'chamado' : 'chamados')}
           </Text>
         </View>
 
@@ -683,9 +679,11 @@ export default function ChamadosScreen() {
           {visibleTickets.length === 0 ? (
             <View style={[styles.emptyState, { backgroundColor: theme.surface, borderColor: theme.line }]}>
               <Wrench size={28} color={theme.textSubtle} />
-              <Text style={[styles.emptyTitle, { color: theme.text }]}>Nenhum chamado nesta etapa</Text>
+              <Text style={[styles.emptyTitle, { color: theme.text }]}>
+                {t('Nenhum chamado nesta etapa')}
+              </Text>
               <Text style={[styles.emptyDescription, { color: theme.textMuted }]}>
-                Ajuste os filtros ou abra uma nova solicitacao.
+                {t('Ajuste os filtros ou abra uma nova solicitacao.')}
               </Text>
             </View>
           ) : (
@@ -811,13 +809,13 @@ export default function ChamadosScreen() {
                   <WorkflowProgress steps={workflowSteps} currentIndex={stageIndex(stage)} />
 
                   <Text style={[styles.detailDescription, { color: theme.textMuted }]}>
-                    {selected.descricao || 'Sem descricao informada.'}
+                    {selected.descricao || t('Sem descricao informada.')}
                   </Text>
 
                   {selected.imagem_url ? (
                     <View style={styles.evidenceBlock}>
                       <Text style={[styles.evidenceLabel, { color: theme.textMuted }]}>
-                        Imagem da abertura
+                        {t('Imagem da abertura')}
                       </Text>
                       <Image source={{ uri: selected.imagem_url }} style={styles.evidenceImage} />
                     </View>
@@ -837,7 +835,7 @@ export default function ChamadosScreen() {
                     label="Local"
                     value={
                       [selected.bloco_nome, selected.sala_nome].filter(Boolean).join(' / ') ||
-                      'Local nao informado'
+                      t('Local nao informado')
                     }
                     icon={<MapPin size={14} color={theme.textMuted} />}
                   />
@@ -848,14 +846,23 @@ export default function ChamadosScreen() {
                   />
                   <InfoRow
                     label="Aberto em"
-                    value={formatDate(
-                      selected.data_abertura ?? selected.created_at ?? selected.criado_em
+                    value={formatAppDateTime(
+                      selected.data_abertura ?? selected.created_at ?? selected.criado_em,
+                      language,
+                      t('Nao informado')
                     )}
                   />
-                  <InfoRow label="Iniciado em" value={formatDate(selected.iniciado_em)} />
+                  <InfoRow
+                    label="Iniciado em"
+                    value={formatAppDateTime(selected.iniciado_em, language, t('Nao informado'))}
+                  />
                   <InfoRow
                     label="Concluido em"
-                    value={formatDate(selected.data_fechamento ?? selected.concluido_em)}
+                    value={formatAppDateTime(
+                      selected.data_fechamento ?? selected.concluido_em,
+                      language,
+                      t('Nao informado')
+                    )}
                   />
 
                   {task ? (
@@ -864,10 +871,11 @@ export default function ChamadosScreen() {
                         <ClipboardCheck size={17} color={colors.blue} />
                         <View style={styles.taskSummaryText}>
                           <Text style={[styles.taskSummaryTitle, { color: theme.text }]}>
-                            {task.codigo ?? 'Tarefa vinculada'}
+                            {task.codigo ?? t('Tarefa vinculada')}
                           </Text>
                           <Text style={[styles.taskSummarySubtitle, { color: theme.textMuted }]}>
-                            {statusTaskLabel(task.status)} - {task.responsavel_nome ?? 'Sem responsavel'}
+                            {t(statusTaskLabel(task.status))} -{' '}
+                            {task.responsavel_nome ?? t('Sem responsavel')}
                           </Text>
                         </View>
                       </View>
@@ -886,7 +894,7 @@ export default function ChamadosScreen() {
                   {selected.evidencia_url ? (
                     <View style={styles.evidenceBlock}>
                       <Text style={[styles.evidenceLabel, { color: theme.textMuted }]}>
-                        Evidencia da conclusao
+                        {t('Evidencia da conclusao')}
                       </Text>
                       <Image source={{ uri: selected.evidencia_url }} style={styles.evidenceImage} />
                     </View>
@@ -895,7 +903,7 @@ export default function ChamadosScreen() {
                   {selected.resumo_resolucao ? (
                     <View style={[styles.noteBox, { backgroundColor: theme.surfaceSoft }]}>
                       <Text style={[styles.noteLabel, { color: theme.textMuted }]}>
-                        Resumo da resolucao
+                        {t('Resumo da resolucao')}
                       </Text>
                       <Text style={[styles.noteText, { color: theme.text }]}>
                         {selected.resumo_resolucao}

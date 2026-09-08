@@ -13,6 +13,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { gridService } from '@/services/grid.service';
 import type { ItemEstoque } from '@/types/grid.types';
 import { normalizeDecimalInput } from '@/utils/formatters';
+import { useI18n } from '@/hooks/useI18n';
 
 const EMPTY_FILTERS = {
   categoriaId: '',
@@ -77,6 +78,7 @@ function formValues(item: ItemEstoque): Record<string, string> {
 }
 
 export default function EstoqueScreen() {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<ItemEstoque | null>(null);
@@ -157,7 +159,7 @@ export default function EstoqueScreen() {
           <MetricTile label="Distribuidoras" value={new Set(items.map(i => i.empresa_distribuidora).filter(Boolean)).size} accent={colors.purple} icon={<Warehouse size={16} color={colors.purple} />} style={styles.metric} />
         </View>
 
-        <SearchField placeholder="Buscar por item, código ou categoria..." value={search} onChangeText={setSearch} />
+        <SearchField placeholder={t("Buscar por item, código ou categoria...")} value={search} onChangeText={setSearch} />
 
         <AdvancedFilterPanel
           resultCount={filtered.length}
@@ -175,17 +177,17 @@ export default function EstoqueScreen() {
           <FilterChoice label="Status" value={draftFilters.status} options={ESTOQUE_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
           <FilterChoice label="Distribuidora" value={draftFilters.distribuidora} options={distribuidoraOptions} onChange={(distribuidora) => setDraftFilters((current) => ({ ...current, distribuidora }))} />
           <FilterChoice label="Estoque baixo" value={draftFilters.estoqueBaixo} options={[{ value: 'sim', label: 'Sim' }, { value: 'nao', label: 'Nao' }]} onChange={(estoqueBaixo) => setDraftFilters((current) => ({ ...current, estoqueBaixo }))} />
-          <FilterTextField label="Localizacao contem" value={draftFilters.localizacao} placeholder="Sala ou prateleira" onChangeText={(localizacao) => setDraftFilters((current) => ({ ...current, localizacao }))} />
-          <FilterTextField label="Custo minimo" value={draftFilters.custoMin} placeholder="0,00" keyboardType="decimal-pad" onChangeText={(custoMin) => setDraftFilters((current) => ({ ...current, custoMin }))} />
-          <FilterTextField label="Custo maximo" value={draftFilters.custoMax} placeholder="0,00" keyboardType="decimal-pad" onChangeText={(custoMax) => setDraftFilters((current) => ({ ...current, custoMax }))} />
-          <FilterTextField label="Quantidade minima" value={draftFilters.quantidadeMin} placeholder="0" keyboardType="numeric" onChangeText={(quantidadeMin) => setDraftFilters((current) => ({ ...current, quantidadeMin }))} />
-          <FilterTextField label="Quantidade maxima" value={draftFilters.quantidadeMax} placeholder="0" keyboardType="numeric" onChangeText={(quantidadeMax) => setDraftFilters((current) => ({ ...current, quantidadeMax }))} />
+          <FilterTextField label="Localizacao contem" value={draftFilters.localizacao} placeholder={t("Sala ou prateleira")} onChangeText={(localizacao) => setDraftFilters((current) => ({ ...current, localizacao }))} />
+          <FilterTextField label="Custo minimo" value={draftFilters.custoMin} placeholder={t("0,00")} keyboardType="decimal-pad" onChangeText={(custoMin) => setDraftFilters((current) => ({ ...current, custoMin }))} />
+          <FilterTextField label="Custo maximo" value={draftFilters.custoMax} placeholder={t("0,00")} keyboardType="decimal-pad" onChangeText={(custoMax) => setDraftFilters((current) => ({ ...current, custoMax }))} />
+          <FilterTextField label="Quantidade minima" value={draftFilters.quantidadeMin} placeholder={t("0")} keyboardType="numeric" onChangeText={(quantidadeMin) => setDraftFilters((current) => ({ ...current, quantidadeMin }))} />
+          <FilterTextField label="Quantidade maxima" value={draftFilters.quantidadeMax} placeholder={t("0")} keyboardType="numeric" onChangeText={(quantidadeMax) => setDraftFilters((current) => ({ ...current, quantidadeMax }))} />
         </AdvancedFilterPanel>
 
         <SurfaceCard title="Itens cadastrados" subtitle="Lista de materiais de manutenção">
           {error || optionsError ? <FeedbackMessage variant="danger" message={error ?? optionsError ?? ''} /> : null}
           {filtered.length === 0 ? (
-            <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum item encontrado.</Text>
+            <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhum item encontrado.")}</Text>
           ) : null}
           {filtered.map((item) => (
             <ListRow

@@ -12,6 +12,7 @@ import { useSelectOptions } from '@/hooks/useSelectOptions';
 import { connectService } from '@/services/connect.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { Aluno, Turma } from '@/types/connect.types';
+import { useI18n } from '@/hooks/useI18n';
 
 const turmaOptionLoaders = {
   cursos: connectService.listCursoOptions,
@@ -50,6 +51,7 @@ function formValues(turma: Turma): Record<string, string> {
 }
 
 export default function TurmasScreen() {
+  const { t } = useI18n();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Turma | null>(null);
   const [search, setSearch] = useState('');
@@ -130,7 +132,7 @@ export default function TurmasScreen() {
           <MetricTile label="Professores" value={new Set(items.map((t) => t.professor_responsavel_id).filter(Boolean)).size} accent={colors.green} icon={<GraduationCap size={16} color={colors.green} />} style={styles.metric} />
         </View>
 
-        <SearchField placeholder="Pesquisar turma, curso, professor ou período..." value={search} onChangeText={setSearch} />
+        <SearchField placeholder={t("Pesquisar turma, curso, professor ou período...")} value={search} onChangeText={setSearch} />
 
         <AdvancedFilterPanel
           resultCount={filtered.length}
@@ -150,7 +152,7 @@ export default function TurmasScreen() {
 
         <SurfaceCard title="Turmas" subtitle="Turmas ativas e período de aulas">
           {error || optionsError ? <FeedbackMessage variant="danger" message={error ?? optionsError ?? ''} /> : null}
-          {filtered.length === 0 ? <Text style={styles.empty}>Nenhuma turma encontrada.</Text> : null}
+          {filtered.length === 0 ? <Text style={styles.empty}>{t("Nenhuma turma encontrada.")}</Text> : null}
           {filtered.map((turma) => (
             <ListRow
               key={turma.id}
@@ -172,9 +174,9 @@ export default function TurmasScreen() {
 
         {selectedTurma ? (
           <SurfaceCard title="Alunos da turma" subtitle={`${selectedTurma.nome} - ${selectedTurma.curso_nome ?? 'Curso não vinculado'}`}>
-            <SearchField placeholder="Pesquisar aluno por nome, RM ou e-mail..." value={alunoSearch} onChangeText={setAlunoSearch} />
-            {loadingAlunos ? <Text style={styles.empty}>Carregando alunos...</Text> : null}
-            {!loadingAlunos && filteredAlunos.length === 0 ? <Text style={styles.empty}>Nenhum aluno encontrado nesta turma.</Text> : null}
+            <SearchField placeholder={t("Pesquisar aluno por nome, RM ou e-mail...")} value={alunoSearch} onChangeText={setAlunoSearch} />
+            {loadingAlunos ? <Text style={styles.empty}>{t("Carregando alunos...")}</Text> : null}
+            {!loadingAlunos && filteredAlunos.length === 0 ? <Text style={styles.empty}>{t("Nenhum aluno encontrado nesta turma.")}</Text> : null}
             {!loadingAlunos && filteredAlunos.map((aluno) => (
               <ListRow
                 key={aluno.id}

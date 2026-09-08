@@ -5,10 +5,12 @@ import { colors } from '@/constants/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { studentService, type StudentDashboardData } from '@/services/student.service';
 import { useAuthStore } from '@/stores/auth.store';
+import { useI18n } from '@/hooks/useI18n';
 
 const DIAS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'];
 
 export default function AlunoGradeScreen() {
+  const { t } = useI18n();
   const session = useAuthStore((s) => s.session);
   const theme = useThemeColors();
   const [activeDay, setActiveDay] = useState(DIAS[0]);
@@ -61,7 +63,7 @@ export default function AlunoGradeScreen() {
             />
           ))}
         </View>
-        <Text style={[styles.hint, { color: theme.textMuted }]}>Exibindo registros disponiveis para {activeDay}.</Text>
+        <Text style={[styles.hint, { color: theme.textMuted }]}>{t("Exibindo registros disponiveis para")}{' '}{activeDay}.</Text>
       </SurfaceCard>
 
       <SurfaceCard title="Aulas do dia" subtitle="Horario, disciplina e status">
@@ -76,7 +78,7 @@ export default function AlunoGradeScreen() {
             accent={colors.blue}
           />
         ))}
-        {aulas.length === 0 ? <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhuma aula registrada ainda.</Text> : null}
+        {aulas.length === 0 ? <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhuma aula registrada ainda.")}</Text> : null}
       </SurfaceCard>
     </ScrollView>
   );

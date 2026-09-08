@@ -34,6 +34,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { gridService } from '@/services/grid.service';
 import type { Chamado, ItemEstoque, Tarefa } from '@/types/grid.types';
 import { buildDateTrend, topGroups } from '@/utils/dashboardAnalytics';
+import { useI18n } from '@/hooks/useI18n';
 
 const GRID_PRESETS: MobileReportPreset[] = [
   {
@@ -75,6 +76,7 @@ const GRID_PRESETS: MobileReportPreset[] = [
 ];
 
 export default function RelatoriosGridScreen() {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const [mode, setMode] = useState<'summary' | 'builder'>('summary');
   const [loading, setLoading] = useState(true);
@@ -472,7 +474,7 @@ export default function RelatoriosGridScreen() {
                         {ticket.codigo} | {ticket.titulo}
                       </Text>
                       <Text numberOfLines={1} style={[styles.ticketMeta, { color: theme.textMuted }]}>
-                        {ticket.responsavel_nome ?? 'Sem responsavel'} | {ticket.bloco_nome ?? ticket.bloco_texto ?? 'Local nao informado'}
+                        {ticket.responsavel_nome ?? t("Sem responsavel")} | {ticket.bloco_nome ?? ticket.bloco_texto ?? t("Local nao informado")}
                       </Text>
                     </View>
                     <Text style={[styles.ticketStatus, { color: priorityColor(ticket.prioridade) }]}>
@@ -482,8 +484,7 @@ export default function RelatoriosGridScreen() {
                 ))
             ) : (
               <Text style={[styles.empty, { color: theme.textMuted }]}>
-                Nenhum chamado encontrado.
-              </Text>
+                {t("Nenhum chamado encontrado.")}</Text>
             )}
           </SurfaceCard>
 
@@ -548,13 +549,13 @@ export default function RelatoriosGridScreen() {
                   label="Data inicial"
                   value={fromDate}
                   onChangeText={setFromDate}
-                  placeholder="AAAA-MM-DD"
+                  placeholder={t("AAAA-MM-DD")}
                 />
                 <ReportTextField
                   label="Data final"
                   value={toDate}
                   onChangeText={setToDate}
-                  placeholder="AAAA-MM-DD"
+                  placeholder={t("AAAA-MM-DD")}
                 />
               </View>
             </View>

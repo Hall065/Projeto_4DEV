@@ -9,6 +9,7 @@ import { notifySelection } from '@/utils/feedback';
 import { ApexChart } from './ApexChart';
 import { toApexHorizontalBar } from './apex/adapters';
 import type { ChartDatum } from './types';
+import { useI18n } from '@/hooks/useI18n';
 
 interface InteractiveBarChartProps {
   data: ChartDatum[];
@@ -21,6 +22,7 @@ export function InteractiveBarChart({
   formatValue = (value) => String(value),
   tone = 'light',
 }: InteractiveBarChartProps) {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const { reduceMotion, shouldAnimate } = useMotionPreference();
   const dark = tone === 'dark' || theme.isDark;
@@ -61,7 +63,7 @@ export function InteractiveBarChart({
   };
 
   if (!normalizedData.length) {
-    return <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum dado para exibir.</Text>;
+    return <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhum dado para exibir.")}</Text>;
   }
 
   return (
@@ -104,7 +106,7 @@ export function InteractiveBarChart({
               </View>
               {isSelected ? (
                 <Text style={[styles.meta, { color: theme.textMuted }]}>
-                  {item.meta ?? percent + '% do total analisado'}
+                  {item.meta ?? `${percent}${t('% do total analisado')}`}
                 </Text>
               ) : null}
             </Pressable>

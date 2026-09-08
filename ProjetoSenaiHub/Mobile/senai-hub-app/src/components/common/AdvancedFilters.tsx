@@ -5,6 +5,7 @@ import { AnimatedPressable, AppButton, FeedbackMessage, SurfaceCard } from '@/co
 import { colors } from '@/constants/colors';
 import { radius, spacing, touchTarget } from '@/constants/designTokens';
 import { useThemeColors } from '@/hooks/useThemeColors';
+import { useI18n } from '@/hooks/useI18n';
 
 export interface FilterOption {
   value: string;
@@ -28,6 +29,7 @@ export function AdvancedFilterPanel({
   onClear,
   error,
 }: AdvancedFilterPanelProps) {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const [expanded, setExpanded] = useState(false);
 
@@ -35,7 +37,7 @@ export function AdvancedFilterPanel({
     <SurfaceCard>
       <AnimatedPressable
         accessibilityRole="button"
-        accessibilityLabel="Filtros avancados"
+        accessibilityLabel={t("Filtros avancados")}
         accessibilityState={{ expanded }}
         onPress={() => setExpanded((current) => !current)}
         style={styles.header}
@@ -43,9 +45,9 @@ export function AdvancedFilterPanel({
         <View style={styles.headerCopy}>
           <SlidersHorizontal size={18} color={colors.primary} />
           <View>
-            <Text style={[styles.title, { color: theme.text }]}>Filtros avancados</Text>
+            <Text style={[styles.title, { color: theme.text }]}>{t("Filtros avancados")}</Text>
             <Text style={[styles.summary, { color: theme.textMuted }]}>
-              {resultCount} resultado(s){activeCount ? ` - ${activeCount} ativo(s)` : ''}
+              {resultCount} {' '}{t("resultado(s)")}{activeCount ? ` - ${activeCount} ativo(s)` : ''}
             </Text>
           </View>
         </View>

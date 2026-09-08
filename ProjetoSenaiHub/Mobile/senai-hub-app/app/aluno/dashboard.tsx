@@ -9,8 +9,10 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { studentService, type StudentDashboardData } from '@/services/student.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { buildDateTrend } from '@/utils/dashboardAnalytics';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function AlunoDashboardScreen() {
+  const { t } = useI18n();
   const session = useAuthStore((s) => s.session);
   const theme = useThemeColors();
   const [loading, setLoading] = useState(true);
@@ -115,7 +117,7 @@ export default function AlunoDashboardScreen() {
             accent={colors.green}
           />
         ))}
-        {frequencias.length === 0 ? <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhuma frequencia cadastrada.</Text> : null}
+        {frequencias.length === 0 ? <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhuma frequencia cadastrada.")}</Text> : null}
       </SurfaceCard>
     </ScrollView>
   );

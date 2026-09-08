@@ -11,6 +11,7 @@ import {
 import { Check, X } from 'lucide-react-native';
 import { AnimatedPressable } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
+import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 export interface WorkflowTab {
@@ -30,6 +31,7 @@ export function WorkflowTabs({
   onChange: (id: string) => void;
 }) {
   const theme = useThemeColors();
+  const { t } = useI18n();
 
   return (
     <ScrollView
@@ -55,7 +57,7 @@ export function WorkflowTabs({
             onPress={() => onChange(tab.id)}
           >
             <Text style={[styles.tabLabel, { color: selected ? colors.white : theme.text }]}>
-              {tab.label}
+              {t(tab.label)}
             </Text>
             <View
               style={[
@@ -88,6 +90,7 @@ export function WorkflowSheet({
   children: ReactNode;
 }) {
   const theme = useThemeColors();
+  const { t } = useI18n();
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -105,7 +108,7 @@ export function WorkflowSheet({
             </View>
             <AnimatedPressable
               accessibilityRole="button"
-              accessibilityLabel="Fechar"
+              accessibilityLabel={t('Fechar')}
               style={[styles.closeButton, { backgroundColor: theme.surfaceSoft }]}
               onPress={onClose}
             >
@@ -133,6 +136,7 @@ export function WorkflowProgress({
   currentIndex: number;
 }) {
   const theme = useThemeColors();
+  const { t } = useI18n();
 
   return (
     <View style={styles.progress}>
@@ -183,7 +187,7 @@ export function WorkflowProgress({
                 active && styles.progressLabelActive,
               ]}
             >
-              {step.label}
+              {t(step.label)}
             </Text>
           </View>
         );
@@ -202,14 +206,17 @@ export function InfoRow({
   icon?: ReactNode;
 }) {
   const theme = useThemeColors();
+  const { t } = useI18n();
 
   return (
     <View style={[styles.infoRow, { borderBottomColor: theme.line }]}>
       <View style={styles.infoLabelWrap}>
         {icon}
-        <Text style={[styles.infoLabel, { color: theme.textMuted }]}>{label}</Text>
+        <Text style={[styles.infoLabel, { color: theme.textMuted }]}>{t(label)}</Text>
       </View>
-      <Text style={[styles.infoValue, { color: theme.text }]}>{value?.trim() || 'Nao informado'}</Text>
+      <Text style={[styles.infoValue, { color: theme.text }]}>
+        {value?.trim() || t('Nao informado')}
+      </Text>
     </View>
   );
 }

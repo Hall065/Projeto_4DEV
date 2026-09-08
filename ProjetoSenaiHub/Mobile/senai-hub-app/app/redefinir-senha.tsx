@@ -17,10 +17,12 @@ import { colors } from '@/constants/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { updatePassword } from '@/lib/auth';
 import { redefinirSenhaSchema, type RedefinirSenhaFormData } from '@/utils/validators';
+import { useI18n } from '@/hooks/useI18n';
 
 const circuitBg = require('../assets/brand/senai-circuit-bg.png');
 
 export default function RedefinirSenhaScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useThemeColors();
   const [error, setError] = useState<string | null>(null);
@@ -53,20 +55,20 @@ export default function RedefinirSenhaScreen() {
         <Image source={getBrandAsset('hub', 'slogan', theme.isDark)} style={styles.logo} resizeMode="contain" />
       </ImageBackground>
       <View style={[styles.sheet, { backgroundColor: theme.surface }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Redefinir senha</Text>
-        <Text style={[styles.subtitle, { color: theme.textMuted }]}>Digite uma nova senha para continuar usando o SENAI Hub.</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t("Redefinir senha")}</Text>
+        <Text style={[styles.subtitle, { color: theme.textMuted }]}>{t("Digite uma nova senha para continuar usando o SENAI Hub.")}</Text>
 
         <Controller
           control={control}
           name="password"
           render={({ field: { onChange, value }, fieldState: { error: fieldError } }) => (
             <View style={styles.field}>
-              <Text style={[styles.label, { color: theme.text }]}>Nova senha</Text>
+              <Text style={[styles.label, { color: theme.text }]}>{t("Nova senha")}</Text>
               <View style={[styles.inputWrap, { backgroundColor: theme.input, borderColor: theme.line }]}>
                 <Lock size={17} color={theme.textMuted} />
                 <TextInput
                   style={[styles.input, { color: theme.text }]}
-                  placeholder="••••••••"
+                  placeholder={t("••••••••")}
                   placeholderTextColor={theme.textSubtle}
                   secureTextEntry
                   value={value}
@@ -84,12 +86,12 @@ export default function RedefinirSenhaScreen() {
           name="confirmPassword"
           render={({ field: { onChange, value }, fieldState: { error: fieldError } }) => (
             <View style={styles.field}>
-              <Text style={[styles.label, { color: theme.text }]}>Confirmar senha</Text>
+              <Text style={[styles.label, { color: theme.text }]}>{t("Confirmar senha")}</Text>
               <View style={[styles.inputWrap, { backgroundColor: theme.input, borderColor: theme.line }]}>
                 <Lock size={17} color={theme.textMuted} />
                 <TextInput
                   style={[styles.input, { color: theme.text }]}
-                  placeholder="••••••••"
+                  placeholder={t("••••••••")}
                   placeholderTextColor={theme.textSubtle}
                   secureTextEntry
                   value={value}

@@ -12,6 +12,7 @@ import { connectService } from '@/services/connect.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { CampusPersonLegendItem, CampusPersonLocation } from '@/types/campusPeople';
 import type { Aluno, LocalizacaoAluno, Turma } from '@/types/connect.types';
+import { useI18n } from '@/hooks/useI18n';
 
 type Tab = 'turmas' | 'alunos';
 const EMPTY_FILTERS = { alunoId: '', turmaId: '', cursoId: '', emAula: '', perimetro: '' };
@@ -33,6 +34,7 @@ function locationMarkerColor(location: LocalizacaoAluno) {
 }
 
 export default function LocalizacaoScreen() {
+  const { t } = useI18n();
   const session = useAuthStore((s) => s.session);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<Tab>('turmas');
@@ -216,7 +218,7 @@ export default function LocalizacaoScreen() {
             <AppButton label="Turmas" variant={tab === 'turmas' ? 'primary' : 'secondary'} accent={connectTheme.accent} onPress={() => setTab('turmas')} wrapperStyle={styles.tab} />
             <AppButton label="Alunos" variant={tab === 'alunos' ? 'primary' : 'secondary'} accent={connectTheme.accent} onPress={() => setTab('alunos')} wrapperStyle={styles.tab} />
           </View>
-          <SearchField placeholder="Buscar turmas ou alunos..." value={search} onChangeText={setSearch} />
+          <SearchField placeholder={t("Buscar turmas ou alunos...")} value={search} onChangeText={setSearch} />
 
           <ScrollView style={styles.listPanel} nestedScrollEnabled>
             {tab === 'turmas'
@@ -286,23 +288,23 @@ export default function LocalizacaoScreen() {
           {selectedLocation ? (
             <View style={styles.infoCard}>
               <Text style={styles.infoTitle}>{selectedLocation.aluno_nome ?? selectedLocation.aluno_id}</Text>
-              <Text style={styles.infoText}>{selectedLocation.turma_nome ?? 'Turma nao vinculada'}</Text>
+              <Text style={styles.infoText}>{selectedLocation.turma_nome ?? t("Turma nao vinculada")}</Text>
               <Text style={styles.infoText}>
                 {(selectedLocation.dentro_do_senai ?? selectedLocation.dentro_perimetro) === true
-                  ? 'Dentro do perimetro'
+                  ? t("Dentro do perimetro")
                   : (selectedLocation.dentro_do_senai ?? selectedLocation.dentro_perimetro) === false
-                    ? 'Fora do perimetro'
-                    : 'Perimetro sem informacao'}
+                    ? t("Fora do perimetro")
+                    : t("Perimetro sem informacao")}
               </Text>
               <Text style={styles.infoText}>
-                Latitude {Number(selectedLocation.latitude).toFixed(6)} - Longitude {Number(selectedLocation.longitude).toFixed(6)}
+                {t("Latitude")}{' '}{Number(selectedLocation.latitude).toFixed(6)} {' '}{t("- Longitude")}{' '}{Number(selectedLocation.longitude).toFixed(6)}
               </Text>
               {selectedLocation.precisao_metros != null ? (
-                <Text style={styles.infoText}>Precisao informada: {selectedLocation.precisao_metros} m</Text>
+                <Text style={styles.infoText}>{t("Precisao informada:")}{' '}{selectedLocation.precisao_metros} m</Text>
               ) : null}
             </View>
           ) : (
-            <Text style={styles.empty}>Selecione no mapa ou na lista um aluno com coordenadas reais.</Text>
+            <Text style={styles.empty}>{t("Selecione no mapa ou na lista um aluno com coordenadas reais.")}</Text>
           )}
         </SurfaceCard>
       </View>

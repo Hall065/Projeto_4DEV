@@ -10,6 +10,7 @@ import { USER_STATUS_OPTIONS } from '@/constants/form-options';
 import { useCrudResource } from '@/hooks/useCrudResource';
 import { connectService } from '@/services/connect.service';
 import type { Professor } from '@/types/connect.types';
+import { useI18n } from '@/hooks/useI18n';
 
 const fields: CrudField[] = [
   { name: 'foto_uri', label: 'Foto de perfil', type: 'image' },
@@ -46,6 +47,7 @@ function formValues(professor: Professor): Record<string, string> {
 }
 
 export default function ProfessoresScreen() {
+  const { t } = useI18n();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Professor | null>(null);
   const [search, setSearch] = useState('');
@@ -87,7 +89,7 @@ export default function ProfessoresScreen() {
           <MetricTile label="Especialidades" value={new Set(items.map((p) => p.especialidade).filter(Boolean)).size} accent={colors.blue} icon={<GraduationCap size={16} color={colors.blue} />} style={styles.metric} />
         </View>
 
-        <SearchField placeholder="Buscar por nome, e-mail ou CPF..." value={search} onChangeText={setSearch} />
+        <SearchField placeholder={t("Buscar por nome, e-mail ou CPF...")} value={search} onChangeText={setSearch} />
 
         <AdvancedFilterPanel
           resultCount={filtered.length}
@@ -105,7 +107,7 @@ export default function ProfessoresScreen() {
 
         <SurfaceCard title="Professores cadastrados" subtitle="Equipe docente ativa">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}
-          {filtered.length === 0 ? <Text style={styles.empty}>Nenhum professor encontrado.</Text> : null}
+          {filtered.length === 0 ? <Text style={styles.empty}>{t("Nenhum professor encontrado.")}</Text> : null}
           {filtered.map((professor) => (
             <ListRow
               key={professor.id}

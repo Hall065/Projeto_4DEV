@@ -1,13 +1,11 @@
 import { useFocusEffect } from 'expo-router';
-import { Plus } from 'lucide-react-native';
 import { useCallback, useMemo, useState } from 'react';
-import { View } from 'react-native';
 import { CrudModal, type CrudField } from '@/components/common/CrudModal';
 import { FeedbackMessage, SearchField, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { SafeAuthorizationRow } from '@/components/safe/SafeAuthorizationRow';
 import { ModuleScreen } from '@/components/screens/ModuleScreen';
-import { colors } from '@/constants/colors';
 import { useSafeStore } from '@/stores/safe.store';
+import { useI18n } from '@/hooks/useI18n';
 
 function initialScheduledDate() {
   const value = new Date();
@@ -16,6 +14,7 @@ function initialScheduledDate() {
 }
 
 export default function SafeAuthorizationsScreen() {
+  const { t } = useI18n();
   const [search, setSearch] = useState('');
   const [creating, setCreating] = useState(false);
   const authorizations = useSafeStore((state) => state.authorizations);
@@ -77,7 +76,7 @@ export default function SafeAuthorizationsScreen() {
         emptyTitle="Nenhuma autorizacao criada"
       >
         {error ? <FeedbackMessage variant="danger" message={error} /> : null}
-        <SearchField placeholder="Buscar aluno, turma ou protocolo" value={search} onChangeText={setSearch} />
+        <SearchField placeholder={t("Buscar aluno, turma ou protocolo")} value={search} onChangeText={setSearch} />
         <SurfaceCard title="Solicitacoes" subtitle={String(filtered.length) + ' resultado(s)'}>
           {filtered.map((item) => <SafeAuthorizationRow key={item.id} item={item} />)}
         </SurfaceCard>

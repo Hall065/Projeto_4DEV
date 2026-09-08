@@ -15,6 +15,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { connectService } from '@/services/connect.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { Aluno, Professor, Turma } from '@/types/connect.types';
+import { useI18n } from '@/hooks/useI18n';
 
 type AulaStatus = 'presente' | 'falta_justificada' | 'falta_injustificada';
 
@@ -52,6 +53,7 @@ function formatDate(date: string) {
 }
 
 export default function FrequenciaScreen() {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const session = useAuthStore((state) => state.session);
   const [loading, setLoading] = useState(true);
@@ -271,7 +273,7 @@ export default function FrequenciaScreen() {
       });
       setHasExistingAttendance(true);
       Alert.alert(
-        'Frequencia',
+        t("Frequencia"),
         result.created ? 'Chamada salva com sucesso!' : 'Chamada atualizada com sucesso!'
       );
     } catch (err) {
@@ -296,7 +298,7 @@ export default function FrequenciaScreen() {
         >
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}
 
-          <Text style={[styles.label, { color: theme.text }]}>Turma</Text>
+          <Text style={[styles.label, { color: theme.text }]}>{t("Turma")}</Text>
           {turmas.length > 0 ? (
             <ScrollView
               horizontal
@@ -334,12 +336,11 @@ export default function FrequenciaScreen() {
             </ScrollView>
           ) : (
             <Text style={[styles.empty, { color: theme.textMuted }]}>
-              Nenhuma turma disponivel.
-            </Text>
+              {t("Nenhuma turma disponivel.")}</Text>
           )}
 
           <View style={styles.configSection}>
-            <Text style={[styles.label, { color: theme.text }]}>Data</Text>
+            <Text style={[styles.label, { color: theme.text }]}>{t("Data")}</Text>
             <View
               style={[
                 styles.dateControl,
@@ -348,7 +349,7 @@ export default function FrequenciaScreen() {
             >
               <AnimatedPressable
                 accessibilityRole="button"
-                accessibilityLabel="Dia anterior"
+                accessibilityLabel={t("Dia anterior")}
                 onPress={() => setDataAula((current) => addDays(current, -1))}
                 style={styles.iconButton}
               >
@@ -362,7 +363,7 @@ export default function FrequenciaScreen() {
               </View>
               <AnimatedPressable
                 accessibilityRole="button"
-                accessibilityLabel="Proximo dia"
+                accessibilityLabel={t("Proximo dia")}
                 onPress={() => setDataAula((current) => addDays(current, 1))}
                 style={styles.iconButton}
               >
@@ -379,7 +380,7 @@ export default function FrequenciaScreen() {
           </View>
 
           <View style={styles.configSection}>
-            <Text style={[styles.label, { color: theme.text }]}>Aulas no dia</Text>
+            <Text style={[styles.label, { color: theme.text }]}>{t("Aulas no dia")}</Text>
             <View style={styles.lessonSelector}>
               {[1, 2, 3, 4, 5].map((value) => {
                 const active = quantidadeAulas === value;
@@ -426,7 +427,7 @@ export default function FrequenciaScreen() {
 
           {alunos.length > 6 ? (
             <SearchField
-              placeholder="Buscar aluno ou RM..."
+              placeholder={t("Buscar aluno ou RM...")}
               value={search}
               onChangeText={setSearch}
             />
@@ -436,21 +437,18 @@ export default function FrequenciaScreen() {
             <View style={styles.inlineLoading}>
               <ActivityIndicator color={connectTheme.accent} />
               <Text style={[styles.loadingText, { color: theme.textMuted }]}>
-                Carregando chamada...
-              </Text>
+                {t("Carregando chamada...")}</Text>
             </View>
           ) : null}
 
           {!loadingAttendance && alunos.length === 0 ? (
             <Text style={[styles.empty, { color: theme.textMuted }]}>
-              Esta turma nao possui alunos cadastrados.
-            </Text>
+              {t("Esta turma nao possui alunos cadastrados.")}</Text>
           ) : null}
 
           {!loadingAttendance && alunos.length > 0 && filteredStudents.length === 0 ? (
             <Text style={[styles.empty, { color: theme.textMuted }]}>
-              Nenhum aluno encontrado.
-            </Text>
+              {t("Nenhum aluno encontrado.")}</Text>
           ) : null}
 
           {!loadingAttendance
@@ -485,7 +483,7 @@ export default function FrequenciaScreen() {
                           {aluno.nome}
                         </Text>
                         <Text style={[styles.studentRm, { color: theme.textMuted }]}>
-                          RM {aluno.rm ?? 'nao informado'}
+                          {t("RM")}{' '}{aluno.rm ?? t("nao informado")}
                         </Text>
                       </View>
                       <View
@@ -511,8 +509,7 @@ export default function FrequenciaScreen() {
                       <View style={styles.missedLessonsRow}>
                         <View style={styles.missedLessonsHeader}>
                           <Text style={[styles.missedLessonsLabel, { color: theme.textMuted }]}>
-                            Aulas faltadas
-                          </Text>
+                            {t("Aulas faltadas")}</Text>
                           <Text style={[styles.missedLessonsCount, { color: absenceColor }]}>
                             {mark.missedLessons}/{quantidadeAulas}
                           </Text>
@@ -547,7 +544,7 @@ export default function FrequenciaScreen() {
                                     { color: missed ? colors.white : theme.textMuted },
                                   ]}
                                 >
-                                  {missed ? 'X' : lesson}
+                                  {missed ? t("X") : lesson}
                                 </Text>
                               </AnimatedPressable>
                             );

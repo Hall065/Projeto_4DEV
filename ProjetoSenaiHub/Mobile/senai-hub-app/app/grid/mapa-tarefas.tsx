@@ -44,6 +44,7 @@ import {
   ticketMarkerColor,
 } from '@/utils/campusTicketMarkers';
 import { normalizeDateToIso } from '@/utils/formatters';
+import { useI18n } from '@/hooks/useI18n';
 
 const EMPTY_FILTERS = { kind: '', status: '', priority: '', blockId: '', assigneeId: '', categoryId: '', from: '', to: '' };
 
@@ -51,6 +52,7 @@ const makeChannelName = () =>
   `grid-campus-map-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
 export default function MapaTarefasScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useThemeColors();
   const [loading, setLoading] = useState(true);
@@ -250,7 +252,7 @@ export default function MapaTarefasScreen() {
 
       <SurfaceCard title="Filtrar atendimentos" subtitle="Refine os marcadores exibidos no mapa">
         <SearchField
-          placeholder="Buscar codigo, titulo, sala ou responsavel..."
+          placeholder={t("Buscar codigo, titulo, sala ou responsavel...")}
           value={search}
           onChangeText={setSearch}
         />
@@ -273,8 +275,8 @@ export default function MapaTarefasScreen() {
         <FilterChoice label="Bloco" value={draftFilters.blockId} options={blockOptions} onChange={(blockId) => setDraftFilters((current) => ({ ...current, blockId }))} />
         <FilterChoice label="Responsavel" value={draftFilters.assigneeId} options={assigneeOptions} onChange={(assigneeId) => setDraftFilters((current) => ({ ...current, assigneeId }))} />
         <FilterChoice label="Categoria do chamado" value={draftFilters.categoryId} options={categoryOptions} onChange={(categoryId) => setDraftFilters((current) => ({ ...current, categoryId }))} />
-        <FilterTextField label="Periodo inicial" value={draftFilters.from} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(from) => setDraftFilters((current) => ({ ...current, from }))} />
-        <FilterTextField label="Periodo final" value={draftFilters.to} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(to) => setDraftFilters((current) => ({ ...current, to }))} />
+        <FilterTextField label="Periodo inicial" value={draftFilters.from} placeholder={t("DD/MM/AAAA")} keyboardType="numeric" onChangeText={(from) => setDraftFilters((current) => ({ ...current, from }))} />
+        <FilterTextField label="Periodo final" value={draftFilters.to} placeholder={t("DD/MM/AAAA")} keyboardType="numeric" onChangeText={(to) => setDraftFilters((current) => ({ ...current, to }))} />
       </AdvancedFilterPanel>
 
       {selectedMarker ? (
@@ -310,8 +312,7 @@ export default function MapaTarefasScreen() {
           ))
         ) : (
           <Text style={[styles.empty, { color: theme.textMuted }]}>
-            Nenhum chamado ou tarefa corresponde aos filtros atuais.
-          </Text>
+            {t("Nenhum chamado ou tarefa corresponde aos filtros atuais.")}</Text>
         )}
       </SurfaceCard>
     </ModuleScreen>
@@ -325,6 +326,7 @@ function SelectedMarkerCard({
   marker: CampusTicketMarker;
   onOpen: () => void;
 }) {
+  const { t } = useI18n();
   const theme = useThemeColors();
   return (
     <SurfaceCard
@@ -347,12 +349,12 @@ function SelectedMarkerCard({
         </View>
       </View>
       <Text style={[styles.selectedMeta, { color: theme.textMuted }]}>
-        Bloco {marker.blockId}
+        {t("Bloco")}{' '}{marker.blockId}
         {marker.room ? ` | Sala ${marker.room}` : ''}
         {` | ${CAMPUS_TICKET_STATUS_LABELS[marker.status]}`}
       </Text>
       <Text style={[styles.selectedMeta, { color: theme.textMuted }]}>
-        Responsavel: {marker.assignee ?? 'Nao atribuido'}
+        {t("Responsavel:")}{' '}{marker.assignee ?? t("Nao atribuido")}
       </Text>
       {marker.detail ? (
         <Text numberOfLines={3} style={[styles.selectedDetail, { color: theme.textMuted }]}>

@@ -4,6 +4,7 @@ import { EmptyState } from '@/components/common/EmptyState';
 import { FeedbackMessage, LoadingState, SurfaceCard } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
 import { radius, spacing } from '@/constants/designTokens';
+import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface ChartCardProps {
@@ -30,21 +31,25 @@ export function ChartCard({
   tone = 'light',
 }: ChartCardProps) {
   const theme = useThemeColors();
+  const { t } = useI18n();
   const dark = tone === 'dark' || theme.isDark;
 
   return (
-    <SurfaceCard title={title} subtitle={subtitle} tone={tone}>
+    <SurfaceCard title={t(title)} subtitle={t(subtitle)} tone={tone}>
       {summary ? (
         <View style={[styles.summary, { backgroundColor: dark ? theme.surfaceSoft : colors.panelSoft, borderColor: theme.line }]}>
           <Text style={[styles.summaryText, { color: dark ? theme.textMuted : colors.grayText }]}>{summary}</Text>
         </View>
       ) : null}
       {loading ? (
-        <LoadingState label="Carregando dados do gráfico..." tone={tone} />
+        <LoadingState label={t('Carregando dados do gráfico...')} tone={tone} />
       ) : error ? (
         <FeedbackMessage message={error} variant="danger" tone={tone} />
       ) : empty ? (
-        <EmptyState title={emptyTitle} description="Ajuste os filtros ou cadastre novos registros." />
+        <EmptyState
+          title={t(emptyTitle)}
+          description={t('Ajuste os filtros ou cadastre novos registros.')}
+        />
       ) : (
         children
       )}

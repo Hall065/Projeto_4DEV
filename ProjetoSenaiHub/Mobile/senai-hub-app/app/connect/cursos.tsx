@@ -12,6 +12,7 @@ import { CURSO_MODALIDADE_OPTIONS, PERIODO_OPTIONS, USER_STATUS_OPTIONS } from '
 import { useCrudResource } from '@/hooks/useCrudResource';
 import { connectService } from '@/services/connect.service';
 import type { Curso } from '@/types/connect.types';
+import { useI18n } from '@/hooks/useI18n';
 
 const fields: CrudField[] = [
   { name: 'nome', label: 'Nome do curso', required: true },
@@ -38,6 +39,7 @@ function formValues(curso: Curso): Record<string, string> {
 }
 
 export default function CursosScreen() {
+  const { t } = useI18n();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Curso | null>(null);
   const [draftFilters, setDraftFilters] = useState({ status: '', modalidade: '', periodo: '' });
@@ -106,7 +108,7 @@ export default function CursosScreen() {
 
         <SurfaceCard title="Catalogo" subtitle="Cursos cadastrados">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}
-          {filteredItems.length === 0 ? <Text style={styles.empty}>Nenhum curso encontrado.</Text> : null}
+          {filteredItems.length === 0 ? <Text style={styles.empty}>{t("Nenhum curso encontrado.")}</Text> : null}
           {filteredItems.map((curso) => (
             <ListRow
               key={curso.id}

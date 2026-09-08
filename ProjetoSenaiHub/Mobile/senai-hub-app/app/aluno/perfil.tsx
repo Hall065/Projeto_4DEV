@@ -7,8 +7,10 @@ import { colors } from '@/constants/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { studentService, type StudentDashboardData } from '@/services/student.service';
 import { useAuthStore } from '@/stores/auth.store';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function AlunoPerfilScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const session = useAuthStore((s) => s.session);
   const logout = useAuthStore((s) => s.logout);
@@ -53,7 +55,7 @@ export default function AlunoPerfilScreen() {
         <View style={[styles.profileHero, { backgroundColor: theme.isDark ? theme.surfaceSoft : colors.primary }]}>
           <View style={[styles.avatar, { borderColor: colors.white, backgroundColor: colors.primaryDark }]}>
             {aluno?.foto_url ?? session?.perfil?.foto_url ? (
-              <Image source={{ uri: aluno?.foto_url ?? session?.perfil?.foto_url ?? '' }} style={styles.avatarImage} accessibilityLabel="Foto do aluno" />
+              <Image source={{ uri: aluno?.foto_url ?? session?.perfil?.foto_url ?? '' }} style={styles.avatarImage} accessibilityLabel={t("Foto do aluno")} />
             ) : (
               <Text style={styles.avatarText}>{initials}</Text>
             )}
@@ -89,7 +91,7 @@ export default function AlunoPerfilScreen() {
             <Info label="Termino" value={contrato.data_termino} />
           </>
         ) : (
-          <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum contrato encontrado.</Text>
+          <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhum contrato encontrado.")}</Text>
         )}
       </SurfaceCard>
 

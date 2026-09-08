@@ -11,6 +11,7 @@ import {
 import { SendHorizonal } from 'lucide-react-native';
 import { AnimatedPressable } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
+import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface ChatInputProps {
@@ -20,6 +21,7 @@ interface ChatInputProps {
 
 export function ChatInput({ disabled, onSend }: ChatInputProps) {
   const theme = useThemeColors();
+  const { t } = useI18n();
   const inputRef = useRef<TextInput>(null);
   const [value, setValue] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -57,7 +59,7 @@ export function ChatInput({ disabled, onSend }: ChatInputProps) {
       <TextInput
         ref={inputRef}
         style={[styles.input, { color: theme.text }]}
-        placeholder="Pergunte sobre alunos, turmas, chamados..."
+        placeholder={t('Pergunte sobre alunos, turmas, chamados...')}
         placeholderTextColor={theme.textSubtle}
         value={value}
         onChangeText={setValue}
@@ -69,7 +71,7 @@ export function ChatInput({ disabled, onSend }: ChatInputProps) {
       />
       <AnimatedPressable
         accessibilityRole="button"
-        accessibilityLabel="Enviar mensagem"
+        accessibilityLabel={t('Enviar mensagem')}
         disabled={!canSend}
         style={[
           styles.sendButton,

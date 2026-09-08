@@ -116,7 +116,7 @@ export function SidebarDrawer({ items, moduleTitle, accentColor = colors.red }: 
           <View style={styles.brandRow}>
             <View style={styles.brandLeft}>
               <View style={styles.senaiMark}>
-                <Text style={styles.senaiText}>SENAI</Text>
+                <Text style={styles.senaiText}>{t("SENAI")}</Text>
               </View>
               <Text style={styles.moduleTitle}>{moduleTitle.replace('SENAI ', '')}</Text>
             </View>
@@ -135,10 +135,10 @@ export function SidebarDrawer({ items, moduleTitle, accentColor = colors.red }: 
             </View>
             <View style={styles.userTextWrap}>
               <Text numberOfLines={1} style={styles.userName}>
-                {session?.perfil?.nome ?? 'Usuário'}
+                {session?.perfil?.nome ?? t("Usuário")}
               </Text>
               <Text numberOfLines={1} style={styles.userRole}>
-                {session?.perfil?.tipo ?? 'perfil ativo'}
+                {session?.perfil?.tipo ?? t("perfil ativo")}
               </Text>
             </View>
           </View>

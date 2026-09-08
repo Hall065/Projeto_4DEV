@@ -11,6 +11,7 @@ import { useCrudResource } from '@/hooks/useCrudResource';
 import { ensureEmpresaUserAccess } from '@/services/empresa.service';
 import { connectService } from '@/services/connect.service';
 import type { Empresa } from '@/types/connect.types';
+import { useI18n } from '@/hooks/useI18n';
 
 const PASSWORD_MIN_LENGTH = 6;
 
@@ -90,6 +91,7 @@ function getEmpresaValues(values: Record<string, string>) {
 }
 
 export default function EmpresasScreen() {
+  const { t } = useI18n();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Empresa | null>(null);
   const [search, setSearch] = useState('');
@@ -129,7 +131,7 @@ export default function EmpresasScreen() {
           <MetricTile label="Parceiras" value={new Set(items.map((e) => e.cnpj ?? e.nome)).size} accent={colors.orange} icon={<BriefcaseBusiness size={16} color={colors.orange} />} style={styles.metric} />
         </View>
 
-        <SearchField placeholder="Buscar empresa, CNPJ ou responsavel..." value={search} onChangeText={setSearch} />
+        <SearchField placeholder={t("Buscar empresa, CNPJ ou responsavel...")} value={search} onChangeText={setSearch} />
 
         <AdvancedFilterPanel
           resultCount={filtered.length}
@@ -145,7 +147,7 @@ export default function EmpresasScreen() {
 
         <SurfaceCard title="Empresas cadastradas" subtitle="Dados usados nos contratos">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}
-          {filtered.length === 0 ? <Text style={styles.empty}>Nenhuma empresa encontrada.</Text> : null}
+          {filtered.length === 0 ? <Text style={styles.empty}>{t("Nenhuma empresa encontrada.")}</Text> : null}
           {filtered.map((empresa) => (
             <ListRow
               key={empresa.id}

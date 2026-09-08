@@ -40,6 +40,7 @@ static-map-*.err.log
 # local env files
 .env
 .env*.local
+supabase/functions/.env*
 
 # typescript
 *.tsbuildinfo

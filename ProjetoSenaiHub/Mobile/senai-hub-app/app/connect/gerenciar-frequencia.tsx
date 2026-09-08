@@ -16,6 +16,7 @@ import { exportService } from '@/services/export.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { FrequenciaRegistro } from '@/types/connect.types';
 import { normalizeDateToIso } from '@/utils/formatters';
+import { useI18n } from '@/hooks/useI18n';
 
 function normalizeAttendanceStatus(status: FrequenciaRegistro['status']) {
   if (status === 'P') return 'presente';
@@ -33,6 +34,7 @@ function validIsoDate(value: string) {
 }
 
 export default function GerenciarFrequenciaScreen() {
+  const { t } = useI18n();
   const session = useAuthStore((s) => s.session);
   const { isEmpresa, empresa, empresaId, loading: empresaLoading } = useEmpresaContext();
   const [loading, setLoading] = useState(true);
@@ -157,8 +159,8 @@ export default function GerenciarFrequenciaScreen() {
         <FilterChoice label="Aprendiz" value={draftFilters.alunoId} options={alunoOptions} onChange={(alunoId) => setDraftFilters((current) => ({ ...current, alunoId }))} />
         <FilterChoice label="Status" value={draftFilters.status} options={FREQUENCIA_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
         <FilterChoice label="Turma" value={draftFilters.turmaId} options={turmaOptions} onChange={(turmaId) => setDraftFilters((current) => ({ ...current, turmaId }))} />
-        <FilterTextField label="Data inicial" value={draftFilters.from} placeholder="DD/MM/AAAA" onChangeText={(from) => setDraftFilters((current) => ({ ...current, from }))} keyboardType="numeric" />
-        <FilterTextField label="Data final" value={draftFilters.to} placeholder="DD/MM/AAAA" onChangeText={(to) => setDraftFilters((current) => ({ ...current, to }))} keyboardType="numeric" />
+        <FilterTextField label="Data inicial" value={draftFilters.from} placeholder={t("DD/MM/AAAA")} onChangeText={(from) => setDraftFilters((current) => ({ ...current, from }))} keyboardType="numeric" />
+        <FilterTextField label="Data final" value={draftFilters.to} placeholder={t("DD/MM/AAAA")} onChangeText={(to) => setDraftFilters((current) => ({ ...current, to }))} keyboardType="numeric" />
       </AdvancedFilterPanel>
 
       <ChartCard

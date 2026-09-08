@@ -49,6 +49,7 @@ import {
   formatCurrencyInput,
   normalizeDecimalInput,
 } from '@/utils/formatters';
+import { useI18n } from '@/hooks/useI18n';
 
 type StatusFilter = 'all' | 'calculado' | 'pago' | 'pendente';
 
@@ -81,6 +82,7 @@ function normalizedStatus(value?: string | null) {
 }
 
 export default function SalarioScreen() {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const { confirm } = useConfirmDialog();
   const session = useAuthStore((state) => state.session);
@@ -373,9 +375,9 @@ export default function SalarioScreen() {
             title="Simulador"
             subtitle="Selecione o aprendiz e confira a previa antes de salvar"
           >
-            <Text style={[styles.label, { color: theme.text }]}>Aprendiz</Text>
+            <Text style={[styles.label, { color: theme.text }]}>{t("Aprendiz")}</Text>
             <SearchField
-              placeholder="Buscar por nome, RM ou turma..."
+              placeholder={t("Buscar por nome, RM ou turma...")}
               value={studentSearch}
               onChangeText={setStudentSearch}
             />
@@ -383,8 +385,7 @@ export default function SalarioScreen() {
               <View style={styles.inlineLoading}>
                 <ActivityIndicator color={connectTheme.accent} />
                 <Text style={[styles.helperText, { color: theme.textMuted }]}>
-                  Carregando aprendizes...
-                </Text>
+                  {t("Carregando aprendizes...")}</Text>
               </View>
             ) : (
               <ScrollView
@@ -417,9 +418,9 @@ export default function SalarioScreen() {
                   {selectedStudentData.nome}
                 </Text>
                 <Text style={[styles.helperText, { color: theme.textMuted }]}>
-                  {selectedStudentData.turma_nome ?? 'Turma nao informada'} ·{' '}
-                  {selectedStudentData.curso_nome ?? 'Curso nao informado'} · RM{' '}
-                  {selectedStudentData.rm ?? 'nao informado'}
+                  {selectedStudentData.turma_nome ?? t("Turma nao informada")} ·{' '}
+                  {selectedStudentData.curso_nome ?? t("Curso nao informado")} {' '}{t("· RM")}{' '}
+                  {selectedStudentData.rm ?? t("nao informado")}
                 </Text>
               </View>
             ) : null}
@@ -452,11 +453,9 @@ export default function SalarioScreen() {
             >
               <View style={styles.switchText}>
                 <Text style={[styles.switchLabel, { color: theme.text }]}>
-                  Desconto automatico por faltas
-                </Text>
+                  {t("Desconto automatico por faltas")}</Text>
                 <Text style={[styles.helperText, { color: theme.textMuted }]}>
-                  Usa as faltas injustificadas registradas no mes
-                </Text>
+                  {t("Usa as faltas injustificadas registradas no mes")}</Text>
               </View>
               <Switch
                 value={useAutoDeductions}
@@ -499,7 +498,7 @@ export default function SalarioScreen() {
           subtitle={`${filteredRecords.length} fechamento(s) em ${formatMonthLabel(month)}`}
         >
           <SearchField
-            placeholder="Buscar aprendiz ou empresa..."
+            placeholder={t("Buscar aprendiz ou empresa...")}
             value={recordSearch}
             onChangeText={setRecordSearch}
           />
@@ -551,11 +550,9 @@ export default function SalarioScreen() {
             <View style={styles.emptyState}>
               <Wallet size={34} color={theme.textSubtle} />
               <Text style={[styles.emptyTitle, { color: theme.text }]}>
-                Nenhum calculo neste mes
-              </Text>
+                {t("Nenhum calculo neste mes")}</Text>
               <Text style={[styles.helperText, { color: theme.textMuted }]}>
-                Use o simulador ou o calculo em lote para gerar os fechamentos.
-              </Text>
+                {t("Use o simulador ou o calculo em lote para gerar os fechamentos.")}</Text>
             </View>
           ) : null}
 
@@ -601,6 +598,7 @@ function MonthSelector({
   onPrevious: () => void;
   onNext: () => void;
 }) {
+  const { t } = useI18n();
   const theme = useThemeColors();
   return (
     <View
@@ -611,21 +609,21 @@ function MonthSelector({
     >
       <AnimatedPressable
         accessibilityRole="button"
-        accessibilityLabel="Mes anterior"
+        accessibilityLabel={t("Mes anterior")}
         onPress={onPrevious}
         style={styles.monthButton}
       >
         <ChevronLeft size={20} color={theme.text} />
       </AnimatedPressable>
       <View style={styles.monthValue}>
-        <Text style={[styles.monthLabel, { color: theme.textMuted }]}>Referencia</Text>
+        <Text style={[styles.monthLabel, { color: theme.textMuted }]}>{t("Referencia")}</Text>
         <Text style={[styles.monthText, { color: theme.text }]}>
           {formatMonthLabel(month)}
         </Text>
       </View>
       <AnimatedPressable
         accessibilityRole="button"
-        accessibilityLabel="Proximo mes"
+        accessibilityLabel={t("Proximo mes")}
         onPress={onNext}
         style={styles.monthButton}
       >
@@ -644,6 +642,7 @@ function StudentChip({
   active: boolean;
   onPress: () => void;
 }) {
+  const { t } = useI18n();
   const theme = useThemeColors();
   return (
     <AnimatedPressable
@@ -671,7 +670,7 @@ function StudentChip({
           { color: active ? 'rgba(255,255,255,0.82)' : theme.textMuted },
         ]}
       >
-        RM {student.rm ?? 'nao informado'}
+        {t("RM")}{' '}{student.rm ?? t("nao informado")}
       </Text>
     </AnimatedPressable>
   );
@@ -688,6 +687,7 @@ function MoneyField({
   disabled?: boolean;
   onChange: (value: string) => void;
 }) {
+  const { t } = useI18n();
   const theme = useThemeColors();
   return (
     <View style={styles.moneyField}>
@@ -702,14 +702,14 @@ function MoneyField({
           },
         ]}
       >
-        <Text style={[styles.currencyPrefix, { color: theme.textMuted }]}>R$</Text>
+        <Text style={[styles.currencyPrefix, { color: theme.textMuted }]}>{t("R$")}</Text>
         <TextInput
           value={value}
           editable={!disabled}
           keyboardType="decimal-pad"
           onChangeText={(text) => onChange(formatCurrencyInput(text))}
           style={[styles.moneyInputText, { color: theme.text }]}
-          placeholder="0,00"
+          placeholder={t("0,00")}
           placeholderTextColor={theme.textSubtle}
         />
       </View>
@@ -718,6 +718,7 @@ function MoneyField({
 }
 
 function SalaryPreview({ preview }: { preview: SalaryPreviewData | null }) {
+  const { t } = useI18n();
   const theme = useThemeColors();
 
   if (!preview) {
@@ -726,11 +727,9 @@ function SalaryPreview({ preview }: { preview: SalaryPreviewData | null }) {
         <View style={styles.previewEmpty}>
           <Calculator size={38} color={theme.textSubtle} />
           <Text style={[styles.emptyTitle, { color: theme.text }]}>
-            Selecione um aprendiz e toque em Simular
-          </Text>
+            {t("Selecione um aprendiz e toque em Simular")}</Text>
           <Text style={[styles.helperText, { color: theme.textMuted }]}>
-            O calculo considera contrato, frequencia, bonus e descontos.
-          </Text>
+            {t("O calculo considera contrato, frequencia, bonus e descontos.")}</Text>
         </View>
       </SurfaceCard>
     );
@@ -748,7 +747,7 @@ function SalaryPreview({ preview }: { preview: SalaryPreviewData | null }) {
         preview.contract?.company_name ?? 'Sem contrato ativo'
       }`}
     >
-      <Text style={[styles.netLabel, { color: theme.textMuted }]}>Valor liquido</Text>
+      <Text style={[styles.netLabel, { color: theme.textMuted }]}>{t("Valor liquido")}</Text>
       <Text style={styles.netValue}>{formatCurrency(preview.amounts.net)}</Text>
 
       <View style={[styles.attendanceTrack, { backgroundColor: theme.surfaceSoft }]}>

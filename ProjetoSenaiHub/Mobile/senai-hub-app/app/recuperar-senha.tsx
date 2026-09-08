@@ -17,10 +17,12 @@ import { colors } from '@/constants/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { resetPasswordForEmail } from '@/lib/auth';
 import { recuperarSenhaSchema, type RecuperarSenhaFormData } from '@/utils/validators';
+import { useI18n } from '@/hooks/useI18n';
 
 const circuitBg = require('../assets/brand/senai-circuit-bg.png');
 
 export default function RecuperarSenhaScreen() {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const [message, setMessage] = useState<{ text: string; variant: 'success' | 'danger' } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -52,22 +54,21 @@ export default function RecuperarSenhaScreen() {
         <Image source={getBrandAsset('hub', 'slogan', theme.isDark)} style={styles.logo} resizeMode="contain" />
       </ImageBackground>
       <View style={[styles.sheet, { backgroundColor: theme.surface }]}>
-        <Text style={[styles.title, { color: theme.text }]}>Recuperar senha</Text>
+        <Text style={[styles.title, { color: theme.text }]}>{t("Recuperar senha")}</Text>
         <Text style={[styles.subtitle, { color: theme.textMuted }]}>
-          Informe o e-mail institucional para receber as instruções de redefinição.
-        </Text>
+          {t("Informe o e-mail institucional para receber as instruções de redefinição.")}</Text>
 
         <Controller
           control={control}
           name="email"
           render={({ field: { onChange, value }, fieldState: { error } }) => (
             <View style={styles.field}>
-              <Text style={[styles.label, { color: theme.text }]}>E-mail</Text>
+              <Text style={[styles.label, { color: theme.text }]}>{t("E-mail")}</Text>
               <View style={[styles.inputWrap, { backgroundColor: theme.input, borderColor: theme.line }]}>
                 <Mail size={17} color={theme.textMuted} />
                 <TextInput
                   style={[styles.input, { color: theme.text }]}
-                  placeholder="seu@email.com"
+                  placeholder={t("seu@email.com")}
                   placeholderTextColor={theme.textSubtle}
                   autoCapitalize="none"
                   keyboardType="email-address"

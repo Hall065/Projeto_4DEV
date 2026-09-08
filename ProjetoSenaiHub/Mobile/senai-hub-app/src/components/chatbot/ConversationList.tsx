@@ -2,8 +2,10 @@ import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-nat
 import { MessageSquarePlus } from 'lucide-react-native';
 import { AnimatedPressable } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
+import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { ChatConversation } from '@/services/chatbot.service';
+import { getAppLocale } from '@/utils/locale';
 
 interface ConversationListProps {
   conversations: ChatConversation[];
@@ -14,9 +16,9 @@ interface ConversationListProps {
   onCreate: () => void;
 }
 
-function formatDate(value?: string) {
+function formatDate(value: string | undefined, locale: string) {
   if (!value) return '';
-  return new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+  return new Date(value).toLocaleDateString(locale, { day: '2-digit', month: '2-digit' });
 }
 
 export function ConversationList({
@@ -28,14 +30,16 @@ export function ConversationList({
   onCreate,
 }: ConversationListProps) {
   const theme = useThemeColors();
+  const { language, t } = useI18n();
+  const locale = getAppLocale(language);
 
   return (
     <View style={styles.wrap}>
       <View style={styles.top}>
-        <Text style={[styles.label, { color: theme.textMuted }]}>Conversas</Text>
+        <Text style={[styles.label, { color: theme.textMuted }]}>{t('Conversas')}</Text>
         <AnimatedPressable
           accessibilityRole="button"
-          accessibilityLabel="Criar nova conversa"
+          accessibilityLabel={t('Criar nova conversa')}
           style={[styles.newButton, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}
           disabled={disabled}
           onPress={onCreate}
@@ -47,7 +51,7 @@ export function ConversationList({
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.list}>
         {loading ? <ActivityIndicator color={theme.textMuted} /> : null}
         {!loading && conversations.length === 0 ? (
-          <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhuma conversa ainda</Text>
+          <Text style={[styles.empty, { color: theme.textMuted }]}>{t('Nenhuma conversa ainda')}</Text>
         ) : null}
         {conversations.map((conversation) => {
           const active = conversation.id === activeConversationId;
@@ -67,10 +71,10 @@ export function ConversationList({
               onPress={() => onSelect(conversation.id)}
             >
               <Text numberOfLines={1} style={[styles.itemTitle, { color: active ? colors.white : theme.text }]}>
-                {conversation.titulo || 'Nova conversa'}
+                {conversation.titulo || t('Nova conversa')}
               </Text>
               <Text style={[styles.itemDate, { color: active ? 'rgba(255,255,255,0.76)' : theme.textMuted }]}>
-                {formatDate(conversation.updated_at ?? conversation.created_at)}
+                {formatDate(conversation.updated_at ?? conversation.created_at, locale)}
               </Text>
             </AnimatedPressable>
           );

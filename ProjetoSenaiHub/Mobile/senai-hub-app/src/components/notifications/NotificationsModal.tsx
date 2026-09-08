@@ -8,6 +8,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useMotionPreference } from '@/hooks/useMotionPreference';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import type { Notificacao } from '@/services/notification.service';
+import { getAppLocale } from '@/utils/locale';
 
 interface NotificationsModalProps {
   visible: boolean;
@@ -26,12 +27,12 @@ function isToday(value: string) {
   return Number.isFinite(date.getTime()) && date.toDateString() === new Date().toDateString();
 }
 
-function formatRelativeTime(value: string) {
+function formatRelativeTime(value: string, locale: string, fallback: string) {
   const date = new Date(value);
-  if (!Number.isFinite(date.getTime())) return 'Data indisponivel';
+  if (!Number.isFinite(date.getTime())) return fallback;
   const diffSeconds = Math.round((date.getTime() - Date.now()) / 1000);
   const absolute = Math.abs(diffSeconds);
-  const formatter = new Intl.RelativeTimeFormat('pt-BR', { numeric: 'auto' });
+  const formatter = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
   if (absolute < 60) return formatter.format(diffSeconds, 'second');
   if (absolute < 3600) return formatter.format(Math.round(diffSeconds / 60), 'minute');
   if (absolute < 86400) return formatter.format(Math.round(diffSeconds / 3600), 'hour');
@@ -50,7 +51,8 @@ export function NotificationsModal({
   onMarkAllAsRead,
 }: NotificationsModalProps) {
   const theme = useThemeColors();
-  const { t } = useI18n();
+  const { language, t } = useI18n();
+  const locale = getAppLocale(language);
   const { duration } = useMotionPreference();
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(24)).current;
@@ -96,8 +98,8 @@ export function NotificationsModal({
             <AnimatedPressable
               key={notification.id}
               accessibilityRole="button"
-              accessibilityLabel={`${notification.titulo}. ${notification.mensagem}. ${formatRelativeTime(notification.created_at)}`}
-              accessibilityHint={actionable ? 'Toque para marcar como lida' : undefined}
+              accessibilityLabel={`${notification.titulo}. ${notification.mensagem}. ${formatRelativeTime(notification.created_at, locale, t('Data indisponivel'))}`}
+              accessibilityHint={actionable ? t('Toque para marcar como lida') : undefined}
               accessibilityState={{ disabled: !actionable }}
               disabled={!actionable}
               style={[
@@ -111,12 +113,16 @@ export function NotificationsModal({
               onPress={() => void onMarkAsRead(notification.id)}
             >
               <View style={styles.itemTop}>
-                <Text style={[styles.itemTitle, { color: theme.text }]}>{t(notification.titulo)}</Text>
-                {!notification.lida ? <View accessibilityLabel="Nao lida" style={styles.dot} /> : null}
+                <Text style={[styles.itemTitle, { color: theme.text }]}>{notification.titulo}</Text>
+                {!notification.lida ? (
+                  <View accessibilityLabel={t('Nao lida')} style={styles.dot} />
+                ) : null}
               </View>
-              <Text style={[styles.itemText, { color: theme.textMuted }]}>{t(notification.mensagem)}</Text>
+              <Text style={[styles.itemText, { color: theme.textMuted }]}>
+                {notification.mensagem}
+              </Text>
               <Text style={[styles.itemDate, { color: theme.textMuted }]}>
-                {formatRelativeTime(notification.created_at)}
+                {formatRelativeTime(notification.created_at, locale, t('Data indisponivel'))}
               </Text>
             </AnimatedPressable>
           );
@@ -142,7 +148,7 @@ export function NotificationsModal({
             </View>
             <AnimatedPressable
               accessibilityRole="button"
-              accessibilityLabel="Fechar notificacoes"
+              accessibilityLabel={t('Fechar notificacoes')}
               style={[styles.closeButton, { backgroundColor: theme.surfaceSoft }]}
               onPress={onClose}
             >

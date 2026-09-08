@@ -10,6 +10,7 @@ import { USER_ROLE_OPTIONS, USER_STATUS_OPTIONS } from '@/constants/form-options
 import { useCrudResource } from '@/hooks/useCrudResource';
 import { gridService } from '@/services/grid.service';
 import type { HubUsuario } from '@/types/auth.types';
+import { useI18n } from '@/hooks/useI18n';
 
 const CONNECT_ADMIN_ROLES = ['secretaria', 'connect_secretaria', 'connect_aqv', 'direcao', 'admin'] as const;
 
@@ -51,6 +52,7 @@ function isConnectAdminUser(usuario: HubUsuario) {
 }
 
 export default function UsuariosConnectScreen() {
+  const { t } = useI18n();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<HubUsuario | null>(null);
   const [search, setSearch] = useState('');
@@ -94,7 +96,7 @@ export default function UsuariosConnectScreen() {
           <MetricTile label="Total" value={connectUsers.length} accent={colors.orange} icon={<UserPlus size={16} color={colors.orange} />} style={styles.metric} />
         </View>
 
-        <SearchField placeholder="Buscar usuário, e-mail ou perfil..." value={search} onChangeText={setSearch} />
+        <SearchField placeholder={t("Buscar usuário, e-mail ou perfil...")} value={search} onChangeText={setSearch} />
 
         <AdvancedFilterPanel
           resultCount={filtered.length}
@@ -112,7 +114,7 @@ export default function UsuariosConnectScreen() {
 
         <SurfaceCard title="Equipe administrativa" subtitle="Usuários com acesso ao SENAI Connect">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}
-          {filtered.length === 0 ? <Text style={styles.empty}>Nenhum usuário administrativo encontrado.</Text> : null}
+          {filtered.length === 0 ? <Text style={styles.empty}>{t("Nenhum usuário administrativo encontrado.")}</Text> : null}
           {filtered.map((usuario) => (
             <ListRow
               key={usuario.id}

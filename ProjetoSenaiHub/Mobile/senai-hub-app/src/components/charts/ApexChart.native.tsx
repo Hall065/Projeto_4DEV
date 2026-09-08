@@ -3,8 +3,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { createApexChartHtml } from './apex/html';
 import type { ApexChartProps } from './apex/types';
+import { useI18n } from '@/hooks/useI18n';
 
 export function ApexChart({ model, height = 238, reduceMotion = false, onSelect }: ApexChartProps) {
+  const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
   const source = useMemo(
     () => ({ html: createApexChartHtml(model, !reduceMotion) }),
@@ -42,7 +44,7 @@ export function ApexChart({ model, height = 238, reduceMotion = false, onSelect 
           }
         }}
       />
-      {error ? <Text style={styles.error}>Gráfico indisponível: {error}</Text> : null}
+      {error ? <Text style={styles.error}>{t("Gráfico indisponível:")}{' '}{error}</Text> : null}
     </View>
   );
 }

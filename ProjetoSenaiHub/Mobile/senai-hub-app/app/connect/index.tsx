@@ -27,8 +27,10 @@ import {
 import { connectService } from '@/services/connect.service';
 import type { ContratoAluno, Curso, FrequenciaRegistro, SalarioAluno, Turma } from '@/types/connect.types';
 import { buildDateTrend, buildMonthTotals, countByStatus, percent, topGroups } from '@/utils/dashboardAnalytics';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function ConnectDashboard() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useThemeColors();
   const themedTone = theme.isDark ? 'dark' : 'light';
@@ -159,10 +161,9 @@ export default function ConnectDashboard() {
           <View style={styles.heroContent}>
             <RingMetric value={empresaMetrics.totalAlunos} label="aprendizes" accent={connectTheme.accent} tone={themedTone} />
             <View style={styles.heroBody}>
-              <Text style={[styles.heroTitle, { color: theme.text }]}>Gestão dos seus contratos</Text>
+              <Text style={[styles.heroTitle, { color: theme.text }]}>{t("Gestão dos seus contratos")}</Text>
               <Text style={[styles.heroText, { color: theme.textMuted }]}>
-                Consulte contratos, frequência e cálculo salarial apenas dos alunos vinculados à sua empresa.
-              </Text>
+                {t("Consulte contratos, frequência e cálculo salarial apenas dos alunos vinculados à sua empresa.")}</Text>
               <View style={styles.heroPills}>
                 <Pill label={`${empresaMetrics.contratosAtivos} contratos ativos`} variant="info" tone={themedTone} />
                 <Pill label={`${empresaMetrics.totalFrequencias} registros`} variant="success" tone={themedTone} />
@@ -235,7 +236,7 @@ export default function ConnectDashboard() {
         </SurfaceCard>
 
         <SurfaceCard title="Contratos recentes" subtitle="Aprendizes vinculados à empresa">
-          {contratos.length === 0 ? <Text style={styles.empty}>Nenhum contrato encontrado.</Text> : null}
+          {contratos.length === 0 ? <Text style={styles.empty}>{t("Nenhum contrato encontrado.")}</Text> : null}
           {contratos.slice(0, 5).map((contrato) => (
             <ListRow
               key={contrato.id}
@@ -263,10 +264,9 @@ export default function ConnectDashboard() {
         <View style={styles.heroContent}>
           <RingMetric value={metrics.totalAlunos} label="alunos ativos" accent={connectTheme.accent} tone={themedTone} />
           <View style={styles.heroBody}>
-            <Text style={[styles.heroTitle, { color: theme.text }]}>Acompanhamento centralizado</Text>
+            <Text style={[styles.heroTitle, { color: theme.text }]}>{t("Acompanhamento centralizado")}</Text>
             <Text style={[styles.heroText, { color: theme.textMuted }]}>
-              Cursos, turmas, professores e frequência reunidos para consulta rápida.
-            </Text>
+              {t("Cursos, turmas, professores e frequência reunidos para consulta rápida.")}</Text>
             <View style={styles.heroPills}>
               <Pill label={`${metrics.totalTurmas} turmas`} variant="info" tone={themedTone} />
               <Pill label={`${metrics.totalCursos} cursos`} variant="success" tone={themedTone} />
@@ -365,7 +365,7 @@ export default function ConnectDashboard() {
       </ChartCard>
 
       <SurfaceCard title="Turmas cadastradas" subtitle="Últimas turmas carregadas do Supabase">
-        {turmas.length === 0 ? <Text style={styles.empty}>Nenhum dado cadastrado ainda.</Text> : null}
+        {turmas.length === 0 ? <Text style={styles.empty}>{t("Nenhum dado cadastrado ainda.")}</Text> : null}
         {turmas.slice(0, 5).map((turma) => (
           <ListRow
             key={turma.id}

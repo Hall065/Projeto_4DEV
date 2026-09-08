@@ -120,7 +120,7 @@ export default function LoginScreen() {
                   <Mail size={17} color={theme.textMuted} />
                   <TextInput
                     style={[styles.input, { color: theme.text }]}
-                    placeholder="seu@email.com"
+                    placeholder={t("seu@email.com")}
                     placeholderTextColor={theme.textSubtle}
                     autoCapitalize="none"
                     keyboardType="email-address"
@@ -143,7 +143,7 @@ export default function LoginScreen() {
                   <Lock size={17} color={theme.textMuted} />
                   <TextInput
                     style={[styles.input, { color: theme.text }]}
-                    placeholder="••••••••"
+                    placeholder={t("••••••••")}
                     placeholderTextColor={theme.textSubtle}
                     secureTextEntry={!showPassword}
                     value={value}

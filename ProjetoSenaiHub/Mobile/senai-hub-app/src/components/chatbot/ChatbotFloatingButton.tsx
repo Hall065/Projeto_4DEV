@@ -3,6 +3,7 @@ import { BotMessageSquare } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AnimatedPressable } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
+import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface ChatbotFloatingButtonProps {
@@ -12,12 +13,13 @@ interface ChatbotFloatingButtonProps {
 export function ChatbotFloatingButton({ onPress }: ChatbotFloatingButtonProps) {
   const insets = useSafeAreaInsets();
   const theme = useThemeColors();
+  const { t } = useI18n();
 
   return (
     <View pointerEvents="box-none" style={StyleSheet.absoluteFill}>
       <AnimatedPressable
         accessibilityRole="button"
-        accessibilityLabel="Abrir assistente SENAI Hub"
+        accessibilityLabel={t('Abrir assistente SENAI Hub')}
         wrapperStyle={[
           styles.buttonPosition,
           {

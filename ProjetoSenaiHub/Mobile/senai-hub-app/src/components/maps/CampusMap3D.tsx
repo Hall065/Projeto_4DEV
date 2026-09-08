@@ -38,6 +38,7 @@ import {
   disposePinMarkerGroup,
   type PinMarkerBlock,
 } from './campusPinMarker3d';
+import { useI18n } from '@/hooks/useI18n';
 
 const DIMMED_OPACITY = 0.2;
 const FULL_OPACITY = 1;
@@ -299,6 +300,7 @@ export function CampusMap3DViewer({
   showPanel = true,
   style,
 }: CampusMap3DViewerProps) {
+  const { t } = useI18n();
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<Renderer | null>(null);
@@ -845,13 +847,13 @@ export function CampusMap3DViewer({
       {loading ? (
         <View style={styles.loadingOverlay}>
           <ActivityIndicator color={colors.navy} />
-          <Text style={styles.loadingText}>Carregando mapa 3D...</Text>
+          <Text style={styles.loadingText}>{t("Carregando mapa 3D...")}</Text>
         </View>
       ) : null}
 
       {!loading && loadedBlocks.length === 0 && !loadError ? (
         <View style={styles.loadingOverlay}>
-          <Text style={styles.emptyText}>Nenhum bloco do campus foi carregado.</Text>
+          <Text style={styles.emptyText}>{t("Nenhum bloco do campus foi carregado.")}</Text>
         </View>
       ) : null}
 
@@ -919,7 +921,7 @@ export function CampusMap3DViewer({
                   <Text numberOfLines={1} style={styles.selectionText}>
                     {CAMPUS_PERSON_ROLE_LABELS[selectedPerson.role]} - {selectedPerson.blockId
                       ? CAMPUS_BLOCK_BY_ID[selectedPerson.blockId].name
-                      : 'Ponto GPS projetado no campus'}
+                      : t("Ponto GPS projetado no campus")}
                   </Text>
                   <Text numberOfLines={1} style={styles.selectionMuted}>
                     {[selectedPerson.room, selectedPerson.detail].filter(Boolean).join(' - ')}
@@ -986,6 +988,7 @@ export function CampusMap3DContainer({
   compact = false,
   fallback,
 }: CampusMap3DContainerProps) {
+  const { t } = useI18n();
   const [selectedBlockId, setSelectedBlockId] = useState<CampusBlockId | null>(null);
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null);
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null);
@@ -1076,7 +1079,7 @@ export function CampusMap3DContainer({
         <SafeAreaView style={styles.modal}>
           <View style={styles.modalHeader}>
             <View style={styles.modalTitleWrap}>
-              <Text style={styles.modalTitle}>Mapa 3D do campus SENAI</Text>
+              <Text style={styles.modalTitle}>{t("Mapa 3D do campus SENAI")}</Text>
               <Text style={styles.modalSubtitle}>{moduleLabel}</Text>
             </View>
             <Pressable accessibilityRole="button" onPress={() => setFullscreen(false)} style={styles.closeButton}>

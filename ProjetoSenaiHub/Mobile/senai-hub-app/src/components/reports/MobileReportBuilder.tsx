@@ -34,8 +34,10 @@ import {
 } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
 import { radius, spacing } from '@/constants/designTokens';
+import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { exportService, type ExportRow } from '@/services/export.service';
+import { formatAppDateTime, formatAppNumber } from '@/utils/locale';
 
 export type ReportSectionKind = 'summary' | 'metrics' | 'donut' | 'bar' | 'trend' | 'table';
 
@@ -97,6 +99,7 @@ export function ReportTabs({
   accent?: string;
 }) {
   const theme = useThemeColors();
+  const { t } = useI18n();
 
   return (
     <View style={[styles.tabs, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}>
@@ -119,7 +122,7 @@ export function ReportTabs({
           >
             <Icon size={16} color={active ? accent : theme.textMuted} />
             <Text style={[styles.tabText, { color: active ? theme.text : theme.textMuted }]}>
-              {tab.label}
+              {t(tab.label)}
             </Text>
           </AnimatedPressable>
         );
@@ -136,10 +139,11 @@ export function ChoiceChips({
   accent = colors.red,
 }: ChoiceChipsProps) {
   const theme = useThemeColors();
+  const { t } = useI18n();
 
   return (
     <View style={styles.controlGroup}>
-      <Text style={[styles.controlLabel, { color: theme.text }]}>{label}</Text>
+      <Text style={[styles.controlLabel, { color: theme.text }]}>{t(label)}</Text>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
         {options.map((option) => {
           const active = value === option.value;
@@ -159,7 +163,7 @@ export function ChoiceChips({
             >
               {active ? <Check size={13} color={colors.white} /> : null}
               <Text style={[styles.chipText, { color: active ? colors.white : theme.text }]}>
-                {option.label}
+                {t(option.label)}
               </Text>
             </AnimatedPressable>
           );
@@ -181,14 +185,15 @@ export function ReportTextField({
   placeholder?: string;
 }) {
   const theme = useThemeColors();
+  const { t } = useI18n();
 
   return (
     <View style={styles.fieldWrap}>
-      <Text style={[styles.controlLabel, { color: theme.text }]}>{label}</Text>
+      <Text style={[styles.controlLabel, { color: theme.text }]}>{t(label)}</Text>
       <TextInput
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholder}
+        placeholder={t(placeholder)}
         placeholderTextColor={theme.textSubtle}
         style={[
           styles.input,
@@ -215,6 +220,7 @@ export function MobileReportBuilder({
   revisionKey,
 }: MobileReportBuilderProps) {
   const theme = useThemeColors();
+  const { language, t } = useI18n();
   const initialPreset = presets[0];
   const [title, setTitle] = useState(defaultTitle);
   const [subtitle, setSubtitle] = useState(defaultSubtitle);
@@ -286,11 +292,11 @@ export function MobileReportBuilder({
 
   const generatePreview = () => {
     if (!title.trim()) {
-      Alert.alert('Titulo obrigatorio', 'Informe um titulo para gerar o relatorio.');
+      Alert.alert(t('Titulo obrigatorio'), t('Informe um titulo para gerar o relatorio.'));
       return;
     }
     if (!selectedSections.length) {
-      Alert.alert('Selecione as secoes', 'Escolha pelo menos uma secao para o relatorio.');
+      Alert.alert(t('Selecione as secoes'), t('Escolha pelo menos uma secao para o relatorio.'));
       return;
     }
     setGeneratedAt(new Date());
@@ -308,8 +314,8 @@ export function MobileReportBuilder({
       setExportOpen(false);
     } catch (error) {
       Alert.alert(
-        'Falha ao exportar',
-        error instanceof Error ? error.message : 'Nao foi possivel gerar o arquivo.'
+        t('Falha ao exportar'),
+        error instanceof Error ? error.message : t('Nao foi possivel gerar o arquivo.')
       );
     } finally {
       setExporting(false);
@@ -325,11 +331,11 @@ export function MobileReportBuilder({
             label="Subtitulo"
             value={subtitle}
             onChangeText={setSubtitle}
-            placeholder="Contexto do relatorio"
+            placeholder={t("Contexto do relatorio")}
           />
         </View>
 
-        <Text style={[styles.controlLabel, { color: theme.text }]}>Modelo rapido</Text>
+        <Text style={[styles.controlLabel, { color: theme.text }]}>{t('Modelo rapido')}</Text>
         <View style={styles.presetGrid}>
           {presets.map((preset) => {
             const active = preset.id === presetId;
@@ -346,10 +352,10 @@ export function MobileReportBuilder({
                 onPress={() => selectPreset(preset)}
               >
                 <Text style={[styles.presetTitle, { color: active ? accent : theme.text }]}>
-                  {preset.label}
+                  {t(preset.label)}
                 </Text>
                 <Text style={[styles.presetDescription, { color: theme.textMuted }]}>
-                  {preset.description}
+                  {t(preset.description)}
                 </Text>
               </AnimatedPressable>
             );
@@ -360,7 +366,12 @@ export function MobileReportBuilder({
         {filterControls}
       </SurfaceCard>
 
-      <SurfaceCard title="Secoes do relatorio" subtitle={`${selectedSections.length} secoes selecionadas`}>
+      <SurfaceCard
+        title="Secoes do relatorio"
+        subtitle={`${formatAppNumber(selectedSections.length, language)} ${t(
+          selectedSections.length === 1 ? 'secao selecionada' : 'secoes selecionadas'
+        )}`}
+      >
         {sections.map((section) => {
           const enabled = selectedSections.includes(section.id);
           const columns = selectedColumns[section.id] ?? [];
@@ -368,9 +379,9 @@ export function MobileReportBuilder({
             <View key={section.id} style={[styles.sectionOption, { borderBottomColor: theme.line }]}>
               <View style={styles.sectionOptionHeader}>
                 <View style={styles.sectionOptionText}>
-                  <Text style={[styles.sectionOptionTitle, { color: theme.text }]}>{section.label}</Text>
+                  <Text style={[styles.sectionOptionTitle, { color: theme.text }]}>{t(section.label)}</Text>
                   <Text style={[styles.sectionOptionDescription, { color: theme.textMuted }]}>
-                    {section.description}
+                    {t(section.description)}
                   </Text>
                 </View>
                 <Switch
@@ -398,7 +409,7 @@ export function MobileReportBuilder({
                         onPress={() => toggleColumn(section.id, column.key)}
                       >
                         <Text style={[styles.columnChipText, { color: active ? accent : theme.textMuted }]}>
-                          {column.label}
+                          {t(column.label)}
                         </Text>
                       </AnimatedPressable>
                     );
@@ -433,11 +444,13 @@ export function MobileReportBuilder({
         <View>
           <FeedbackMessage
             variant="success"
-            message={`Previa atualizada com ${exportRows.length} linhas exportaveis.`}
+            message={`${t('Previa atualizada com')} ${formatAppNumber(exportRows.length, language)} ${t(
+              exportRows.length === 1 ? 'linha exportavel.' : 'linhas exportaveis.'
+            )}`}
           />
           <View style={[styles.reportCover, { backgroundColor: theme.surface, borderColor: theme.line }]}>
             <Text style={[styles.reportKicker, { color: accent }]}>
-              {moduleKey === 'connect' ? 'SENAI CONNECT' : 'SENAI GRID'}
+              {moduleKey === 'connect' ? t("SENAI CONNECT") : t("SENAI GRID")}
             </Text>
             <Text style={[styles.reportTitle, { color: theme.text }]}>{title}</Text>
             {subtitle ? <Text style={[styles.reportSubtitle, { color: theme.textMuted }]}>{subtitle}</Text> : null}
@@ -445,7 +458,8 @@ export function MobileReportBuilder({
               {filterSummary.join(' | ')}
             </Text>
             <Text style={[styles.reportMeta, { color: theme.textSubtle }]}>
-              Gerado em {generatedAt?.toLocaleString('pt-BR')}
+              {t('Gerado em')}{' '}
+              {generatedAt ? formatAppDateTime(generatedAt, language, t('Nao informado')) : ''}
             </Text>
           </View>
 
@@ -462,7 +476,7 @@ export function MobileReportBuilder({
         <View style={[styles.previewHint, { borderColor: theme.line, backgroundColor: theme.surfaceSoft }]}>
           <Eye size={18} color={theme.textMuted} />
           <Text style={[styles.previewHintText, { color: theme.textMuted }]}>
-            Gere a previa para conferir os dados antes de exportar.
+            {t('Gere a previa para conferir os dados antes de exportar.')}
           </Text>
         </View>
       )}
@@ -489,6 +503,7 @@ function ReportSectionPreview({
   accent: string;
 }) {
   const theme = useThemeColors();
+  const { language, t } = useI18n();
 
   if (section.kind === 'summary') {
     return (
@@ -507,7 +522,7 @@ function ReportSectionPreview({
   if (section.kind === 'metrics') {
     return (
       <View>
-        <Text style={[styles.previewSectionTitle, { color: theme.text }]}>{section.label}</Text>
+        <Text style={[styles.previewSectionTitle, { color: theme.text }]}>{t(section.label)}</Text>
         <MetricGrid>
           {(section.items ?? []).map((item) => (
             <MetricTile
@@ -566,7 +581,9 @@ function ReportSectionPreview({
   return (
     <SurfaceCard
       title={section.label}
-      subtitle={`${rows.length} registros no recorte | exibindo ate 6 na previa`}
+      subtitle={`${formatAppNumber(rows.length, language)} ${t(
+        rows.length === 1 ? 'registro no recorte' : 'registros no recorte'
+      )} | ${t('exibindo ate 6 na previa')}`}
     >
       {rows.length && columns.length ? (
         rows.slice(0, 6).map((row, index) => (
@@ -576,9 +593,11 @@ function ReportSectionPreview({
           >
             {columns.map((column) => (
               <View key={column.key} style={styles.previewCell}>
-                <Text style={[styles.previewCellLabel, { color: theme.textSubtle }]}>{column.label}</Text>
+                <Text style={[styles.previewCellLabel, { color: theme.textSubtle }]}>
+                  {t(column.label)}
+                </Text>
                 <Text numberOfLines={2} style={[styles.previewCellValue, { color: theme.text }]}>
-                  {formatReportValue(row[column.key])}
+                  {formatReportValue(row[column.key], t)}
                 </Text>
               </View>
             ))}
@@ -586,7 +605,7 @@ function ReportSectionPreview({
         ))
       ) : (
         <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-          Nenhum registro encontrado para os filtros atuais.
+          {t('Nenhum registro encontrado para os filtros atuais.')}
         </Text>
       )}
     </SurfaceCard>
@@ -636,9 +655,12 @@ function buildExportRows(
   });
 }
 
-function formatReportValue(value: ExportRow[string]) {
+function formatReportValue(
+  value: ExportRow[string],
+  t: (value: string | undefined | null) => string
+) {
   if (value == null || value === '') return '-';
-  if (typeof value === 'boolean') return value ? 'Sim' : 'Nao';
+  if (typeof value === 'boolean') return t(value ? 'Sim' : 'Nao');
   return String(value);
 }
 

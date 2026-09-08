@@ -40,6 +40,7 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { gridService } from '@/services/grid.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { ChamadoPrioridade, Tarefa, TarefaStatus } from '@/types/grid.types';
+import { useI18n } from '@/hooks/useI18n';
 
 const tarefaOptionLoaders = {
   chamados: gridService.listChamadoOptions,
@@ -211,6 +212,7 @@ function TaskCard({
   onDelete?: () => void;
   onMove: (status: TarefaStatus) => void;
 }) {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const normalizedStatus = normalizeTaskStatus(task.status);
   const accent =
@@ -235,11 +237,11 @@ function TaskCard({
         <View style={styles.cardHeader}>
           <View style={styles.cardHeading}>
             <Text style={[styles.code, { color: colors.blue }]}>
-              {task.codigo ?? task.chamado_codigo ?? 'TAREFA'}
+              {task.codigo ?? task.chamado_codigo ?? t("TAREFA")}
             </Text>
             {task.chamado_codigo ? (
               <Text style={[styles.linkedCode, { color: theme.textMuted }]}>
-                Chamado {task.chamado_codigo}
+                {t("Chamado")}{' '}{task.chamado_codigo}
               </Text>
             ) : null}
           </View>
@@ -259,13 +261,13 @@ function TaskCard({
           <View style={styles.cardMeta}>
             <UserRound size={14} color={theme.textMuted} />
             <Text numberOfLines={1} style={[styles.cardMetaText, { color: theme.textMuted }]}>
-              {task.responsavel_nome ?? 'Sem responsavel'}
+              {task.responsavel_nome ?? t("Sem responsavel")}
             </Text>
           </View>
           <View style={styles.cardMeta}>
             <MapPin size={14} color={theme.textMuted} />
             <Text numberOfLines={1} style={[styles.cardMetaText, { color: theme.textMuted }]}>
-              {[task.bloco_nome, task.sala_nome].filter(Boolean).join(' / ') || 'Local nao informado'}
+              {[task.bloco_nome, task.sala_nome].filter(Boolean).join(' / ') || t("Local nao informado")}
             </Text>
           </View>
         </View>
@@ -326,7 +328,7 @@ function TaskCard({
 
       {onDelete ? (
         <AnimatedPressable onPress={onDelete} style={styles.deleteLink}>
-          <Text style={styles.deleteLinkText}>Excluir tarefa</Text>
+          <Text style={styles.deleteLinkText}>{t("Excluir tarefa")}</Text>
         </AnimatedPressable>
       ) : null}
     </View>
@@ -334,6 +336,7 @@ function TaskCard({
 }
 
 export default function TarefasScreen() {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const { confirm } = useConfirmDialog();
   const params = useLocalSearchParams<{ chamado_id?: string }>();
@@ -543,10 +546,9 @@ export default function TarefasScreen() {
         {canManage ? (
           <SurfaceCard style={styles.createPanel}>
             <View style={styles.createPanelText}>
-              <Text style={[styles.createPanelTitle, { color: theme.text }]}>Atalho operacional</Text>
+              <Text style={[styles.createPanelTitle, { color: theme.text }]}>{t("Atalho operacional")}</Text>
               <Text style={[styles.createPanelDescription, { color: theme.textMuted }]}>
-                Transforme um chamado aberto em tarefa com responsavel definido.
-              </Text>
+                {t("Transforme um chamado aberto em tarefa com responsavel definido.")}</Text>
             </View>
             <AppButton
               label="Criar do chamado"
@@ -559,7 +561,7 @@ export default function TarefasScreen() {
         ) : null}
 
         <SearchField
-          placeholder="Buscar tarefa, chamado, local ou responsavel..."
+          placeholder={t("Buscar tarefa, chamado, local ou responsavel...")}
           value={search}
           onChangeText={setSearch}
         />
@@ -591,7 +593,7 @@ export default function TarefasScreen() {
                       { color: selectedPriority ? colors.white : theme.textMuted },
                     ]}
                   >
-                    {item === 'todas' ? 'Todas prioridades' : priorityLabel(item)}
+                    {item === 'todas' ? t("Todas prioridades") : priorityLabel(item)}
                   </Text>
                 </AnimatedPressable>
               );
@@ -627,12 +629,11 @@ export default function TarefasScreen() {
           <View>
             <Text style={[styles.listTitle, { color: theme.text }]}>
               {activeBucket === 'todas'
-                ? 'Fila completa'
+                ? t("Fila completa")
                 : tabs.find((tab) => tab.id === activeBucket)?.label}
             </Text>
             <Text style={[styles.listSubtitle, { color: theme.textMuted }]}>
-              {visibleTasks.length} tarefa(s), ordenadas por prioridade
-            </Text>
+              {visibleTasks.length} {' '}{t("tarefa(s), ordenadas por prioridade")}</Text>
           </View>
         </View>
 
@@ -640,10 +641,9 @@ export default function TarefasScreen() {
           {visibleTasks.length === 0 ? (
             <View style={[styles.emptyState, { backgroundColor: theme.surface, borderColor: theme.line }]}>
               <ClipboardList size={28} color={theme.textSubtle} />
-              <Text style={[styles.emptyTitle, { color: theme.text }]}>Nenhuma tarefa nesta etapa</Text>
+              <Text style={[styles.emptyTitle, { color: theme.text }]}>{t("Nenhuma tarefa nesta etapa")}</Text>
               <Text style={[styles.emptyDescription, { color: theme.textMuted }]}>
-                Ajuste os filtros ou crie uma nova tarefa a partir de um chamado.
-              </Text>
+                {t("Ajuste os filtros ou crie uma nova tarefa a partir de um chamado.")}</Text>
             </View>
           ) : (
             visibleTasks.map((task) => (
@@ -748,7 +748,7 @@ export default function TarefasScreen() {
             />
             {selected.observacao || selected.observacoes ? (
               <View style={[styles.noteBox, { backgroundColor: theme.surfaceSoft }]}>
-                <Text style={[styles.noteLabel, { color: theme.textMuted }]}>Ultima observacao</Text>
+                <Text style={[styles.noteLabel, { color: theme.textMuted }]}>{t("Ultima observacao")}</Text>
                 <Text style={[styles.noteText, { color: theme.text }]}>
                   {selected.observacao ?? selected.observacoes}
                 </Text>

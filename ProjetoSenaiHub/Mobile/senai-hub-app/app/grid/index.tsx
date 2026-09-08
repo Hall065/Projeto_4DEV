@@ -19,8 +19,10 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { gridService } from '@/services/grid.service';
 import type { Chamado, ItemEstoque, Tarefa } from '@/types/grid.types';
 import { buildDateTrend, countByStatus, topGroups } from '@/utils/dashboardAnalytics';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function GridDashboard() {
+  const { t } = useI18n();
   const router = useRouter();
   const theme = useThemeColors();
   const [loading, setLoading] = useState(true);
@@ -117,10 +119,9 @@ export default function GridDashboard() {
         <View style={styles.heroContent}>
           <RingMetric value={metrics.chamadosAbertos} label="chamados abertos" accent={gridTheme.accent} />
           <View style={styles.heroBody}>
-            <Text style={[styles.heroTitle, { color: theme.text }]}>Fila operacional organizada</Text>
+            <Text style={[styles.heroTitle, { color: theme.text }]}>{t("Fila operacional organizada")}</Text>
             <Text style={[styles.heroText, { color: theme.textMuted }]}>
-              Chamados, tarefas e estoque aparecem juntos para facilitar a tomada de decisão.
-            </Text>
+              {t("Chamados, tarefas e estoque aparecem juntos para facilitar a tomada de decisão.")}</Text>
             <View style={styles.heroPills}>
               <Pill label={`${metrics.chamadosEmAndamento} em andamento`} variant="warning" />
               <Pill label={`${itensCriticos.length} itens críticos`} variant="danger" />
@@ -176,7 +177,7 @@ export default function GridDashboard() {
 
       <SurfaceCard title="Chamados recentes" subtitle="Últimas solicitações registradas">
         {chamados.length === 0 ? (
-          <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum dado cadastrado ainda.</Text>
+          <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhum dado cadastrado ainda.")}</Text>
         ) : null}
         {chamados.slice(0, 5).map((chamado) => (
           <ListRow
@@ -247,7 +248,7 @@ export default function GridDashboard() {
 
       <SurfaceCard title="Itens com estoque baixo" subtitle="Peças que exigem reposição">
         {itensCriticos.length === 0 ? (
-          <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum dado cadastrado ainda.</Text>
+          <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhum dado cadastrado ainda.")}</Text>
         ) : null}
         {itensCriticos.slice(0, 5).map((item) => (
           <ListRow

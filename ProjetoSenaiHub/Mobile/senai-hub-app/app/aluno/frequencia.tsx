@@ -8,8 +8,10 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { exportService } from '@/services/export.service';
 import { studentService, type StudentDashboardData } from '@/services/student.service';
 import { useAuthStore } from '@/stores/auth.store';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function AlunoFrequenciaScreen() {
+  const { t } = useI18n();
   const session = useAuthStore((s) => s.session);
   const theme = useThemeColors();
   const [month, setMonth] = useState(new Date().toISOString().slice(0, 7));
@@ -56,8 +58,8 @@ export default function AlunoFrequenciaScreen() {
         <View style={styles.ringRow}>
           <RingMetric value={`${salario?.frequencia_percentual ?? percentual}%`} label="frequencia" accent={colors.green} />
           <View style={styles.salaryBox}>
-            <Text style={[styles.salaryLabel, { color: theme.textMuted }]}>Valor final</Text>
-            <Text style={styles.salaryValue}>R$ {Math.round(salario?.salario_final ?? 0).toLocaleString('pt-BR')}</Text>
+            <Text style={[styles.salaryLabel, { color: theme.textMuted }]}>{t("Valor final")}</Text>
+            <Text style={styles.salaryValue}>{t("R$")}{' '}{Math.round(salario?.salario_final ?? 0).toLocaleString('pt-BR')}</Text>
             <ProgressBar value={salario?.frequencia_percentual ?? percentual} accent={colors.green} />
           </View>
         </View>
@@ -90,7 +92,7 @@ export default function AlunoFrequenciaScreen() {
             accent={colors.green}
           />
         ))}
-        {frequencias.length === 0 ? <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum lancamento encontrado para este mes.</Text> : null}
+        {frequencias.length === 0 ? <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhum lancamento encontrado para este mes.")}</Text> : null}
       </SurfaceCard>
 
       <ExportModal

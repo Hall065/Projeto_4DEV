@@ -19,6 +19,7 @@ import { connectService } from '@/services/connect.service';
 import { useAuthStore } from '@/stores/auth.store';
 import { useFilterStore } from '@/stores/filter.store';
 import type { Aluno } from '@/types/connect.types';
+import { useI18n } from '@/hooks/useI18n';
 
 const alunoOptionLoaders = {
   cursos: connectService.listCursoOptions,
@@ -87,6 +88,7 @@ function formValues(aluno: Aluno): Record<string, string> {
 }
 
 export default function AlunosScreen() {
+  const { t } = useI18n();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<Aluno | null>(null);
   const [draftFilters, setDraftFilters] = useState({ status: '', cursoId: '', turmaId: '', empresaId: '' });
@@ -161,7 +163,7 @@ export default function AlunosScreen() {
         </View>
 
         <SearchField
-          placeholder="Pesquisar aluno, matrícula, turma ou responsável..."
+          placeholder={t("Pesquisar aluno, matrícula, turma ou responsável...")}
           value={search}
           onChangeText={setSearch}
         />
@@ -184,7 +186,7 @@ export default function AlunosScreen() {
 
         <SurfaceCard title="Lista de alunos" subtitle="Dados principais e situação acadêmica">
           {error || optionsError ? <FeedbackMessage variant="danger" message={error ?? optionsError ?? ''} /> : null}
-          {filtered.length === 0 ? <Text style={styles.empty}>Nenhum aluno encontrado.</Text> : null}
+          {filtered.length === 0 ? <Text style={styles.empty}>{t("Nenhum aluno encontrado.")}</Text> : null}
           {filtered.map((aluno) => (
             <ListRow
               key={aluno.id}

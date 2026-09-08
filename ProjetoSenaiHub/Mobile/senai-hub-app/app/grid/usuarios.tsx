@@ -14,6 +14,7 @@ import { gridService } from '@/services/grid.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { HubUsuario } from '@/types/auth.types';
 import { normalizeDateToIso } from '@/utils/formatters';
+import { useI18n } from '@/hooks/useI18n';
 
 const EMPTY_FILTERS = { role: '', status: '', createdFrom: '', createdTo: '', updatedFrom: '', updatedTo: '' };
 
@@ -65,6 +66,7 @@ function formValues(usuario: HubUsuario): Record<string, string> {
 }
 
 export default function UsuariosGridScreen() {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const [modalOpen, setModalOpen] = useState(false);
   const [editing, setEditing] = useState<HubUsuario | null>(null);
@@ -140,7 +142,7 @@ export default function UsuariosGridScreen() {
           <MetricTile label="Total" value={visibleItems.length} accent={colors.orange} icon={<UserPlus size={16} color={colors.orange} />} style={styles.metric} />
         </View>
 
-        <SearchField placeholder="Buscar usuário, e-mail, cargo ou permissão..." value={search} onChangeText={setSearch} />
+        <SearchField placeholder={t("Buscar usuário, e-mail, cargo ou permissão...")} value={search} onChangeText={setSearch} />
 
         <AdvancedFilterPanel
           resultCount={filtered.length}
@@ -155,16 +157,16 @@ export default function UsuariosGridScreen() {
         >
           <FilterChoice label="Papel" value={draftFilters.role} options={roleFilterOptions} onChange={(roleValue) => setDraftFilters((current) => ({ ...current, role: roleValue }))} />
           <FilterChoice label="Status" value={draftFilters.status} options={USER_STATUS_OPTIONS} onChange={(status) => setDraftFilters((current) => ({ ...current, status }))} />
-          <FilterTextField label="Criado a partir de" value={draftFilters.createdFrom} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(createdFrom) => setDraftFilters((current) => ({ ...current, createdFrom }))} />
-          <FilterTextField label="Criado ate" value={draftFilters.createdTo} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(createdTo) => setDraftFilters((current) => ({ ...current, createdTo }))} />
-          <FilterTextField label="Atualizado a partir de" value={draftFilters.updatedFrom} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(updatedFrom) => setDraftFilters((current) => ({ ...current, updatedFrom }))} />
-          <FilterTextField label="Atualizado ate" value={draftFilters.updatedTo} placeholder="DD/MM/AAAA" keyboardType="numeric" onChangeText={(updatedTo) => setDraftFilters((current) => ({ ...current, updatedTo }))} />
+          <FilterTextField label="Criado a partir de" value={draftFilters.createdFrom} placeholder={t("DD/MM/AAAA")} keyboardType="numeric" onChangeText={(createdFrom) => setDraftFilters((current) => ({ ...current, createdFrom }))} />
+          <FilterTextField label="Criado ate" value={draftFilters.createdTo} placeholder={t("DD/MM/AAAA")} keyboardType="numeric" onChangeText={(createdTo) => setDraftFilters((current) => ({ ...current, createdTo }))} />
+          <FilterTextField label="Atualizado a partir de" value={draftFilters.updatedFrom} placeholder={t("DD/MM/AAAA")} keyboardType="numeric" onChangeText={(updatedFrom) => setDraftFilters((current) => ({ ...current, updatedFrom }))} />
+          <FilterTextField label="Atualizado ate" value={draftFilters.updatedTo} placeholder={t("DD/MM/AAAA")} keyboardType="numeric" onChangeText={(updatedTo) => setDraftFilters((current) => ({ ...current, updatedTo }))} />
         </AdvancedFilterPanel>
 
         <SurfaceCard title="Equipe cadastrada" subtitle="Usuários internos e níveis de acesso">
           {error ? <FeedbackMessage variant="danger" message={error} /> : null}
           {filtered.length === 0 ? (
-            <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum usuário encontrado.</Text>
+            <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhum usuário encontrado.")}</Text>
           ) : null}
           {filtered.map((usuario) => (
             <ListRow

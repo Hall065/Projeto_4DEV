@@ -14,6 +14,7 @@ import { listContratosByEmpresaId } from '@/services/empresa.service';
 import { connectService } from '@/services/connect.service';
 import { useAuthStore } from '@/stores/auth.store';
 import type { ContratoAluno } from '@/types/connect.types';
+import { useI18n } from '@/hooks/useI18n';
 
 const contratoOptionLoaders = {
   alunos: connectService.listAlunoOptions,
@@ -56,6 +57,7 @@ function formValues(contrato: ContratoAluno): Record<string, string> {
 }
 
 export default function ContratosScreen() {
+  const { t } = useI18n();
   const session = useAuthStore((state) => state.session);
   const { isEmpresa, empresa, empresaId, loading: empresaLoading } = useEmpresaContext();
   const canManage = canManageConnectData(session?.perfil?.tipo);
@@ -139,7 +141,7 @@ export default function ContratosScreen() {
           <MetricTile label="Pendências" value={items.filter((i) => i.status === 'pendente').length} accent={colors.orange} icon={<FileText size={16} color={colors.orange} />} style={styles.metric} />
         </View>
 
-        <SearchField placeholder="Buscar contrato, aluno ou empresa..." value={search} onChangeText={setSearch} />
+        <SearchField placeholder={t("Buscar contrato, aluno ou empresa...")} value={search} onChangeText={setSearch} />
 
         {alunoOptions.length > 0 ? (
           <SurfaceCard title="Filtrar por aprendiz" subtitle="Alunos com contrato ativo na empresa">
@@ -159,7 +161,7 @@ export default function ContratosScreen() {
 
         <SurfaceCard title="Contratos vigentes" subtitle={isEmpresa ? 'Somente leitura' : 'Contratos de aprendizagem'}>
           {error || optionsError ? <FeedbackMessage variant="danger" message={error ?? optionsError ?? ''} /> : null}
-          {filtered.length === 0 ? <Text style={styles.empty}>Nenhum contrato encontrado.</Text> : null}
+          {filtered.length === 0 ? <Text style={styles.empty}>{t("Nenhum contrato encontrado.")}</Text> : null}
           {filtered.map((contrato) => (
             <ListRow
               key={contrato.id}

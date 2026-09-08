@@ -9,6 +9,7 @@ import { ApexChart } from './ApexChart';
 import { toApexDonut } from './apex/adapters';
 import { ChartLegend } from './ChartLegend';
 import type { ChartDatum } from './types';
+import { useI18n } from '@/hooks/useI18n';
 
 interface DonutStatusChartProps {
   data: ChartDatum[];
@@ -23,6 +24,7 @@ export function DonutStatusChart({
   formatValue = (value) => String(value),
   tone = 'light',
 }: DonutStatusChartProps) {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const { reduceMotion, shouldAnimate } = useMotionPreference();
   const dark = tone === 'dark' || theme.isDark;
@@ -64,7 +66,7 @@ export function DonutStatusChart({
   };
 
   if (!visibleData.length) {
-    return <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum dado para exibir.</Text>;
+    return <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhum dado para exibir.")}</Text>;
   }
 
   return (
@@ -78,7 +80,7 @@ export function DonutStatusChart({
       <View style={[styles.currentValue, { backgroundColor: dark ? theme.surfaceSoft : colors.panelSoft, borderColor: theme.line }]}>
         <Text style={[styles.centerValue, { color: theme.text }]}>{formatValue(selected?.value ?? total)}</Text>
         <Text numberOfLines={1} style={[styles.centerLabel, { color: theme.textMuted }]}>
-          {selected?.label ?? 'Total'}
+          {selected?.label ?? t("Total")}
         </Text>
       </View>
 

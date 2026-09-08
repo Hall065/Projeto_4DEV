@@ -8,6 +8,7 @@ import { notifySelection } from '@/utils/feedback';
 import { ApexChart } from './ApexChart';
 import { toApexArea } from './apex/adapters';
 import type { TimeSeriesDatum } from './types';
+import { useI18n } from '@/hooks/useI18n';
 
 interface TrendLineChartProps {
   data: TimeSeriesDatum[];
@@ -22,6 +23,7 @@ export function TrendLineChart({
   formatValue = (value) => String(value),
   tone = 'light',
 }: TrendLineChartProps) {
+  const { t } = useI18n();
   const theme = useThemeColors();
   const { reduceMotion, shouldAnimate } = useMotionPreference();
   const dark = tone === 'dark' || theme.isDark;
@@ -54,7 +56,7 @@ export function TrendLineChart({
   );
 
   if (!normalizedData.length) {
-    return <Text style={[styles.empty, { color: theme.textMuted }]}>Nenhum dado para exibir.</Text>;
+    return <Text style={[styles.empty, { color: theme.textMuted }]}>{t("Nenhum dado para exibir.")}</Text>;
   }
 
   const selected = normalizedData[selectedIndex] ?? normalizedData[normalizedData.length - 1];

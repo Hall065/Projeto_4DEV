@@ -16,6 +16,7 @@ import { ChatInput } from '@/components/chatbot/ChatInput';
 import { ChatMessageBubble } from '@/components/chatbot/ChatMessageBubble';
 import { ConversationList } from '@/components/chatbot/ConversationList';
 import { colors } from '@/constants/colors';
+import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { useChatbotStore } from '@/stores/chatbot.store';
@@ -30,6 +31,7 @@ const SUGGESTIONS = [
 
 export function ChatbotModal() {
   const theme = useThemeColors();
+  const { t } = useI18n();
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
   const { confirm } = useConfirmDialog();
@@ -76,9 +78,9 @@ export function ChatbotModal() {
   const handleArchive = async () => {
     if (!activeConversationId) return;
     const confirmed = await confirm({
-      title: 'Arquivar conversa',
-      message: 'A conversa saira do historico ativo, mas suas mensagens nao serao apagadas definitivamente.',
-      confirmLabel: 'Arquivar',
+      title: t('Arquivar conversa'),
+      message: t('A conversa saira do historico ativo, mas suas mensagens nao serao apagadas definitivamente.'),
+      confirmLabel: t('Arquivar'),
     });
     if (confirmed) await archiveActiveConversation();
   };
@@ -106,15 +108,17 @@ export function ChatbotModal() {
                 <BotMessageSquare size={18} color={theme.isDark ? colors.white : colors.red} />
               </View>
               <View style={styles.titleCopy}>
-                <Text style={[styles.title, { color: theme.text }]}>Assistente SENAI Hub</Text>
-                <Text style={[styles.subtitle, { color: theme.textMuted }]}>Dados do app em conversa profissional</Text>
+                <Text style={[styles.title, { color: theme.text }]}>{t('Assistente SENAI Hub')}</Text>
+                <Text style={[styles.subtitle, { color: theme.textMuted }]}>
+                  {t('Dados do app em conversa profissional')}
+                </Text>
               </View>
             </View>
             <View style={styles.actions}>
               {activeConversationId ? (
                 <AnimatedPressable
                   accessibilityRole="button"
-                  accessibilityLabel="Arquivar conversa ativa"
+                  accessibilityLabel={t('Arquivar conversa ativa')}
                   accessibilityState={{ disabled: Boolean(archivingConversationId || isSending) }}
                   disabled={Boolean(archivingConversationId || isSending)}
                   style={[styles.iconButton, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}
@@ -129,7 +133,7 @@ export function ChatbotModal() {
               ) : null}
               <AnimatedPressable
                 accessibilityRole="button"
-                accessibilityLabel="Atualizar conversas"
+                accessibilityLabel={t('Atualizar conversas')}
                 style={[styles.iconButton, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}
                 onPress={() => {
                   clearError();
@@ -140,7 +144,7 @@ export function ChatbotModal() {
               </AnimatedPressable>
               <AnimatedPressable
                 accessibilityRole="button"
-                accessibilityLabel="Fechar assistente"
+                accessibilityLabel={t('Fechar assistente')}
                 style={[styles.iconButton, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}
                 onPress={close}
               >
@@ -170,15 +174,17 @@ export function ChatbotModal() {
             {loadingMessages ? (
               <View style={styles.loading}>
                 <ActivityIndicator color={theme.textMuted} />
-                <Text style={[styles.loadingText, { color: theme.textMuted }]}>Carregando conversa...</Text>
+                <Text style={[styles.loadingText, { color: theme.textMuted }]}>
+                  {t('Carregando conversa...')}
+                </Text>
               </View>
             ) : null}
 
             {!loadingMessages && messages.length === 0 ? (
               <View style={styles.emptyState}>
-                <Text style={[styles.emptyTitle, { color: theme.text }]}>Como posso ajudar?</Text>
+                <Text style={[styles.emptyTitle, { color: theme.text }]}>{t('Como posso ajudar?')}</Text>
                 <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-                  Pergunte sobre alunos, turmas, frequencia, chamados, tarefas ou estoque.
+                  {t('Pergunte sobre alunos, turmas, frequencia, chamados, tarefas ou estoque.')}
                 </Text>
                 <View style={styles.suggestions}>
                   {SUGGESTIONS.map((suggestion) => (
@@ -188,7 +194,7 @@ export function ChatbotModal() {
                       style={[styles.suggestion, { backgroundColor: theme.surface, borderColor: theme.line }]}
                       onPress={() => void sendMessage(suggestion)}
                     >
-                      <Text style={[styles.suggestionText, { color: theme.text }]}>{suggestion}</Text>
+                      <Text style={[styles.suggestionText, { color: theme.text }]}>{t(suggestion)}</Text>
                     </AnimatedPressable>
                   ))}
                 </View>
@@ -202,7 +208,9 @@ export function ChatbotModal() {
             {isSending ? (
               <View style={styles.typing}>
                 <ActivityIndicator size="small" color={theme.textMuted} />
-                <Text style={[styles.typingText, { color: theme.textMuted }]}>Assistente respondendo...</Text>
+                <Text style={[styles.typingText, { color: theme.textMuted }]}>
+                  {t('Assistente respondendo...')}
+                </Text>
               </View>
             ) : null}
           </ScrollView>

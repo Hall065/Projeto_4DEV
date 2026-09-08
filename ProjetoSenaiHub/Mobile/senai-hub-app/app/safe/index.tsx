@@ -11,8 +11,10 @@ import { ROUTES } from '@/constants/routes';
 import { hasPermission } from '@/lib/permissions';
 import { useAuthStore } from '@/stores/auth.store';
 import { useSafeStore } from '@/stores/safe.store';
+import { useI18n } from '@/hooks/useI18n';
 
 export default function SafeDashboardScreen() {
+  const { t } = useI18n();
   const router = useRouter();
   const role = useAuthStore((state) => state.session?.perfil?.tipo);
   const dashboard = useSafeStore((state) => state.dashboard);
@@ -51,8 +53,7 @@ export default function SafeDashboardScreen() {
           <View style={{ alignItems: 'center', paddingVertical: 20 }}>
             <ClipboardCheck size={28} color={colors.grayText} />
             <Text style={{ color: colors.grayText, fontSize: 12, fontWeight: '700', marginTop: 8 }}>
-              Nenhuma autorizacao disponivel nesta fila.
-            </Text>
+              {t("Nenhuma autorizacao disponivel nesta fila.")}</Text>
           </View>
         )}
       </SurfaceCard>

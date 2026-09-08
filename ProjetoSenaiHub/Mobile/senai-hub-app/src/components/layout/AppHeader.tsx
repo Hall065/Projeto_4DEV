@@ -86,7 +86,7 @@ export function AppHeader({
       <View style={styles.row}>
         {showMenu ? (
           <AnimatedPressable
-            accessibilityLabel="Abrir menu"
+            accessibilityLabel={t("Abrir menu")}
             style={[styles.iconButton, { backgroundColor: headerIconBackground, borderColor: headerIconBorder }]}
             onPress={toggleSidebar}
             hitSlop={8}
@@ -105,7 +105,7 @@ export function AppHeader({
           />
         </View>
         <AnimatedPressable
-          accessibilityLabel="Abrir notificações"
+          accessibilityLabel={t("Abrir notificações")}
           style={[styles.iconButton, { backgroundColor: headerIconBackground, borderColor: headerIconBorder }]}
           onPress={onNotificationsPress}
           hitSlop={8}
@@ -120,7 +120,7 @@ export function AppHeader({
           ) : null}
         </AnimatedPressable>
         <AnimatedPressable
-          accessibilityLabel="Abrir perfil"
+          accessibilityLabel={t("Abrir perfil")}
           accessibilityRole="button"
           style={styles.profile}
           onPress={() => router.push(profileRoute as never)}

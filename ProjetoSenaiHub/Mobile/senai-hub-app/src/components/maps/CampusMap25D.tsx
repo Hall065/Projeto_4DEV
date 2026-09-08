@@ -7,6 +7,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 import { colors } from '@/constants/colors';
 import { senaiCampus } from '@/lib/geofence';
 import type { LocalizacaoAluno } from '@/types/connect.types';
+import { useI18n } from '@/hooks/useI18n';
 
 interface CampusFloor {
   id: string;
@@ -94,6 +95,7 @@ function buildPins(locations: LocalizacaoAluno[]): LocationPin[] {
 }
 
 export function CampusMap25D({ locations, selectedId, onSelect }: CampusMap25DProps) {
+  const { t } = useI18n();
   const [activeFloorId, setActiveFloorId] = useState(campusFloors[0].id);
   const [viewport, setViewport] = useState({ width: 0, height: 0 });
   const pins = useMemo(() => buildPins(locations), [locations]);
@@ -207,7 +209,7 @@ export function CampusMap25D({ locations, selectedId, onSelect }: CampusMap25DPr
   return (
     <View style={styles.wrap}>
       <View style={styles.floorTabs}>
-        <Text style={styles.floorLabel}>Pav.</Text>
+        <Text style={styles.floorLabel}>{t("Pav.")}</Text>
         {campusFloors.map((floor) => {
           const active = floor.id === activeFloor.id;
           return (
