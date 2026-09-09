@@ -120,6 +120,7 @@ export default function GerenciarFrequenciaScreen() {
 
   return (
     <ModuleScreen
+      analysis={{ datasets: { frequencias: filteredItems }, filters: { ...appliedFilters } }}
       kicker="SENAI Connect"
       title={isEmpresa ? 'Frequencia dos aprendizes' : 'Gerenciar frequencia'}
       description={

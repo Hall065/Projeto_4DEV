@@ -114,6 +114,7 @@ export default function EmpresasScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { empresas: filtered }, filters: { search, status: appliedStatus }, error }}
         kicker="SENAI Connect"
         title="Empresas"
         description="Cadastro das empresas parceiras dos contratos de aprendizagem."

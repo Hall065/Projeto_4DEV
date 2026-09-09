@@ -32,6 +32,7 @@ export default function SafeDashboardScreen() {
 
   return (
     <ModuleScreen
+      analysis={{ datasets: { autorizacoes: dashboard?.recentes ?? [] }, limitations: ['Somente as oito autorizações recentes do painel. Indicadores da fila completa não estão incluídos.'], error }}
       title="SENAI Safe"
       kicker="Seguranca escolar"
       description="Acompanhe as autorizacoes visiveis para o seu papel."

@@ -145,6 +145,7 @@ export default function ConnectDashboard() {
   if (isEmpresa) {
     return (
       <ModuleScreen
+      analysis={{ datasets: { cursos, turmas, frequencias, contratos, salarios }, filters: { empresaId }, limitations: ["Totais gerais de alunos e professores do painel não estão incluídos neste recorte de registros."] }}
         kicker="SENAI Connect"
         title="Portal da empresa"
         description={`Acompanhe contratos, frequência e salários dos aprendizes de ${empresa?.nome ?? 'sua empresa'}.`}
@@ -255,6 +256,7 @@ export default function ConnectDashboard() {
 
   return (
     <ModuleScreen
+      analysis={{ datasets: { cursos, turmas, frequencias, contratos, salarios }, filters: { empresaId }, limitations: ["Totais gerais de alunos e professores do painel não estão incluídos neste recorte de registros."] }}
       kicker="SENAI Connect"
       title="Visão geral"
       description="Dashboard acadêmico do SENAI Connect."

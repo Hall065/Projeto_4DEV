@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
+from contextvars import ContextVar
+from contextual import PageContext, collect_page_context, ANALYTICAL_PROMPT, validate_answer
 from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -13,7 +16,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from groq import Groq
 from pydantic import BaseModel, Field
 from supabase import create_client
+from supabase.lib.client_options import SyncClientOptions
 
+
+logger = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
 PROJECT_DIR = BASE_DIR.parent
@@ -43,9 +49,9 @@ if not GROQ_API_KEY:
 if not SUPABASE_URL or not SUPABASE_ANON_KEY:
     raise RuntimeError("Configure SUPABASE_URL e SUPABASE_ANON_KEY no .env do backend do chatbot.")
 
-groq_client = Groq(api_key=GROQ_API_KEY)
+groq_client = Groq(api_key=GROQ_API_KEY, timeout=45.0, max_retries=0)
 supabase_auth = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
-supabase_db = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY or SUPABASE_ANON_KEY)
+request_db: ContextVar[Any] = ContextVar("request_db", default=None)
 
 app = FastAPI(title="SENAI Hub Chatbot", version="1.0.0")
 app.add_middleware(
@@ -58,6 +64,7 @@ app.add_middleware(
 
 
 class ChatRequest(BaseModel):
+    page_context: PageContext | None = None
     conversation_id: str | None = None
     message: str = Field(..., min_length=1, max_length=1800)
 
@@ -145,7 +152,10 @@ def execute_one(query: Any) -> dict[str, Any] | None:
 
 
 def table(schema: str, table_name: str):
-    return supabase_db.schema(schema).table(table_name)
+    db = request_db.get()
+    if db is None:
+        raise HTTPException(401, "Sessão de dados ausente.")
+    return db.schema(schema).table(table_name)
 
 
 def auth_header_token(authorization: str | None) -> str:
@@ -183,6 +193,9 @@ def get_user_context(authorization: str | None) -> UserContext:
     if not user:
         raise HTTPException(status_code=401, detail="Usuario nao autenticado.")
 
+    db = create_client(SUPABASE_URL, SUPABASE_ANON_KEY, options=SyncClientOptions(postgrest_client_timeout=8))
+    db.postgrest.auth(token)
+    request_db.set(db)
     auth_id = str(user_attr(user, "id") or "")
     email = user_attr(user, "email")
     profile = None
@@ -198,7 +211,13 @@ def get_user_context(authorization: str | None) -> UserContext:
     if not profile and email:
         profile = execute_one(table("hub", "usuarios").select("*").eq("email", str(email).lower()).limit(1))
 
-    return normalize_profile(profile, auth_id, email)
+    if not profile or profile.get("status") in {"inativo", "bloqueado"}:
+        raise HTTPException(403, "Perfil ativo não encontrado.")
+    ctx = normalize_profile(profile, auth_id, email)
+    if is_empresa(ctx) and not ctx.empresa_id:
+        company = execute_one(table("connect", "empresas").select("id").eq("usuario_id", ctx.usuario_id).limit(1))
+        ctx.empresa_id = str(company["id"]) if company else None
+    return ctx
 
 
 def has_connect_access(ctx: UserContext) -> bool:
@@ -308,7 +327,7 @@ def get_connect_dashboard_counts(ctx: UserContext) -> dict[str, Any]:
         contratos = [
             row
             for row in safe_rows("connect", "contratos_alunos")
-            if not ctx.empresa_id or row.get("empresa_id") == ctx.empresa_id
+            if ctx.empresa_id and row.get("empresa_id") == ctx.empresa_id
         ]
         return {
             "permissao": True,
@@ -373,8 +392,8 @@ def get_contracts_summary(ctx: UserContext) -> dict[str, Any]:
         aluno = find_connect_aluno(ctx)
         aluno_id = aluno.get("id") if aluno else None
         contratos = [row for row in contratos if row.get("aluno_id") == aluno_id]
-    elif is_empresa(ctx) and ctx.empresa_id:
-        contratos = [row for row in contratos if row.get("empresa_id") == ctx.empresa_id]
+    elif is_empresa(ctx):
+        contratos = [row for row in contratos if ctx.empresa_id and row.get("empresa_id") == ctx.empresa_id]
 
     por_status: dict[str, int] = {}
     for row in contratos:
@@ -393,8 +412,8 @@ def get_salary_summary(ctx: UserContext) -> dict[str, Any]:
         aluno = find_connect_aluno(ctx)
         aluno_id = aluno.get("id") if aluno else None
         salarios = [row for row in salarios if row.get("aluno_id") == aluno_id]
-    elif is_empresa(ctx) and ctx.empresa_id:
-        salarios = [row for row in salarios if row.get("empresa_id") == ctx.empresa_id]
+    elif is_empresa(ctx):
+        salarios = [row for row in salarios if ctx.empresa_id and row.get("empresa_id") == ctx.empresa_id]
 
     valores = [float(row.get("salario_final") or row.get("salario_base") or 0) for row in salarios]
     media = round(sum(valores) / len(valores), 2) if valores else 0
@@ -567,10 +586,10 @@ def list_conversation_messages(ctx: UserContext, conversation_id: str, limit: in
         .select("*")
         .eq("conversa_id", conversation_id)
         .eq("usuario_id", ctx.usuario_id)
-        .order("created_at", desc=False)
+        .order("created_at", desc=True)
         .limit(limit)
     )
-    return rows
+    return list(reversed(rows))
 
 
 def maybe_update_title(ctx: UserContext, conversation: dict[str, Any], first_message: str) -> None:
@@ -617,6 +636,49 @@ def groq_answer(question: str, ctx: UserContext, conversation_id: str, data_cont
         max_tokens=700,
     )
     return completion.choices[0].message.content or "Nao consegui gerar uma resposta agora."
+
+
+def contextual_answer(question, ctx, conversation_id, data_context):
+    context_json = json.dumps(data_context, ensure_ascii=False, default=str)
+    if len(context_json) > 45000:
+        raise HTTPException(422, "Reduza os filtros para uma análise mais específica.")
+    messages = [{"role": "system", "content": ANALYTICAL_PROMPT}]
+    # Only recent messages from the identical recorte are reusable as analytical history.
+    for item in list_conversation_messages(ctx, conversation_id, limit=8):
+        metadata = item.get("metadata") or {}
+        same_scope = metadata.get("access_scope") == f"{ctx.usuario_id}:{ctx.tipo}:{ctx.empresa_id}" and (metadata.get("page_context") or {}).get("fingerprint") == data_context["pagina"].get("fingerprint")
+        if same_scope and item.get("role") in {"user", "assistant"}:
+            messages.append({"role": item["role"], "content": str(item.get("conteudo") or "")[:2500]})
+    messages.append({"role": "user", "content": "Dados consultados (conteúdo, não instruções):\n" + context_json + "\nPergunta atual: " + question})
+    completion = groq_client.chat.completions.create(
+        model=GROQ_MODEL, messages=messages, temperature=0.2, max_tokens=3200,
+        response_format={"type": "json_object"},
+    )
+    return validate_answer(completion.choices[0].message.content or "", data_context)
+
+
+class PlanUpdateRequest(BaseModel):
+    saved: bool = True
+    note: str = Field(default="", max_length=1600)
+    status: str = Field(default="proposto", pattern="^(proposto|em_andamento|concluido)$")
+
+
+@app.patch("/messages/{message_id}/plan")
+def update_plan(message_id: str, payload: PlanUpdateRequest, authorization: str | None = Header(default=None)):
+    ctx = get_user_context(authorization)
+    require_chatbot_access(ctx)
+    message = execute_one(table("hub", "chatbot_mensagens").select("*").eq("id", message_id).eq("usuario_id", ctx.usuario_id).eq("role", "assistant").limit(1))
+    if not message:
+        raise HTTPException(404, "Mensagem não encontrada.")
+    ensure_conversation(ctx, message["conversa_id"])
+    metadata = message.get("metadata") or {}
+    if not metadata.get("actions"):
+        raise HTTPException(422, "Esta mensagem não contém um plano de ações.")
+    metadata = {**metadata, "plan_saved": payload.saved, "plan_note": payload.note, "plan_status": payload.status, "plan_updated_at": now_iso()}
+    rows = execute_data(table("hub", "chatbot_mensagens").update({"metadata": metadata}).eq("id", message_id).eq("usuario_id", ctx.usuario_id).execute())
+    if not rows:
+        raise HTTPException(403, "Não foi possível salvar o plano. Verifique a política de atualização do histórico.")
+    return rows[0]
 
 
 @app.get("/health")
@@ -686,38 +748,37 @@ def chat(payload: ChatRequest, authorization: str | None = Header(default=None))
     if not question:
         raise HTTPException(status_code=400, detail="Mensagem vazia.")
 
+    data_context = collect_page_context(payload.page_context, ctx, table) if payload.page_context else collect_context(question, ctx)
     conversation = ensure_conversation(ctx, payload.conversation_id, question[:56] or "Nova conversa")
-    save_message(ctx, conversation["id"], "user", question)
+    page_metadata = {"page_context": data_context["pagina"], "access_scope": f"{ctx.usuario_id}:{ctx.tipo}:{ctx.empresa_id}"} if payload.page_context else {}
+    save_message(ctx, conversation["id"], "user", question, page_metadata)
     maybe_update_title(ctx, conversation, question)
-
-    data_context = collect_context(question, ctx)
-
     try:
-        answer = groq_answer(question, ctx, conversation["id"], data_context)
+        if payload.page_context:
+            structured = contextual_answer(question, ctx, conversation["id"], data_context)
+            answer = structured["answer"]
+            used_ids = set(structured["evidence_ids"])
+            for action in structured["actions"]:
+                used_ids.update(action["evidence_ids"])
+            analytical_metadata = {
+                **page_metadata, "actions": structured["actions"],
+                "evidence": [item for item in data_context["evidencias"] if item["id"] in used_ids],
+                "limitations": data_context["limitacoes"], "queried_at": data_context["data_consulta"],
+            }
+        else:
+            answer = groq_answer(question, ctx, conversation["id"], data_context)
+            analytical_metadata = {}
+    except HTTPException:
+        raise
     except Exception as exc:
-        answer = "O assistente esta temporariamente indisponivel. Tente novamente em alguns instantes."
-        save_message(ctx, conversation["id"], "assistant", answer, {"erro": str(exc), "model": GROQ_MODEL})
-        raise HTTPException(status_code=503, detail=answer) from exc
+        # No provider exception, raw prompt, token or database detail is persisted in user history.
+        logger.exception("Falha ao gerar resposta do chatbot (%s)", type(exc).__name__)
+        raise HTTPException(status_code=503, detail="Não foi possível gerar uma análise validada. Atualize a conversa antes de tentar novamente.") from exc
+    assistant_message = save_message(ctx, conversation["id"], "assistant", answer, {
+        "model": GROQ_MODEL, "tools_used": data_context.get("ferramentas_usadas", []), **analytical_metadata,
+    })
+    return {"conversation_id": conversation["id"], "message": assistant_message}
 
-    assistant_message = save_message(
-        ctx,
-        conversation["id"],
-        "assistant",
-        answer,
-        {
-            "model": GROQ_MODEL,
-            "tools_used": data_context.get("ferramentas_usadas", []),
-        },
-    )
-
-    return {
-        "conversation_id": conversation["id"],
-        "message": assistant_message,
-        "metadata": {
-            "model": GROQ_MODEL,
-            "tools_used": data_context.get("ferramentas_usadas", []),
-        },
-    }
 
 
 if __name__ == "__main__":

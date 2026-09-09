@@ -1,3 +1,4 @@
+import { useChatbotContextStore } from '@/stores/chatbot-context.store';
 import { create } from 'zustand';
 import { chatbotService, type ChatConversation, type ChatMessage } from '@/services/chatbot.service';
 import { useAuthStore } from '@/stores/auth.store';
@@ -20,6 +21,7 @@ interface ChatbotState {
   selectConversation: (conversationId: string) => Promise<void>;
   createConversation: () => Promise<boolean>;
   archiveActiveConversation: () => Promise<boolean>;
+  savePlan: (messageId: string, saved: boolean, note: string, status: string) => Promise<boolean>;
   sendMessage: (message: string) => Promise<boolean>;
   clearError: () => void;
   clearSuccess: () => void;
@@ -32,6 +34,11 @@ function getErrorMessage(error: unknown) {
 }
 
 let messageLoadSequence = 0;
+let sessionGeneration = 0;
+function authorized() {
+  const session = useAuthStore.getState().session;
+  return Boolean(session && !isStudentRole(session.perfil?.tipo));
+}
 
 export const useChatbotStore = create<ChatbotState>((set, get) => ({
   isOpen: false,
@@ -58,11 +65,14 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
   close: () => set({ isOpen: false }),
 
   loadConversations: async () => {
+    if (!authorized()) { get().reset(); return; }
+    const generation = sessionGeneration;
     set({ loadingConversations: true, error: null });
     try {
       const conversations = (await chatbotService.listConversations()).filter(
         (conversation) => conversation.status !== 'arquivada'
       );
+      if (generation !== sessionGeneration) return;
       const currentId = get().activeConversationId;
       const currentStillExists = Boolean(
         currentId && conversations.some((conversation) => conversation.id === currentId)
@@ -78,30 +88,37 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
         await get().selectConversation(conversations[0].id);
       }
     } catch (error) {
+      if (generation !== sessionGeneration) return;
       set({ loadingConversations: false, error: getErrorMessage(error) });
     }
   },
 
   selectConversation: async (conversationId: string) => {
+    if (!authorized()) { get().reset(); return; }
+    const generation = sessionGeneration;
     if (get().archivingConversationId || get().isSending) return;
     const requestSequence = ++messageLoadSequence;
     set({ activeConversationId: conversationId, messages: [], loadingMessages: true, error: null });
     try {
       const messages = await chatbotService.listMessages(conversationId);
-      if (requestSequence !== messageLoadSequence || get().activeConversationId !== conversationId) return;
+      if (generation !== sessionGeneration || requestSequence !== messageLoadSequence || get().activeConversationId !== conversationId) return;
       set({ messages, loadingMessages: false });
     } catch (error) {
-      if (requestSequence !== messageLoadSequence || get().activeConversationId !== conversationId) return;
+      if (generation !== sessionGeneration) return;
+      if (generation !== sessionGeneration || requestSequence !== messageLoadSequence || get().activeConversationId !== conversationId) return;
       set({ loadingMessages: false, error: getErrorMessage(error) });
     }
   },
 
   createConversation: async () => {
+    if (!authorized()) { get().reset(); return false; }
+    const generation = sessionGeneration;
     if (get().archivingConversationId || get().isSending) return false;
     messageLoadSequence += 1;
     set({ loadingMessages: true, error: null });
     try {
       const conversation = await chatbotService.createConversation();
+      if (generation !== sessionGeneration) return false;
       set((state) => ({
         conversations: [conversation, ...state.conversations],
         activeConversationId: conversation.id,
@@ -110,12 +127,15 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
       }));
       return true;
     } catch (error) {
+      if (generation !== sessionGeneration) return false;
       set({ loadingMessages: false, error: getErrorMessage(error) });
       return false;
     }
   },
 
   archiveActiveConversation: async () => {
+    if (!authorized()) { get().reset(); return false; }
+    const generation = sessionGeneration;
     const conversationId = get().activeConversationId;
     if (!conversationId || get().archivingConversationId || get().isSending) return false;
 
@@ -124,6 +144,7 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
     set({ archivingConversationId: conversationId, error: null, success: null });
     try {
       await chatbotService.archiveConversation(conversationId);
+      if (generation !== sessionGeneration) return false;
       archived = true;
       set((state) => ({
         conversations: state.conversations.filter((item) => item.id !== conversationId),
@@ -131,6 +152,7 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
         messages: [],
       }));
       const conversation = await chatbotService.createConversation();
+      if (generation !== sessionGeneration) return false;
       set((state) => ({
         conversations: [
           conversation,
@@ -144,6 +166,7 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
       }));
       return true;
     } catch (error) {
+      if (generation !== sessionGeneration) return false;
       set({
         archivingConversationId: null,
         error: archived
@@ -156,12 +179,17 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
   },
 
   sendMessage: async (message: string) => {
+    if (!authorized()) { get().reset(); return false; }
+    const generation = sessionGeneration;
+    const context = useChatbotContextStore.getState().context;
+    if (!context || context.loading) { set({ error: 'Aguarde os dados da página antes de analisar.' }); return false; }
     const trimmed = message.trim();
     if (!trimmed || get().isSending || get().archivingConversationId) return false;
 
     const activeConversationId = get().activeConversationId;
     const optimisticMessage: ChatMessage = {
       id: `local-${Date.now()}`,
+      metadata: { page_context: context },
       role: 'user',
       conteudo: trimmed,
       created_at: new Date().toISOString(),
@@ -177,8 +205,10 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
       const response = await chatbotService.sendMessage({
         conversationId: activeConversationId,
         message: trimmed,
+        context,
       });
 
+      if (generation !== sessionGeneration) return false;
       set((state) => ({
         activeConversationId: response.conversation_id,
         messages: [...state.messages, response.message],
@@ -188,6 +218,7 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
       await get().loadConversations();
       return true;
     } catch (error) {
+      if (generation !== sessionGeneration) return false;
       set((state) => ({
         messages: state.messages.filter((item) => item.id !== optimisticMessage.id),
         isSending: false,
@@ -197,9 +228,24 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
     }
   },
 
+  savePlan: async (messageId, saved, note, status) => {
+    if (!authorized()) return false;
+    const generation = sessionGeneration;
+    try {
+      const updated = await chatbotService.savePlan(messageId, saved, note, status);
+      if (generation !== sessionGeneration) return false;
+      set((state) => ({ messages: state.messages.map((message) => message.id === messageId ? updated : message), success: saved ? 'Plano salvo no histórico.' : 'Plano removido dos salvos.' }));
+      return true;
+    } catch (error) {
+      if (generation === sessionGeneration) set({ error: getErrorMessage(error) });
+      return false;
+    }
+  },
+
   clearError: () => set({ error: null }),
   clearSuccess: () => set({ success: null }),
   reset: () => {
+    sessionGeneration += 1;
     messageLoadSequence += 1;
     set({
       isOpen: false,
@@ -215,3 +261,10 @@ export const useChatbotStore = create<ChatbotState>((set, get) => ({
     });
   },
 }));
+
+useAuthStore.subscribe((state, previous) => {
+  if (state.session?.userId !== previous.session?.userId || state.session?.perfil?.tipo !== previous.session?.perfil?.tipo) {
+    useChatbotStore.getState().reset();
+    useChatbotContextStore.getState().clear();
+  }
+});

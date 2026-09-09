@@ -33,6 +33,7 @@ export default function SafeApprovalsScreen() {
 
   return (
     <ModuleScreen
+      analysis={{ datasets: { autorizacoes: authorizations }, filters: { status: 'aguardando_professor' }, error }}
       title="Aprovacoes"
       kicker="Professor responsavel"
       description="Decida apenas as solicitacoes dos alunos das suas turmas."

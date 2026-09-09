@@ -66,6 +66,7 @@ export default function SafeAuthorizationsScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { autorizacoes: filtered }, filters: { search }, error }}
         title="Autorizacoes"
         kicker="AQV"
         description="Crie e acompanhe solicitacoes de entrada e saida."

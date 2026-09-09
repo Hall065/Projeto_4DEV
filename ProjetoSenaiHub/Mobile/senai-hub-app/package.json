@@ -12,13 +12,14 @@
     "test:safe-access": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types tests/safe-role.test.mjs",
     "i18n:audit": "node scripts/audit-mobile-i18n.mjs",
     "i18n:check": "node scripts/audit-mobile-i18n.mjs --strict",
-    "lint": "expo lint --no-cache"
+    "lint": "expo lint --no-cache",
+    "test:chatbot-context": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --experimental-strip-types --test tests/chatbot-context.test.mjs"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
     "@hookform/resolvers": "^5.0.1",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "@supabase/supabase-js": "^2.49.8",
+    "@supabase/supabase-js": "2.112.0",
     "apexcharts": "^7.0.0",
     "date-fns": "^4.1.0",
     "expo": "~54.0.33",

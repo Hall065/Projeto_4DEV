@@ -66,6 +66,7 @@ export default function CursosScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { cursos: filteredItems }, filters: { ...appliedFilters }, error }}
         kicker="SENAI Connect"
         title="Cursos"
         description="Catalogo de cursos, carga horaria e turmas vinculadas."

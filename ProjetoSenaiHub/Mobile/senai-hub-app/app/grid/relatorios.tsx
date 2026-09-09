@@ -374,6 +374,7 @@ export default function RelatoriosGridScreen() {
 
   return (
     <ModuleScreen
+      analysis={{ datasets: { chamados: filteredTickets, tarefas: filteredTasks, estoque }, filters: { ticketStatus, priority, block, fromDate, toDate, mode }, limitations: ['Estoque representa o estado atual, sem filtro histórico.', ...(mode === 'builder' ? ['Análise do resumo filtrado; seleções internas do construtor não estão incluídas.'] : [])], error }}
       kicker="SENAI Grid"
       title="Relatorios operacionais"
       description="Acompanhe chamados, tarefas, equipe e estoque em um unico fluxo."

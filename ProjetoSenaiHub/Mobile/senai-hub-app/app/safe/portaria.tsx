@@ -33,6 +33,7 @@ export default function SafePortariaScreen() {
 
   return (
     <ModuleScreen
+      analysis={{ datasets: { autorizacoes: authorizations }, filters: { status: 'liberado_portaria' }, error }}
       title="Portaria"
       kicker="Validacao presencial"
       description="Confirme somente saidas previamente liberadas pelo professor."

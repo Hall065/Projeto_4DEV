@@ -1,3 +1,4 @@
+import { AnalysisDetails } from '@/components/chatbot/AnalysisDetails';
 import { StyleSheet, Text, View } from 'react-native';
 import { Bot, UserRound } from 'lucide-react-native';
 import { colors } from '@/constants/colors';
@@ -30,7 +31,8 @@ export function ChatMessageBubble({ message }: ChatMessageBubbleProps) {
           },
         ]}
       >
-        <Text style={[styles.text, { color: textColor }]}>{message.conteudo}</Text>
+        <Text selectable style={[styles.text, { color: textColor }]}>{message.conteudo}</Text>
+        {!isUser ? <AnalysisDetails message={message} /> : null}
       </View>
       {isUser ? (
         <View style={[styles.avatar, { backgroundColor: theme.isDark ? theme.surface : '#FFE7E9' }]}>
@@ -59,7 +61,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   bubble: {
-    maxWidth: '78%',
+    maxWidth: '92%',
     borderRadius: 8,
     borderWidth: 1,
     paddingHorizontal: 12,

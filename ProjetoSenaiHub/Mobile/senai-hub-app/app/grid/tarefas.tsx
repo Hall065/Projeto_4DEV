@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useChatbotTaskDraftStore, type ChatTaskDraft } from '@/stores/chatbot-task-draft.store';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
 import {
@@ -337,6 +338,8 @@ function TaskCard({
 
 export default function TarefasScreen() {
   const { t } = useI18n();
+  const incomingDraft = useChatbotTaskDraftStore((state) => state.draft);
+  const [analysisDraft, setAnalysisDraft] = useState<ChatTaskDraft | null>(null);
   const theme = useThemeColors();
   const { confirm } = useConfirmDialog();
   const params = useLocalSearchParams<{ chamado_id?: string }>();
@@ -361,6 +364,15 @@ export default function TarefasScreen() {
   const isMaintenanceWorker = role === 'manutencao' || role === 'grid_funcionario';
   const canManage = ['admin', 'direcao', 'gerente_manutencao', 'grid_chefe'].includes(role ?? '');
   const { options, error: optionsError } = useSelectOptions(tarefaOptionLoaders);
+
+  useEffect(() => {
+    if (!incomingDraft || !canManage) return;
+    setAnalysisDraft(incomingDraft);
+    setEditing(null);
+    setFormMode('regular');
+    setModalOpen(true);
+    useChatbotTaskDraftStore.getState().setDraft(null);
+  }, [incomingDraft, canManage]);
 
   const fields = getFields(options, isMaintenanceWorker, formMode);
   const loadTarefas = useCallback(async () => {
@@ -501,6 +513,7 @@ export default function TarefasScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { tarefas: selected ? [selected] : visibleTasks }, filters: { search, bucket: activeBucket, priority, chamadoId: linkedChamadoId, selectedId: selected?.id }, error }}
         kicker="SENAI Grid"
         title="Tarefas"
         description={
@@ -678,15 +691,17 @@ export default function TarefasScreen() {
                 prioridade: 'media',
                 status: 'a_fazer',
                 chamado_id: formMode === 'from-ticket' ? linkedChamadoId : '',
+                ...(analysisDraft ?? {}),
               }
         }
         isSubmitting={submitting}
         submitLabel={editing ? 'Salvar alteracoes' : 'Criar tarefa'}
-        onClose={() => setModalOpen(false)}
+        onClose={() => { setModalOpen(false); setAnalysisDraft(null); }}
         onSubmit={async (values) => {
           if (editing) await updateItem(editing.id, values);
           else await createItem(values);
           setModalOpen(false);
+          setAnalysisDraft(null);
           setSuccess(editing ? 'Tarefa atualizada com sucesso.' : 'Tarefa criada com sucesso.');
         }}
       />

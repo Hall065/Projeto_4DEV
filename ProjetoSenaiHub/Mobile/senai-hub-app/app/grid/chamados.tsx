@@ -569,6 +569,7 @@ export default function ChamadosScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { chamados: selected ? [selected] : visibleTickets }, filters: { search, stage: activeStage, priority, selectedId: selected?.id }, error }}
         kicker="SENAI Grid"
         title="Chamados"
         description={

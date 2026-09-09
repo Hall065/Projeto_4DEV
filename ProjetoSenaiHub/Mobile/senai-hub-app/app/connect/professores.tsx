@@ -73,6 +73,7 @@ export default function ProfessoresScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { professores: filtered }, filters: { search, ...appliedFilters }, error }}
         kicker="SENAI Connect"
         title="Gerenciamento de professores"
         description="Cadastro, especialidades e status dos docentes."

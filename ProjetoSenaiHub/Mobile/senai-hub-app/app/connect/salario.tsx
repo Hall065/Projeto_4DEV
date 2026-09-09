@@ -325,6 +325,7 @@ export default function SalarioScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { salarios: filteredRecords }, filters: { month, search: recordSearch, status: statusFilter }, error }}
         kicker="SENAI Connect"
         title="Calculo salarial"
         description={

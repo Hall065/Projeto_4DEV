@@ -110,6 +110,7 @@ export default function GridDashboard() {
 
   return (
     <ModuleScreen
+      analysis={{ datasets: { chamados, tarefas, estoque } }}
       kicker="SENAI Grid"
       title="Dashboard"
       description="Resumo operacional da manutenção e infraestrutura."

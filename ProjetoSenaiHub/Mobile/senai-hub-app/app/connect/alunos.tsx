@@ -131,6 +131,7 @@ export default function AlunosScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { alunos: filtered }, filters: { search, ...appliedFilters }, error }}
         kicker="SENAI Connect"
         title="Gerenciamento de alunos"
         description="Cadastro, busca e atualização de alunos."

@@ -1,3 +1,4 @@
+import type { AnalysisContext } from '@/lib/chatbotContext';
 import Constants from 'expo-constants';
 import { supabase } from '@/lib/supabase';
 
@@ -49,27 +50,35 @@ async function getAccessToken() {
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = await getAccessToken();
-  const response = await fetch(`${getBaseUrl()}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-      ...(options.headers ?? {}),
-    },
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 65000);
+  try {
+    const response = await fetch(`${getBaseUrl()}${path}`, {
+      ...options,
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        ...(options.headers ?? {}),
+      },
+    });
 
-  if (!response.ok) {
-    let message = 'Nao consegui conectar ao assistente agora.';
-    try {
-      const payload = await response.json();
-      message = payload.detail ?? payload.message ?? message;
-    } catch {
-      message = response.status === 404 ? 'Servico do assistente nao encontrado.' : message;
+    if (!response.ok) {
+      let message = 'Nao consegui conectar ao assistente agora.';
+      try {
+        const payload = await response.json();
+        message = typeof payload.detail === 'string' ? payload.detail : typeof payload.message === 'string' ? payload.message : response.status === 422 ? 'A consulta excedeu os limites ou contém filtros inválidos. Reduza o recorte.' : message;
+      } catch {
+        message = response.status === 404 ? 'Servico do assistente nao encontrado.' : message;
+      }
+      throw new Error(message);
     }
-    throw new Error(message);
-  }
 
-  return response.json() as Promise<T>;
+    return await response.json() as T;
+  } catch (error) {
+    if (controller.signal.aborted) throw new Error('A consulta demorou demais. Atualize a conversa antes de tentar novamente.');
+    throw error;
+  } finally { clearTimeout(timeout); }
 }
 
 export const chatbotService = {
@@ -88,13 +97,20 @@ export const chatbotService = {
     return request<ChatMessage[]>(`/conversations/${conversationId}/messages`);
   },
 
-  sendMessage(input: { conversationId?: string | null; message: string }) {
+  sendMessage(input: { conversationId?: string | null; message: string; context?: AnalysisContext | null }) {
     return request<ChatResponse>('/chat', {
       method: 'POST',
       body: JSON.stringify({
         conversation_id: input.conversationId ?? null,
         message: input.message,
+        page_context: input.context ?? null,
       }),
+    });
+  },
+
+  savePlan(messageId: string, saved: boolean, note: string, status: string) {
+    return request<ChatMessage>(`/messages/${encodeURIComponent(messageId)}/plan`, {
+      method: 'PATCH', body: JSON.stringify({ saved, note, status }),
     });
   },
 

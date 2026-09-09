@@ -49,3 +49,7 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Arquivos gerados pelos testes e pelo servidor Python
+__pycache__/
+*.py[cod]

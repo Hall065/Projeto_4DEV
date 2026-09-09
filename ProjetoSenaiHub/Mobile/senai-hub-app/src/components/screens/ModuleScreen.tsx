@@ -1,3 +1,5 @@
+import { useChatbotPageContext } from '@/hooks/useChatbotPageContext';
+import type { PageAnalysis } from '@/lib/chatbotContext';
 import type { ReactNode } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SkeletonCard } from '@/components/common/SkeletonCard';
@@ -9,6 +11,7 @@ import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
 
 interface ModuleScreenProps {
+  analysis?: PageAnalysis;
   title: string;
   description: string;
   kicker?: string;
@@ -22,6 +25,7 @@ interface ModuleScreenProps {
 }
 
 export function ModuleScreen({
+  analysis,
   title,
   description,
   kicker,
@@ -33,6 +37,7 @@ export function ModuleScreen({
   emptyTitle = 'Nenhum registro encontrado',
   children,
 }: ModuleScreenProps) {
+  useChatbotPageContext(title, analysis, Boolean(isLoading));
   const theme = useThemeColors();
   const { t } = useI18n();
   const dark = tone === 'dark' || theme.isDark;

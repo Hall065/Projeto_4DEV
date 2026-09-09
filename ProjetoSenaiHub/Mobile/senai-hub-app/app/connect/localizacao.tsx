@@ -179,6 +179,7 @@ export default function LocalizacaoScreen() {
 
   return (
     <ModuleScreen
+      analysis={{ datasets: { alunos: selectedAlunoId ? filteredAlunos.filter((item) => item.id === selectedAlunoId) : filteredAlunos, turmas: selectedTurmaId ? filteredTurmas.filter((item) => item.id === selectedTurmaId) : filteredTurmas }, filters: { search, ...appliedFilters, tab, selectedAlunoId, selectedTurmaId }, limitations: ['Coordenadas e presença em tempo real não são enviadas nem validadas por esta análise.'], error }}
       kicker="SENAI Connect"
       title="Localizacao"
       description="Monitoramento por turma, aluno e geofence."

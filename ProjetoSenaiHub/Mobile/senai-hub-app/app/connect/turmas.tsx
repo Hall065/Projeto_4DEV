@@ -115,6 +115,7 @@ export default function TurmasScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { turmas: selectedTurma ? [selectedTurma] : filtered }, filters: { search, ...appliedFilters, selectedId: selectedTurma?.id }, error }}
         kicker="SENAI Connect"
         title="Turmas e Cursos"
         description={isProfessor ? 'Consulte suas turmas e os alunos vinculados.' : 'Gerencie turmas, cursos e vínculos acadêmicos.'}

@@ -104,6 +104,7 @@ export default function ContratosScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { contratos: filtered }, filters: { search, alunoId: alunoFilter }, error }}
         kicker="SENAI Connect"
         title={isEmpresa ? 'Contratos da empresa' : 'Contratos'}
         description={

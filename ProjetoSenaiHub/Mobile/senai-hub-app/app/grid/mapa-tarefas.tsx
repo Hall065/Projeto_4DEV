@@ -188,7 +188,7 @@ export default function MapaTarefasScreen() {
   };
 
   return (
-    <ModuleScreen
+    <ModuleScreen analysis={{ datasets: { chamados: filteredMarkers.filter((marker) => marker.kind === 'ticket' && (!selectedMarkerId || marker.id === selectedMarkerId)).map((marker) => ({ id: marker.sourceId })), tarefas: filteredMarkers.filter((marker) => marker.kind === 'task' && (!selectedMarkerId || marker.id === selectedMarkerId)).map((marker) => ({ id: marker.sourceId })) }, filters: { search, ...appliedFilters, selectedMarkerId }, error }}
       kicker="SENAI Grid"
       title="Localizacao de chamados"
       description="Encontre chamados e tarefas por bloco no mapa 3D do campus."

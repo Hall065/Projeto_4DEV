@@ -142,6 +142,7 @@ export default function EstoqueScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { estoque: filtered }, filters: { search, ...appliedFilters }, error }}
         kicker="SENAI Grid"
         title="Estoque"
         description="Controle de itens, reservas e movimentações."

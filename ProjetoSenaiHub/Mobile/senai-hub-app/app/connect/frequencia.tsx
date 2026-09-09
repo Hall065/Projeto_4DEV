@@ -1,3 +1,4 @@
+import { useChatbotPageContext } from '@/hooks/useChatbotPageContext';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { CalendarDays, ChevronLeft, ChevronRight, Save } from 'lucide-react-native';
@@ -191,6 +192,8 @@ export default function FrequenciaScreen() {
       ),
     [alunos, registros]
   );
+
+  useChatbotPageContext('Chamada de frequência', { datasets: { alunos: filteredStudents }, filters: { search, turmaId, dataAula }, limitations: ['Marcações locais de presença podem conter alterações não salvas; a análise não trata o formulário como frequência confirmada.'], error }, loading || loadingAttendance);
 
   const updateLessonCount = (nextValue: number) => {
     const nextLessons = clampLessons(nextValue);

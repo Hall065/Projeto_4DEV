@@ -1,4 +1,8 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState }
+from 'react';
+import { usePathname } from 'expo-router';
+import { useChatbotContextStore } from '@/stores/chatbot-context.store';
+import { getAnalysisSuggestions } from '@/lib/chatbotContext';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -21,16 +25,14 @@ import { useThemeColors } from '@/hooks/useThemeColors';
 import { useConfirmDialog } from '@/hooks/useConfirmDialog';
 import { useChatbotStore } from '@/stores/chatbot.store';
 
-const SUGGESTIONS = [
-  'Quantos alunos tem cadastrados?',
-  'Quantos alunos foram cadastrados hoje?',
-  'Resumo dos chamados abertos',
-  'Como esta a frequencia das turmas?',
-  'Quais itens estao com estoque critico?',
-];
 
 export function ChatbotModal() {
   const theme = useThemeColors();
+  const pathname = usePathname();
+  const storedContext = useChatbotContextStore((state) => state.context);
+  const context = storedContext?.route === pathname ? storedContext : null;
+  const suggestions = getAnalysisSuggestions(context);
+  const [savedOnly, setSavedOnly] = useState(false);
   const { t } = useI18n();
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
@@ -110,7 +112,7 @@ export function ChatbotModal() {
               <View style={styles.titleCopy}>
                 <Text style={[styles.title, { color: theme.text }]}>{t('Assistente SENAI Hub')}</Text>
                 <Text style={[styles.subtitle, { color: theme.textMuted }]}>
-                  {t('Dados do app em conversa profissional')}
+                  {context ? `${context.title} • ${context.loading ? t('Carregando dados') : t('Recorte da tela')}` : t('Preparando contexto da página')}
                 </Text>
               </View>
             </View>
@@ -153,6 +155,15 @@ export function ChatbotModal() {
             </View>
           </View>
 
+          {context ? (
+            <View style={{ paddingBottom: 8, gap: 4 }}>
+              <Text style={{ color: theme.textMuted, fontSize: 11 }}>{Object.entries(context.filters).filter(([, value]) => value !== '' && value !== null).map(([key, value]) => `${key}: ${value}`).join(' • ') || t('Sem filtros adicionais')}</Text>
+              <Text style={{ color: theme.textMuted, fontSize: 11 }}>{t('Análise limitada aos registros carregados; dados relidos ao enviar.')}</Text>
+            </View>
+          ) : null}
+          <AnimatedPressable accessibilityRole="button" accessibilityLabel={t('Alternar planos salvos')} onPress={() => setSavedOnly((value) => !value)} style={{ paddingVertical: 8 }}>
+            <Text style={{ color: theme.text }}>{savedOnly ? t('Ver todas as mensagens') : t('Ver planos salvos nesta conversa')}</Text>
+          </AnimatedPressable>
           <ConversationList
             conversations={conversations}
             activeConversationId={activeConversationId}
@@ -184,11 +195,12 @@ export function ChatbotModal() {
               <View style={styles.emptyState}>
                 <Text style={[styles.emptyTitle, { color: theme.text }]}>{t('Como posso ajudar?')}</Text>
                 <Text style={[styles.emptyText, { color: theme.textMuted }]}>
-                  {t('Pergunte sobre alunos, turmas, frequencia, chamados, tarefas ou estoque.')}
+                  {t('Peça uma análise do recorte atual, com evidências e próximos passos.')}
                 </Text>
                 <View style={styles.suggestions}>
-                  {SUGGESTIONS.map((suggestion) => (
+                  {suggestions.map((suggestion) => (
                     <AnimatedPressable
+                      disabled={isSending || loadingMessages || !context}
                       key={suggestion}
                       accessibilityRole="button"
                       style={[styles.suggestion, { backgroundColor: theme.surface, borderColor: theme.line }]}
@@ -201,7 +213,7 @@ export function ChatbotModal() {
               </View>
             ) : null}
 
-            {messages.map((message, index) => (
+            {messages.filter((message) => !savedOnly || message.metadata?.plan_saved === true).map((message, index) => (
               <ChatMessageBubble key={message.id ?? `${message.role}-${index}`} message={message} />
             ))}
 
@@ -209,14 +221,14 @@ export function ChatbotModal() {
               <View style={styles.typing}>
                 <ActivityIndicator size="small" color={theme.textMuted} />
                 <Text style={[styles.typingText, { color: theme.textMuted }]}>
-                  {t('Assistente respondendo...')}
+                  {t('Consultando evidências e preparando a análise...')}
                 </Text>
               </View>
             ) : null}
           </ScrollView>
 
           <ChatInput
-            disabled={Boolean(isSending || loadingMessages || archivingConversationId)}
+            disabled={Boolean(isSending || loadingMessages || archivingConversationId || !context || context.loading)}
             onSend={sendMessage}
           />
         </View>

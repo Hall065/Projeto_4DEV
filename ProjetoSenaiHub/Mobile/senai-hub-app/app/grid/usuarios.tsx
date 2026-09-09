@@ -125,6 +125,7 @@ export default function UsuariosGridScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { usuarios: filtered }, filters: { search, ...appliedFilters }, error }}
         kicker="SENAI Grid"
         title="Usuários"
         description="Controle de acesso da equipe interna do Grid."

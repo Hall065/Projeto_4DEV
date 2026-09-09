@@ -446,6 +446,7 @@ export default function RelatoriosConnectScreen() {
 
   return (
     <ModuleScreen
+      analysis={{ datasets: { alunos: filteredStudents, professores: filteredTeachers, turmas: filteredClasses, contratos: filteredContracts, frequencias: filteredAttendance }, filters: { courseId, classId, studentStatus, fromDate, toDate, mode }, limitations: mode === 'builder' ? ['Análise do resumo filtrado; seleções internas do construtor de relatórios não estão incluídas.'] : [], error }}
       kicker="SENAI Connect"
       title="Relatorios academicos"
       description="Analise, personalize e exporte dados reais do Connect."

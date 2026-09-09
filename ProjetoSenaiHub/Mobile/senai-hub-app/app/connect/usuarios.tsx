@@ -79,6 +79,7 @@ export default function UsuariosConnectScreen() {
   return (
     <>
       <ModuleScreen
+      analysis={{ datasets: { usuarios: filtered }, filters: { search, ...appliedFilters }, error }}
         kicker="SENAI Connect"
         title="Usuários Connect"
         description="Cadastro de secretaria, direção e administradores do Connect."
