@@ -15,6 +15,8 @@ export const radius = {
   md: 10,
   lg: 14,
   xl: 18,
+  card: 24,
+  hero: 28,
   pill: 999,
 } as const;
 
@@ -49,6 +51,13 @@ export const shadow = {
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
+  },
+  lg: {
+    shadowColor: colors.black,
+    shadowOpacity: 0.16,
+    shadowRadius: 24,
+    shadowOffset: { width: 0, height: 12 },
+    elevation: 8,
   },
 } as const;
 

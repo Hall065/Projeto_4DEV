@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Animated, Easing, Modal, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Bell, CheckCheck, X } from 'lucide-react-native';
-import { AnimatedPressable, AppButton, FeedbackMessage, LoadingState } from '@/components/common/VisualPrimitives';
+import { AnimataPressable } from '@/components/common/AnimataPrimitives';
+import { AppButton, FeedbackMessage, LoadingState } from '@/components/common/VisualPrimitives';
 import { colors } from '@/constants/colors';
 import { radius, spacing, touchTarget } from '@/constants/designTokens';
 import { useI18n } from '@/hooks/useI18n';
@@ -95,7 +96,7 @@ export function NotificationsModal({
           const pending = pendingIds.includes(notification.id);
           const actionable = !notification.lida && !pending;
           return (
-            <AnimatedPressable
+            <AnimataPressable
               key={notification.id}
               accessibilityRole="button"
               accessibilityLabel={`${notification.titulo}. ${notification.mensagem}. ${formatRelativeTime(notification.created_at, locale, t('Data indisponivel'))}`}
@@ -124,7 +125,7 @@ export function NotificationsModal({
               <Text style={[styles.itemDate, { color: theme.textMuted }]}>
                 {formatRelativeTime(notification.created_at, locale, t('Data indisponivel'))}
               </Text>
-            </AnimatedPressable>
+            </AnimataPressable>
           );
         })}
       </View>
@@ -146,14 +147,14 @@ export function NotificationsModal({
               <Bell size={18} color={theme.text} />
               <Text style={[styles.title, { color: theme.text }]}>{t('Notificacoes')}</Text>
             </View>
-            <AnimatedPressable
+            <AnimataPressable
               accessibilityRole="button"
               accessibilityLabel={t('Fechar notificacoes')}
               style={[styles.closeButton, { backgroundColor: theme.surfaceSoft }]}
               onPress={onClose}
             >
               <X size={18} color={theme.text} />
-            </AnimatedPressable>
+            </AnimataPressable>
           </View>
 
           <AppButton

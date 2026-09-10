@@ -15,7 +15,8 @@ import {
   View,
 } from 'react-native';
 import { Archive, BotMessageSquare, RefreshCw, X } from 'lucide-react-native';
-import { AnimatedPressable, FeedbackMessage } from '@/components/common/VisualPrimitives';
+import { AnimataPressable } from '@/components/common/AnimataPrimitives';
+import { FeedbackMessage } from '@/components/common/VisualPrimitives';
 import { ChatInput } from '@/components/chatbot/ChatInput';
 import { ChatMessageBubble } from '@/components/chatbot/ChatMessageBubble';
 import { ConversationList } from '@/components/chatbot/ConversationList';
@@ -118,7 +119,7 @@ export function ChatbotModal() {
             </View>
             <View style={styles.actions}>
               {activeConversationId ? (
-                <AnimatedPressable
+                <AnimataPressable
                   accessibilityRole="button"
                   accessibilityLabel={t('Arquivar conversa ativa')}
                   accessibilityState={{ disabled: Boolean(archivingConversationId || isSending) }}
@@ -131,9 +132,9 @@ export function ChatbotModal() {
                   ) : (
                     <Archive size={17} color={colors.orange} />
                   )}
-                </AnimatedPressable>
+                </AnimataPressable>
               ) : null}
-              <AnimatedPressable
+              <AnimataPressable
                 accessibilityRole="button"
                 accessibilityLabel={t('Atualizar conversas')}
                 style={[styles.iconButton, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}
@@ -143,15 +144,15 @@ export function ChatbotModal() {
                 }}
               >
                 <RefreshCw size={17} color={theme.text} />
-              </AnimatedPressable>
-              <AnimatedPressable
+              </AnimataPressable>
+              <AnimataPressable
                 accessibilityRole="button"
                 accessibilityLabel={t('Fechar assistente')}
                 style={[styles.iconButton, { backgroundColor: theme.surfaceSoft, borderColor: theme.line }]}
                 onPress={close}
               >
                 <X size={18} color={theme.text} />
-              </AnimatedPressable>
+              </AnimataPressable>
             </View>
           </View>
 
@@ -161,9 +162,9 @@ export function ChatbotModal() {
               <Text style={{ color: theme.textMuted, fontSize: 11 }}>{t('Análise limitada aos registros carregados; dados relidos ao enviar.')}</Text>
             </View>
           ) : null}
-          <AnimatedPressable accessibilityRole="button" accessibilityLabel={t('Alternar planos salvos')} onPress={() => setSavedOnly((value) => !value)} style={{ paddingVertical: 8 }}>
+          <AnimataPressable accessibilityRole="button" accessibilityLabel={t('Alternar planos salvos')} onPress={() => setSavedOnly((value) => !value)} style={{ paddingVertical: 8 }}>
             <Text style={{ color: theme.text }}>{savedOnly ? t('Ver todas as mensagens') : t('Ver planos salvos nesta conversa')}</Text>
-          </AnimatedPressable>
+          </AnimataPressable>
           <ConversationList
             conversations={conversations}
             activeConversationId={activeConversationId}
@@ -199,7 +200,7 @@ export function ChatbotModal() {
                 </Text>
                 <View style={styles.suggestions}>
                   {suggestions.map((suggestion) => (
-                    <AnimatedPressable
+                    <AnimataPressable
                       disabled={isSending || loadingMessages || !context}
                       key={suggestion}
                       accessibilityRole="button"
@@ -207,7 +208,7 @@ export function ChatbotModal() {
                       onPress={() => void sendMessage(suggestion)}
                     >
                       <Text style={[styles.suggestionText, { color: theme.text }]}>{t(suggestion)}</Text>
-                    </AnimatedPressable>
+                    </AnimataPressable>
                   ))}
                 </View>
               </View>
@@ -268,7 +269,7 @@ const styles = StyleSheet.create({
   titleIcon: {
     width: 38,
     height: 38,
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
   iconButton: {
     width: 34,
     height: 34,
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -288,7 +289,7 @@ const styles = StyleSheet.create({
   messages: {
     flexGrow: 1,
     minHeight: 280,
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     marginBottom: 10,
   },
@@ -312,7 +313,7 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 13, lineHeight: 19, fontWeight: '600' },
   suggestions: { gap: 8, marginTop: 4 },
   suggestion: {
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 10,

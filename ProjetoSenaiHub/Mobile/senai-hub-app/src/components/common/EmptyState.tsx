@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
   iconWrap: {
     width: 58,
     height: 58,
-    borderRadius: 8,
+    borderRadius: 18,
     backgroundColor: '#E8F1FF',
     borderWidth: 1,
     borderColor: '#C7DAFF',

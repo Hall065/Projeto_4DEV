@@ -33,12 +33,12 @@ export const colors = {
 
 export const connectTheme = {
   primary: colors.navy,
-  accent: colors.red,
+  accent: colors.green,
   background: colors.white,
 };
 
 export const gridTheme = {
   primary: colors.navy,
-  accent: colors.green,
+  accent: colors.orange,
   background: colors.background,
 };

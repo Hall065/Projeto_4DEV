@@ -50,7 +50,7 @@ export default function GridLayout() {
       <AppHeader
         title="SENAI Grid"
         brandArea="grid"
-        accentColor={theme.isDark ? theme.gridHeader : gridTheme.primary}
+        accentColor={gridTheme.accent}
         notificationCount={notifications.unreadCount}
         onNotificationsPress={() => setNotificationsOpen(true)}
       />

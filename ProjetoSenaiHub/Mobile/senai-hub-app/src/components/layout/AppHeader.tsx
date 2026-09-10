@@ -2,7 +2,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Bell, Menu } from 'lucide-react-native';
-import { AnimatedPressable } from '@/components/common/VisualPrimitives';
+import { AnimataPressable } from '@/components/common/AnimataPrimitives';
 import { getBrandAsset, type BrandArea } from '@/constants/brandAssets';
 import { colors } from '@/constants/colors';
 import { radius, shadow, touchTarget } from '@/constants/designTokens';
@@ -85,14 +85,14 @@ export function AppHeader({
     >
       <View style={styles.row}>
         {showMenu ? (
-          <AnimatedPressable
+          <AnimataPressable
             accessibilityLabel={t("Abrir menu")}
             style={[styles.iconButton, { backgroundColor: headerIconBackground, borderColor: headerIconBorder }]}
             onPress={toggleSidebar}
             hitSlop={8}
           >
             <Menu color={headerIconColor} size={21} />
-          </AnimatedPressable>
+          </AnimataPressable>
         ) : (
           <View style={styles.spacer} />
         )}
@@ -104,7 +104,7 @@ export function AppHeader({
             accessibilityLabel={`${t(moduleName)}. ${t(moduleSubtitle)}`}
           />
         </View>
-        <AnimatedPressable
+        <AnimataPressable
           accessibilityLabel={t("Abrir notificações")}
           style={[styles.iconButton, { backgroundColor: headerIconBackground, borderColor: headerIconBorder }]}
           onPress={onNotificationsPress}
@@ -118,8 +118,8 @@ export function AppHeader({
               </Text>
             </View>
           ) : null}
-        </AnimatedPressable>
-        <AnimatedPressable
+        </AnimataPressable>
+        <AnimataPressable
           accessibilityLabel={t("Abrir perfil")}
           accessibilityRole="button"
           style={styles.profile}
@@ -136,7 +136,7 @@ export function AppHeader({
           <Text numberOfLines={1} style={[styles.profileName, { color: profileTextColor }]}>
             {profileName}
           </Text>
-        </AnimatedPressable>
+        </AnimataPressable>
       </View>
     </View>
   );
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
   iconButton: {
     width: touchTarget.min,
     height: touchTarget.min,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(255,255,255,0.1)',
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   avatar: {
     width: 31,
     height: 31,
-    borderRadius: 8,
+    borderRadius: radius.lg,
     backgroundColor: colors.white,
     alignItems: 'center',
     justifyContent: 'center',

@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { AnimataPressable } from '@/components/common/AnimataPrimitives';
 import { colors } from '@/constants/colors';
-import { AnimatedPressable } from './VisualPrimitives';
+import { radius, shadow } from '@/constants/designTokens';
+import { useThemeColors } from '@/hooks/useThemeColors';
 import { StatusBadge } from './StatusBadge';
 
 interface DataCardProps {
@@ -11,9 +13,15 @@ interface DataCardProps {
 }
 
 export function DataCard({ title, subtitle, statusLabel, onPress }: DataCardProps) {
+  const theme = useThemeColors();
+
   return (
-    <AnimatedPressable style={styles.card} onPress={onPress}>
-      <View style={styles.avatar}>
+    <AnimataPressable
+      haptic={Boolean(onPress)}
+      style={[styles.card, { backgroundColor: theme.surface, borderColor: theme.line }]}
+      onPress={onPress}
+    >
+      <View style={[styles.avatar, { backgroundColor: theme.isDark ? 'rgba(227,6,19,0.16)' : '#FFE7E9' }]}>
         <Text style={styles.avatarText}>
           {title
             .split(' ')
@@ -25,38 +33,32 @@ export function DataCard({ title, subtitle, statusLabel, onPress }: DataCardProp
         </Text>
       </View>
       <View style={styles.content}>
-        <Text numberOfLines={1} style={styles.title}>
-          {title}
-        </Text>
-        {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+        <Text numberOfLines={1} style={[styles.title, { color: theme.text }]}>{title}</Text>
+        {subtitle ? <Text style={[styles.subtitle, { color: theme.textMuted }]}>{subtitle}</Text> : null}
       </View>
       {statusLabel ? <StatusBadge label={statusLabel} variant="success" /> : null}
-    </AnimatedPressable>
+    </AnimataPressable>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
-    minHeight: 64,
+    minHeight: 72,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
     backgroundColor: colors.white,
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 8,
+    borderRadius: radius.lg,
+    padding: 12,
+    marginBottom: 10,
     borderWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.black,
-    shadowOpacity: 0.04,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 1,
+    ...shadow.sm,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 16,
     backgroundColor: '#FFE7E9',
     alignItems: 'center',
     justifyContent: 'center',
@@ -64,5 +66,5 @@ const styles = StyleSheet.create({
   avatarText: { color: colors.red, fontSize: 12, fontWeight: '900' },
   content: { flex: 1, minWidth: 0 },
   title: { fontSize: 14, fontWeight: '800', color: colors.navy },
-  subtitle: { marginTop: 3, fontSize: 11, color: colors.grayText },
+  subtitle: { marginTop: 3, fontSize: 11, lineHeight: 16, color: colors.grayText },
 });

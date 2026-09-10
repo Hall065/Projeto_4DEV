@@ -54,7 +54,7 @@ export default function ConnectLayout() {
       <AppHeader
         title="SENAI Connect"
         brandArea="connect"
-        accentColor={theme.isDark ? theme.connectHeader : connectTheme.primary}
+        accentColor={connectTheme.accent}
         notificationCount={notifications.unreadCount}
         onNotificationsPress={() => setNotificationsOpen(true)}
       />

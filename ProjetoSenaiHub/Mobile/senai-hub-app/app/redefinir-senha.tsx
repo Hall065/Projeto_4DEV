@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Eye, Lock } from 'lucide-react-native';
 import { AppButton, FeedbackMessage } from '@/components/common/VisualPrimitives';
+import { AtmosphericGlow } from '@/components/common/AnimataPrimitives';
 import { getBrandAsset } from '@/constants/brandAssets';
 import { colors } from '@/constants/colors';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -49,10 +50,11 @@ export default function RedefinirSenhaScreen() {
     <View style={[styles.container, { backgroundColor: theme.appBackground }]}>
       <ImageBackground
         source={circuitBg}
-        style={[styles.hero, { backgroundColor: theme.isDark ? colors.navy : colors.white }]}
-        imageStyle={[styles.heroImage, { opacity: theme.isDark ? 0.42 : 0.08 }]}
+        style={styles.hero}
+        imageStyle={[styles.heroImage, { opacity: 0.36 }]}
       >
-        <Image source={getBrandAsset('hub', 'slogan', theme.isDark)} style={styles.logo} resizeMode="contain" />
+        <AtmosphericGlow />
+        <Image source={getBrandAsset('hub', 'slogan', true)} style={styles.logo} resizeMode="contain" />
       </ImageBackground>
       <View style={[styles.sheet, { backgroundColor: theme.surface }]}>
         <Text style={[styles.title, { color: theme.text }]}>{t("Redefinir senha")}</Text>
@@ -142,7 +144,7 @@ const styles = StyleSheet.create({
     gap: 9,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 8,
+    borderRadius: 14,
     paddingHorizontal: 12,
     backgroundColor: colors.white,
   },

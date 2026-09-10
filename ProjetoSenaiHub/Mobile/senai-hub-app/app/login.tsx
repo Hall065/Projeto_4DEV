@@ -14,7 +14,8 @@ import {
   View,
 } from 'react-native';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react-native';
-import { AnimatedPressable, AppButton, FeedbackMessage } from '@/components/common/VisualPrimitives';
+import { AnimataPressable } from '@/components/common/AnimataPrimitives';
+import { AppButton, FeedbackMessage } from '@/components/common/VisualPrimitives';
 import { DEV_TEST_ACCOUNT } from '@/constants/dev-test-account';
 import { colors } from '@/constants/colors';
 import { isSupabaseConfigured } from '@/lib/supabase-config';
@@ -149,13 +150,13 @@ export default function LoginScreen() {
                     value={value}
                     onChangeText={onChange}
                   />
-                  <AnimatedPressable style={styles.eyeButton} onPress={() => setShowPassword(!showPassword)}>
+                  <AnimataPressable haptic={false} style={styles.eyeButton} onPress={() => setShowPassword(!showPassword)}>
                     {showPassword ? (
                       <EyeOff size={17} color={theme.textMuted} />
                     ) : (
                       <Eye size={17} color={theme.textMuted} />
                     )}
-                  </AnimatedPressable>
+                  </AnimataPressable>
                 </View>
                 {fieldError ? <Text style={styles.fieldError}>{fieldError.message}</Text> : null}
               </View>
@@ -172,9 +173,9 @@ export default function LoginScreen() {
 
           <AppButton label="Entrar" accent={colors.red} onPress={handleSubmit(onSubmit)} loading={isLoading} />
 
-          <AnimatedPressable style={styles.testAccess} onPress={handleBypass} disabled={isLoading}>
+          <AnimataPressable style={styles.testAccess} onPress={handleBypass} disabled={isLoading}>
             <Text style={[styles.testAccessText, { color: theme.text }]}>{t('Acesso rápido para demonstração')}</Text>
-          </AnimatedPressable>
+          </AnimataPressable>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -215,7 +216,7 @@ const styles = StyleSheet.create({
     gap: 9,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 8,
+    borderRadius: 14,
     paddingHorizontal: 12,
     backgroundColor: colors.white,
   },
@@ -228,7 +229,7 @@ const styles = StyleSheet.create({
   eyeButton: {
     width: 32,
     height: 32,
-    borderRadius: 8,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
   devButton: {
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 8,
+    borderRadius: 14,
     padding: 12,
     alignItems: 'center',
     backgroundColor: colors.panelSoft,

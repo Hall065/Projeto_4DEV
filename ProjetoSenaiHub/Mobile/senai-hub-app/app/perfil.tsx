@@ -454,7 +454,7 @@ const styles = StyleSheet.create({
   label: { color: colors.navy, fontSize: 12, fontWeight: '800' },
   input: {
     minHeight: 44,
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.white,
@@ -472,7 +472,7 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 430,
     maxHeight: '84%',
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     padding: 14,
   },
@@ -489,14 +489,14 @@ const styles = StyleSheet.create({
   modalClose: {
     width: 34,
     height: 34,
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   selectTrigger: {
     minHeight: 54,
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 9,
@@ -512,7 +512,7 @@ const styles = StyleSheet.create({
   languageOptionsContent: { gap: 8, paddingBottom: 4 },
   languageOption: {
     minHeight: 52,
-    borderRadius: 8,
+    borderRadius: 14,
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 9,

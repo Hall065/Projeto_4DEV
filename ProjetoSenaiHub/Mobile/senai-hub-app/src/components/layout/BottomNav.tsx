@@ -2,7 +2,7 @@ import { cloneElement, isValidElement, type ReactElement } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePathname, useRouter } from 'expo-router';
-import { AnimatedPressable } from '@/components/common/VisualPrimitives';
+import { AnimataPressable } from '@/components/common/AnimataPrimitives';
 import { colors } from '@/constants/colors';
 import { useI18n } from '@/hooks/useI18n';
 import { useThemeColors } from '@/hooks/useThemeColors';
@@ -61,7 +61,7 @@ export function BottomNav({ items, accentColor = colors.navy }: BottomNavProps) 
           ? cloneElement(item.icon, { color: iconColor, size: active ? 22 : 20 })
           : item.icon;
         return (
-          <AnimatedPressable
+          <AnimataPressable
             key={item.route}
             wrapperStyle={styles.itemWrap}
             style={[styles.item, active && { backgroundColor: activeBg }]}
@@ -72,7 +72,7 @@ export function BottomNav({ items, accentColor = colors.navy }: BottomNavProps) 
             <Text style={[styles.label, { color: theme.isDark ? theme.textMuted : colors.grayText }, active && { color: accentColor, fontWeight: '700' }]}>
               {t(item.label)}
             </Text>
-          </AnimatedPressable>
+          </AnimataPressable>
         );
       })}
     </View>
@@ -92,6 +92,8 @@ const styles = StyleSheet.create({
     shadowRadius: 12,
     shadowOffset: { width: 0, height: -3 },
     elevation: 8,
+    borderTopLeftRadius: 22,
+    borderTopRightRadius: 22,
   },
   itemWrap: { flex: 1 },
   item: {
@@ -99,7 +101,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 3,
-    borderRadius: 8,
+    borderRadius: 14,
     position: 'relative',
     overflow: 'hidden',
   },

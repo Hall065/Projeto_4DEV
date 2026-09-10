@@ -60,14 +60,14 @@ export default function SafeLayout() {
         title="SENAI Safe"
         brandArea="safe"
         subtitle="Controle seguro de entradas e saidas"
-        accentColor={colors.red}
+        accentColor={colors.purple}
         notificationCount={notifications.unreadCount}
         onNotificationsPress={() => setNotificationsOpen(true)}
       />
       <View style={{ flex: 1, backgroundColor: theme.appBackground }}>
         <Stack screenOptions={{ headerShown: false, animation: 'fade_from_bottom', contentStyle: { backgroundColor: theme.appBackground } }} />
       </View>
-      <BottomNav items={items} accentColor={colors.red} />
+      <BottomNav items={items} accentColor={colors.purple} />
       <SidebarDrawer items={drawerItems} moduleTitle="SENAI Safe" accentColor={colors.purple} />
       <NotificationsModal
         visible={notificationsOpen}

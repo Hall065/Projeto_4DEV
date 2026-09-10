@@ -796,7 +796,7 @@ const styles = StyleSheet.create({
   },
   feedback: {
     minHeight: 44,
-    borderRadius: 8,
+    borderRadius: radius.lg,
     borderWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
   },
   surface: {
     backgroundColor: colors.panel,
-    borderRadius: radius.lg,
+    borderRadius: radius.card,
     borderWidth: 1,
     borderColor: colors.border,
     padding: spacing.lg,
@@ -850,7 +850,7 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 128,
     backgroundColor: colors.panel,
-    borderRadius: 8,
+    borderRadius: radius.lg,
     borderWidth: 1,
     borderLeftWidth: 3,
     borderColor: colors.border,
@@ -888,7 +888,7 @@ const styles = StyleSheet.create({
   pillText: { fontSize: 10, fontWeight: '800' },
   search: {
     minHeight: touchTarget.min,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.white,
@@ -914,7 +914,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.white,
@@ -1004,7 +1004,7 @@ const styles = StyleSheet.create({
   ringLabel: { color: colors.grayText, fontSize: 11, fontWeight: '700', textAlign: 'center' },
   map: {
     height: 290,
-    borderRadius: 8,
+    borderRadius: radius.card,
     overflow: 'hidden',
     backgroundColor: '#DDEBD8',
     borderWidth: 1,
