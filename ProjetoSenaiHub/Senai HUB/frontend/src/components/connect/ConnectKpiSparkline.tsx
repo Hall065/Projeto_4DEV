@@ -4,6 +4,8 @@ interface ConnectKpiSparklineProps {
   data: number[]
   className?: string
   height?: number
+  /** Cor do traço / área (hex). Padrão: navy SENAI suave. */
+  color?: string
 }
 
 function buildSparklinePaths(
@@ -42,15 +44,14 @@ function buildSparklinePaths(
   return { line, area }
 }
 
-const strokeProps = {
-  fill: 'none' as const,
-  stroke: '#ffffff',
-  strokeLinecap: 'round' as const,
-  strokeLinejoin: 'round' as const,
-  vectorEffect: 'non-scaling-stroke' as const,
-}
+const DEFAULT_COLOR = '#021a3a'
 
-export function ConnectKpiSparkline({ data, className = '', height = 52 }: ConnectKpiSparklineProps) {
+export function ConnectKpiSparkline({
+  data,
+  className = '',
+  height = 52,
+  color = DEFAULT_COLOR,
+}: ConnectKpiSparklineProps) {
   const gradientId = useId().replace(/:/g, '')
   const width = 280
   const safeData = useMemo(() => {
@@ -68,6 +69,14 @@ export function ConnectKpiSparkline({ data, className = '', height = 52 }: Conne
     const count = 7
     return Array.from({ length: count }, (_, i) => ((i + 1) / (count + 1)) * width)
   }, [])
+
+  const strokeProps = {
+    fill: 'none' as const,
+    stroke: color,
+    strokeLinecap: 'round' as const,
+    strokeLinejoin: 'round' as const,
+    vectorEffect: 'non-scaling-stroke' as const,
+  }
 
   if (!line) {
     return (
@@ -89,8 +98,8 @@ export function ConnectKpiSparkline({ data, className = '', height = 52 }: Conne
     >
       <defs>
         <linearGradient id={`${gradientId}-fill`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity={0.35} />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity={0.04} />
+          <stop offset="0%" stopColor={color} stopOpacity={0.28} />
+          <stop offset="100%" stopColor={color} stopOpacity={0.03} />
         </linearGradient>
       </defs>
       {gridLines.map((x) => (
@@ -100,16 +109,16 @@ export function ConnectKpiSparkline({ data, className = '', height = 52 }: Conne
           x2={x}
           y1={0}
           y2={height}
-          stroke="#ffffff"
-          strokeOpacity={0.12}
+          stroke={color}
+          strokeOpacity={0.08}
           strokeWidth={1}
           vectorEffect="non-scaling-stroke"
         />
       ))}
       <path d={area} fill={`url(#${gradientId}-fill)`} />
       {/* Halo suave (sem feDropShadow — em stroke-only o filtro SVG some com a linha) */}
-      <path d={line} {...strokeProps} strokeOpacity={0.35} strokeWidth={5} />
-      <path d={line} {...strokeProps} strokeWidth={2.5} />
+      <path d={line} {...strokeProps} strokeOpacity={0.2} strokeWidth={5} />
+      <path d={line} {...strokeProps} strokeOpacity={0.85} strokeWidth={2} />
     </svg>
   )
 }
