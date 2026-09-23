@@ -1,15 +1,36 @@
 @import "tailwindcss";
 
+/* Portfolio design tokens — black ink replaces institutional navy */
+:root {
+  --bg: #f6f7f9;
+  --bg-elevated: #ffffff;
+  --ink: #0a0c10;
+  --ink-soft: #3a4050;
+  --muted: #6b7285;
+  --line: rgba(10, 12, 16, 0.1);
+  --accent: #e30613;
+  --accent-soft: rgba(227, 6, 19, 0.12);
+  --radius: 1.25rem;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-body: "Instrument Sans", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
 @theme {
-  --color-hub-navy: #021a3a;
+  --color-hub-navy: #0a0c10;
   --color-hub-red: #e30613;
   --color-hub-red-hover: #c00510;
   --color-hub-red-link: #d90404;
-  --color-hub-bg: #f8f9fa;
-  --color-hub-text: #333333;
-  --color-hub-text-muted: #666666;
+  --color-hub-bg: #f6f7f9;
+  --color-hub-text: #0a0c10;
+  --color-hub-text-muted: #6b7285;
   --color-hub-border: #d1d5db;
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --color-hub-ink: #0a0c10;
+  --color-hub-ink-soft: #3a4050;
+  --font-sans: "Instrument Sans", system-ui, -apple-system, sans-serif;
+  --font-display: "Syne", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
 * {
@@ -28,9 +49,239 @@ body,
 
 body {
   margin: 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-body), var(--font-sans);
   color: var(--color-hub-text);
+  background: var(--bg);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+body.has-custom-cursor,
+body.has-custom-cursor * {
+  cursor: none !important;
+}
+
+@media (pointer: coarse) {
+  body.has-custom-cursor,
+  body.has-custom-cursor * {
+    cursor: auto !important;
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: white;
+}
+
+.display {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+}
+
+.mono,
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, monospace;
+}
+
+.section-pad {
+  padding: clamp(4rem, 10vw, 8rem) clamp(1.25rem, 4vw, 4rem);
+}
+
+.hairline {
+  border: 1px solid var(--line);
+}
+
+.topo-bg {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(227, 6, 19, 0.08), transparent),
+    url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 60c20-10 40-10 60 0s40 10 60 0M0 30c20-10 40-10 60 0s40 10 60 0M0 90c20-10 40-10 60 0s40 10 60 0' fill='none' stroke='%230a0c10' stroke-opacity='0.05' stroke-width='1'/%3E%3C/svg%3E");
+}
+
+/* Portfolio parity: 28s linear loop, hover pause, -50% for duplicated content */
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 2.5rem;
+  animation: hub-marquee 28s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.marquee-track.is-paused {
+  animation: none;
+}
+
+@keyframes hub-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.6;
+  }
+  70% {
+    transform: scale(1.35);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+/* Vector cursor (SVG in CustomCursor.tsx): dual-tone strokes for light + dark.
+   No mix-blend multiply (vanishes on dark), no box-shadow/filter blur (soft edges). */
+.custom-cursor,
+.custom-cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  will-change: transform;
+  /* Keep vectors sharp while CSS-scaling on interactive hover */
+  transform: translate3d(-100px, -100px, 0) translate(-50%, -50%);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.custom-cursor {
+  z-index: 9999;
+  width: 16px;
+  height: 16px;
+  line-height: 0;
+  color: var(--accent);
+}
+
+.custom-cursor-ring {
+  z-index: 9998;
+  width: 48px;
+  height: 48px;
+  line-height: 0;
+}
+
+.custom-cursor svg,
+.custom-cursor-ring svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  shape-rendering: geometricPrecision;
+}
+
+@media (pointer: coarse) {
+  .custom-cursor,
+  .custom-cursor-ring {
+    display: none;
+  }
+}
+
+.hero-orbit-stage {
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+/* Orbit PNGs are dark glass squircles; container only clips + depth shadow */
+.hero-orbit-item {
+  transition: box-shadow 0.35s ease;
+}
+
+.hero-orbit-item[data-depth="front"] {
+  box-shadow:
+    0 18px 44px rgba(10, 12, 16, 0.28),
+    0 0 28px rgba(227, 6, 19, 0.08);
+}
+
+.hero-orbit-item[data-depth="back"] {
+  box-shadow: none;
+}
+
+.cta-fill {
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-fill::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: translateY(101%);
+  transition: transform 0.45s var(--ease-out);
+  z-index: 0;
+}
+
+.cta-fill:hover::before {
+  transform: translateY(0);
+}
+
+.cta-fill > span {
+  position: relative;
+  z-index: 1;
+  transition: color 0.35s ease;
+}
+
+.cta-fill:hover > span {
+  color: white;
+}
+
+.feature-chip {
+  transition:
+    transform 0.35s var(--ease-out),
+    background 0.35s ease,
+    color 0.35s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s var(--ease-out);
+}
+
+.feature-chip:hover {
+  transform: translateY(-4px) scale(1.01);
+  background: var(--ink);
+  color: white;
+  border-color: rgba(227, 6, 19, 0.4);
+  box-shadow:
+    0 18px 42px rgba(10, 12, 16, 0.22),
+    0 0 0 1px rgba(227, 6, 19, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* Settings → Reduzir animações: keep ink/red hover chrome, skip lift */
+html.reduce-motion-pref .feature-chip:hover {
+  transform: none;
+}
+
+/* Settings-only gate for marquee (Portfolio never freezes ticker on OS reduce). */
+html.reduce-motion-pref .marquee-track {
+  animation: none;
+}
+
+html.reduce-motion-pref .pulse-dot::after {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse-dot::after {
+    animation: none;
+  }
 }
 
 /**
@@ -150,7 +401,7 @@ body {
     -webkit-backdrop-filter: blur(24px) saturate(1.15);
     border: 1px solid rgba(255, 255, 255, 0.65);
     box-shadow:
-      0 8px 32px rgba(2, 26, 58, 0.1),
+      0 8px 32px rgba(10, 12, 16, 0.1),
       inset 0 1px 0 rgba(255, 255, 255, 0.75);
   }
 
@@ -160,7 +411,7 @@ body {
     -webkit-backdrop-filter: blur(28px) saturate(1.12);
     border: 1px solid rgba(255, 255, 255, 0.7);
     box-shadow:
-      0 12px 40px rgba(2, 26, 58, 0.12),
+      0 12px 40px rgba(10, 12, 16, 0.12),
       inset 0 1px 0 rgba(255, 255, 255, 0.8);
   }
 
@@ -171,18 +422,18 @@ body {
     -webkit-backdrop-filter: blur(20px) saturate(1.15);
     border: 1px solid rgba(255, 255, 255, 0.92);
     box-shadow:
-      0 12px 40px rgba(2, 26, 58, 0.14),
+      0 12px 40px rgba(10, 12, 16, 0.14),
       inset 0 1px 0 rgba(255, 255, 255, 0.95);
   }
 
-  /* Chrome institucional — navy fixo (não segue o tom do wallpaper) */
+  /* Chrome institucional — preto Portfolio (não segue o tom do wallpaper) */
   .hub-chrome {
-    background-color: #021a3a;
+    background-color: #0a0c10;
     border-color: rgba(255, 255, 255, 0.12);
   }
 
   .hub-chrome-sidebar {
-    background-color: #021a3a;
+    background-color: #0a0c10;
     border-color: rgba(255, 255, 255, 0.1);
   }
 
@@ -196,7 +447,7 @@ body {
   }
 
   .glass-sidebar {
-    background-color: #021a3a;
+    background-color: #0a0c10;
     border-color: rgba(255, 255, 255, 0.1);
   }
 
@@ -223,7 +474,7 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.55);
     background: rgba(255, 255, 255, 0.72);
     box-shadow:
-      0 4px 14px rgba(2, 26, 58, 0.08),
+      0 4px 14px rgba(10, 12, 16, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.85);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -232,7 +483,7 @@ body {
   .app-brand-mark-fallback {
     background: var(--color-hub-bg);
     border-color: var(--color-hub-border);
-    box-shadow: 0 2px 8px rgba(2, 26, 58, 0.06);
+    box-shadow: 0 2px 8px rgba(10, 12, 16, 0.06);
   }
 
   .sidebar-app-logo-mark {
@@ -241,12 +492,12 @@ body {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
   }
 
-  /* Botão na borda da sidebar — navy fixo (não segue wallpaper-tone) */
+  /* Botão na borda da sidebar — preto fixo (não segue wallpaper-tone) */
   .sidebar-rail-toggle-face {
-    background-color: #021a3a;
+    background-color: #0a0c10;
     color: #ffffff;
     border-color: rgba(255, 255, 255, 0.35);
-    box-shadow: 0 2px 10px rgba(2, 26, 58, 0.5);
+    box-shadow: 0 2px 10px rgba(10, 12, 16, 0.5);
     --tw-ring-color: rgba(255, 255, 255, 0.22);
   }
 
@@ -260,18 +511,18 @@ body {
   }
 
   .chart-bar-track {
-    background: rgba(2, 26, 58, 0.08);
+    background: rgba(10, 12, 16, 0.08);
   }
 
   .chart-stat-badge {
-    background: rgba(2, 26, 58, 0.06);
-    border: 1px solid rgba(2, 26, 58, 0.1);
+    background: rgba(10, 12, 16, 0.06);
+    border: 1px solid rgba(10, 12, 16, 0.1);
     color: var(--color-hub-navy);
   }
 
   /**
    * Scrollbars minimalistas (WebKit + Firefox thin)
-   * — sidebar navy, área principal, painéis glass e scroll horizontal em tabelas
+   * — sidebar escura, área principal, painéis glass e scroll horizontal em tabelas
    */
 
   .scrollbar-sidebar-navy {
@@ -307,10 +558,10 @@ body {
     height: 0;
   }
 
-  /** Coluna principal (Connect / Grid) — trilho invisível, thumb navy suave */
+  /** Coluna principal (Connect / Grid) — trilho invisível, thumb ink suave */
   .scrollbar-app-main {
     scrollbar-width: thin;
-    scrollbar-color: rgba(2, 26, 58, 0.28) transparent;
+    scrollbar-color: rgba(10, 12, 16, 0.28) transparent;
   }
 
   .scrollbar-app-main::-webkit-scrollbar {
@@ -322,7 +573,7 @@ body {
   }
 
   .scrollbar-app-main::-webkit-scrollbar-thumb {
-    background: rgba(2, 26, 58, 0.18);
+    background: rgba(10, 12, 16, 0.18);
     border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: padding-box;
@@ -343,7 +594,7 @@ body {
   /** Listas / cards em fundo claro ou glass */
   .scrollbar-glass-inset {
     scrollbar-width: thin;
-    scrollbar-color: rgba(2, 26, 58, 0.22) rgba(255, 255, 255, 0.2);
+    scrollbar-color: rgba(10, 12, 16, 0.22) rgba(255, 255, 255, 0.2);
   }
 
   .scrollbar-glass-inset::-webkit-scrollbar {
@@ -357,7 +608,7 @@ body {
   }
 
   .scrollbar-glass-inset::-webkit-scrollbar-thumb {
-    background: rgba(2, 26, 58, 0.2);
+    background: rgba(10, 12, 16, 0.2);
     border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: padding-box;
@@ -378,7 +629,7 @@ body {
   /** Scroll horizontal em tabelas */
   .scrollbar-minimal-x {
     scrollbar-width: thin;
-    scrollbar-color: rgba(2, 26, 58, 0.28) transparent;
+    scrollbar-color: rgba(10, 12, 16, 0.28) transparent;
   }
 
   .scrollbar-minimal-x::-webkit-scrollbar {
@@ -390,7 +641,7 @@ body {
   }
 
   .scrollbar-minimal-x::-webkit-scrollbar-thumb {
-    background: rgba(2, 26, 58, 0.18);
+    background: rgba(10, 12, 16, 0.18);
     border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: padding-box;
@@ -457,7 +708,7 @@ html[data-wallpaper-tone="dark"] body {
 }
 
 html[data-wallpaper-tone="dark"] .glass-panel {
-  background: rgba(2, 26, 58, 0.58);
+  background: rgba(10, 12, 16, 0.58);
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.28),
@@ -465,7 +716,7 @@ html[data-wallpaper-tone="dark"] .glass-panel {
 }
 
 html[data-wallpaper-tone="dark"] .glass-panel-solid {
-  background: rgba(2, 26, 58, 0.68);
+  background: rgba(10, 12, 16, 0.68);
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.32),
@@ -473,13 +724,13 @@ html[data-wallpaper-tone="dark"] .glass-panel-solid {
 }
 
 html[data-wallpaper-tone="dark"] .glass-nav {
-  background: rgba(2, 26, 58, 0.55);
+  background: rgba(10, 12, 16, 0.55);
   border-color: rgba(255, 255, 255, 0.12);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
 html[data-wallpaper-tone="dark"] .glass-panel-menu {
-  background: rgba(2, 26, 58, 0.94);
+  background: rgba(10, 12, 16, 0.94);
   border-color: rgba(255, 255, 255, 0.14);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.35),
@@ -487,7 +738,7 @@ html[data-wallpaper-tone="dark"] .glass-panel-menu {
 }
 
 html[data-wallpaper-tone="dark"] .glass-input {
-  background: rgba(2, 26, 58, 0.48);
+  background: rgba(10, 12, 16, 0.48);
   border-color: rgba(255, 255, 255, 0.18);
   color: var(--color-hub-text);
 }
@@ -497,15 +748,15 @@ html[data-wallpaper-tone="dark"] .glass-input::placeholder {
 }
 
 html[data-wallpaper-tone="dark"] .glass-thead {
-  background: rgba(2, 26, 58, 0.52);
+  background: rgba(10, 12, 16, 0.52);
 }
 
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .bg-gradient-to-r.from-white {
-  background-image: linear-gradient(to right, rgba(2, 26, 58, 0.62), rgba(15, 23, 42, 0.42)) !important;
+  background-image: linear-gradient(to right, rgba(10, 12, 16, 0.62), rgba(15, 23, 42, 0.42)) !important;
 }
 
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .surface-inset {
-  background: rgba(2, 26, 58, 0.48);
+  background: rgba(10, 12, 16, 0.48);
   border-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -524,7 +775,7 @@ html[data-wallpaper-tone="dark"] .app-brand-mark-fallback {
 }
 
 html[data-wallpaper-tone="dark"] .chart-panel {
-  background: linear-gradient(180deg, rgba(2, 26, 58, 0.62) 0%, rgba(15, 23, 42, 0.48) 100%);
+  background: linear-gradient(180deg, rgba(10, 12, 16, 0.62) 0%, rgba(15, 23, 42, 0.48) 100%);
   border-color: rgba(255, 255, 255, 0.12);
 }
 
@@ -544,12 +795,12 @@ html[data-wallpaper-tone="dark"] .app-wallpaper-surface .bg-white\/60,
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .bg-white\/80,
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .bg-white\/90,
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .bg-white\/95 {
-  background-color: rgba(2, 26, 58, 0.45) !important;
+  background-color: rgba(10, 12, 16, 0.45) !important;
 }
 
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .border-hub-border\/50.bg-white,
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .bg-white {
-  background-color: rgba(2, 26, 58, 0.52) !important;
+  background-color: rgba(10, 12, 16, 0.52) !important;
 }
 
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .border-white\/40,
@@ -559,7 +810,7 @@ html[data-wallpaper-tone="dark"] .app-wallpaper-surface .border-white\/60 {
 }
 
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .bg-slate-50 {
-  background-color: rgba(2, 26, 58, 0.38) !important;
+  background-color: rgba(10, 12, 16, 0.38) !important;
 }
 
 html[data-wallpaper-tone="dark"] .app-wallpaper-surface .hover\:bg-white\/40:hover,
@@ -586,11 +837,11 @@ html[data-wallpaper-tone="dark"] .scrollbar-app-main::-webkit-scrollbar-thumb:ho
 }
 
 html[data-wallpaper-tone="dark"] .scrollbar-glass-inset {
-  scrollbar-color: rgba(255, 255, 255, 0.22) rgba(2, 26, 58, 0.35);
+  scrollbar-color: rgba(255, 255, 255, 0.22) rgba(10, 12, 16, 0.35);
 }
 
 html[data-wallpaper-tone="dark"] .scrollbar-glass-inset::-webkit-scrollbar-track {
-  background: rgba(2, 26, 58, 0.35);
+  background: rgba(10, 12, 16, 0.35);
 }
 
 html[data-wallpaper-tone="dark"] .scrollbar-glass-inset::-webkit-scrollbar-thumb {
@@ -607,12 +858,12 @@ html[data-wallpaper-tone="dark"] .scrollbar-minimal-x::-webkit-scrollbar-thumb {
 
 /* Login/cadastro mantêm formulário claro mesmo com tema escuro salvo */
 html[data-wallpaper-tone="dark"] .auth-shell {
-  --color-hub-text: #333333;
-  --color-hub-text-muted: #666666;
-  --color-hub-navy: #021a3a;
-  --color-hub-bg: #f8f9fa;
+  --color-hub-text: #0a0c10;
+  --color-hub-text-muted: #6b7285;
+  --color-hub-navy: #0a0c10;
+  --color-hub-bg: #f6f7f9;
   --color-hub-border: #d1d5db;
-  color: #333333;
+  color: #0a0c10;
 }
 
 /* Preferência do usuário em Configurações (reduz animações) */

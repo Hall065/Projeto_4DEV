@@ -44,7 +44,7 @@ function buildSparklinePaths(
   return { line, area }
 }
 
-const DEFAULT_COLOR = '#021a3a'
+const DEFAULT_COLOR = '#0a0c10'
 
 export function ConnectKpiSparkline({
   data,

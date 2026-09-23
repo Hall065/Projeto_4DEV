@@ -1,5 +1,6 @@
 import { useAppearance } from '../../contexts/AppearanceContext'
 import { getAppBrandAssets, getBrandMarkSrc } from '../../utils/appBrandAssets'
+import type { WallpaperTone } from '../../utils/wallpaperTone'
 
 type AppBrandMarkSize = 'sm' | 'md'
 
@@ -18,15 +19,18 @@ export function AppBrandMark({
   name,
   size = 'md',
   className = '',
+  /** Force mark-light / mark-dark (e.g. light cards ignore dark wallpaper). */
+  tone,
 }: {
   slug: string
   name: string
   size?: AppBrandMarkSize
   className?: string
+  tone?: WallpaperTone
 }) {
   const { wallpaperTone } = useAppearance()
   const assets = slug === 'hub' ? undefined : getAppBrandAssets(slug)
-  const mark = getBrandMarkSrc(slug, wallpaperTone)
+  const mark = getBrandMarkSrc(slug, tone ?? wallpaperTone)
   const displayName = slug === 'hub' ? 'SENAI HUB' : assets?.name ?? name
 
   if (!mark) {

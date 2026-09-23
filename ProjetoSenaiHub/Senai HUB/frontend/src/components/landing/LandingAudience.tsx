@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { audienceAdmin, audienceStudent, audienceTeacher } from '../../assets/landing'
+import { FadeIn, StaggerChildren, MotionItem } from '../../motion'
 
 export function LandingAudience() {
   const { t } = useTranslation()
@@ -23,39 +24,48 @@ export function LandingAudience() {
   ]
 
   return (
-    <section id="para-quem" className="py-16 sm:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="glass-panel-solid mx-auto max-w-2xl rounded-2xl px-6 py-8 text-center sm:px-10">
-          <h2 className="text-2xl font-bold text-hub-navy sm:text-3xl">{t('landing.audience.title')}</h2>
-          <p className="mt-4 text-base text-hub-text-muted">{t('landing.audience.subtitle')}</p>
-        </div>
+    <section id="para-quem" className="section-pad bg-[var(--bg)]">
+      <div className="mx-auto max-w-[1200px]">
+        <FadeIn whenVisible tone="marketing" className="max-w-3xl">
+          <p className="mono text-[11px] uppercase tracking-[0.28em] text-[var(--muted)]">
+            {t('landing.navAudience')}
+          </p>
+          <h2 className="mt-4 display text-[clamp(2.4rem,6vw,4.5rem)] text-hub-navy">
+            {t('landing.audience.title')}
+          </h2>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
+            {t('landing.audience.subtitle')}
+          </p>
+        </FadeIn>
 
-        <div className="mt-12 grid gap-8 md:grid-cols-3">
+        <StaggerChildren whenVisible tone="marketing" className="mt-14 grid gap-6 md:grid-cols-3" stagger={0.12}>
           {audiences.map((item) => (
-            <article
-              key={item.title}
-              className="glass-panel-solid flex flex-col overflow-hidden rounded-2xl transition-shadow hover:shadow-lg"
-            >
-              <div className="flex h-64 items-end justify-center bg-white/25 px-3 pt-4 backdrop-blur-sm sm:h-72 lg:h-80">
-                <img
-                  src={item.image}
-                  alt=""
-                  className="h-[92%] w-auto max-w-full object-contain object-bottom sm:h-[95%]"
-                />
-              </div>
-              <div className="flex flex-1 flex-col p-6">
-                <h3 className="text-lg font-bold text-hub-navy">{item.title}</h3>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-hub-text-muted">{item.description}</p>
-                <a
-                  href="#recursos"
-                  className="mt-4 inline-flex items-center text-sm font-semibold text-hub-red transition-colors hover:text-hub-red-hover"
-                >
-                  {t('landing.audience.learnMore')}
-                </a>
-              </div>
-            </article>
+            <MotionItem key={item.title} tone="marketing">
+              <article className="hairline group flex h-full flex-col overflow-hidden rounded-[1.5rem] bg-white transition-shadow hover:shadow-[0_20px_50px_rgba(10,12,16,0.08)]">
+                <div className="flex h-64 items-end justify-center bg-[var(--bg)] px-3 pt-4 sm:h-72">
+                  <img
+                    src={item.image}
+                    alt=""
+                    className="h-[92%] w-auto max-w-full object-contain object-bottom transition-transform duration-500 group-hover:scale-[1.03] sm:h-[95%]"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="display text-2xl text-hub-navy">{item.title}</h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-[var(--ink-soft)]">
+                    {item.description}
+                  </p>
+                  <a
+                    href="#recursos"
+                    data-cursor
+                    className="mt-4 inline-flex items-center text-[11px] font-semibold uppercase tracking-[0.16em] text-hub-red transition hover:brightness-110"
+                  >
+                    {t('landing.audience.learnMore')}
+                  </a>
+                </div>
+              </article>
+            </MotionItem>
           ))}
-        </div>
+        </StaggerChildren>
       </div>
     </section>
   )

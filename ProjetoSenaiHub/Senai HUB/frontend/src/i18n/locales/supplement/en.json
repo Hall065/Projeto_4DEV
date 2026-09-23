@@ -245,11 +245,17 @@
       "benefit2": "Intuitive navigation",
       "benefit3": "More productivity",
       "benefit4": "Security and reliability",
-      "exploreHub": "Explore the Hub"
+      "exploreHub": "Explore the Hub",
+      "connectDesc": "Access educational data, track indicators, enrollments, classes, courses, attendance and more.",
+      "gridDesc": "Manage work orders, maintenance, contracts, assets, tickets and physical spaces.",
+      "safeDesc": "Control authorizations, access and safety protocols with full traceability."
     },
     "cta": {
-      "title": "Start turning education into the future today.",
+      "eyebrow": "Get started",
+      "title": "Turn education into the future.",
       "body": "Sign in with your account and access the best of SENAI professional and technological education.",
+      "inviteLine": "One login for the systems and tools that power your SENAI journey.",
+      "trust": "Secure access · SENAI account",
       "accessPlatform": "Access platform"
     },
     "preview": {

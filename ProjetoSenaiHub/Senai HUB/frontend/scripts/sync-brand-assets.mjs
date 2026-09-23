@@ -5,6 +5,10 @@ import sharp from 'sharp'
 
 const brandDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '../src/assets/brand')
 
+/**
+ * Crop the SAFE symbol from expanded and square it on a transparent canvas.
+ * mark-light (purple, transparent) is curated separately — do not overwrite.
+ */
 async function regenerateSafeMarks() {
   const expandedPath = path.join(brandDir, 'safe-logo-expanded.png')
   const meta = await sharp(expandedPath).metadata()
@@ -20,14 +24,14 @@ async function regenerateSafeMarks() {
       width: size,
       height: size,
       channels: 4,
-      background: { r: 0, g: 0, b: 0, alpha: 1 },
+      background: { r: 0, g: 0, b: 0, alpha: 0 },
     },
   })
     .composite([{ input: symbol, gravity: 'center' }])
     .png()
     .toBuffer()
 
-  for (const name of ['safe-logo-icon.png', 'safe-logo-mark-dark.png', 'safe-logo-mark-light.png']) {
+  for (const name of ['safe-logo-icon.png', 'safe-logo-mark-dark.png']) {
     await sharp(icon).toFile(path.join(brandDir, name))
   }
 }
@@ -41,4 +45,4 @@ function syncHubMarks() {
 
 await regenerateSafeMarks()
 syncHubMarks()
-console.log('Brand assets synchronized.')
+console.log('Brand assets synchronized (SAFE icon/mark-dark transparent).')

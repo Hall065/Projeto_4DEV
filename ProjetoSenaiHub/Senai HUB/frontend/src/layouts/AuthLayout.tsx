@@ -1,6 +1,6 @@
-import { Outlet } from 'react-router-dom'
 import { AuthSidebar } from '../components/auth/AuthSidebar'
 import loginBackground from '../assets/auth/login-background.png'
+import { PageTransition } from '../motion'
 
 export function AuthLayout() {
   return (
@@ -15,7 +15,7 @@ export function AuthLayout() {
           className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-90"
         />
         <div className="relative z-10 w-full max-w-[420px]">
-          <Outlet />
+          <PageTransition />
         </div>
       </section>
     </div>

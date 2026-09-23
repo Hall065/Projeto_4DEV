@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
-import { Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { GridHeader } from '../components/grid/GridHeader'
 import { GridSidebar } from '../components/grid/GridSidebar'
 import { GlassShell } from '../components/layout/GlassShell'
 import { SkipToMainLink } from '../components/layout/SkipToMainLink'
 import { SidebarRailToggle } from '../components/layout/SidebarRailToggle'
+import { PageTransition } from '../motion'
 
 export function GridLayout() {
   const { t } = useTranslation()
@@ -63,7 +63,7 @@ export function GridLayout() {
         />
         <main id="main-content" className="scrollbar-app-main relative z-0 min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
           <div className="mx-auto w-full max-w-[1600px] min-w-0">
-            <Outlet />
+            <PageTransition />
           </div>
         </main>
       </div>

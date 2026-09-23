@@ -2,6 +2,10 @@ import { useCallback, useEffect, useState } from 'react'
 
 const REDUCE_MOTION_KEY = 'senai_hub_reduce_motion'
 
+/**
+ * Default OFF — animations on unless the user opts in via Settings.
+ * Only an explicit `'1'` enables reduce; missing/corrupt values stay off.
+ */
 function readReduceMotion(): boolean {
   try {
     return localStorage.getItem(REDUCE_MOTION_KEY) === '1'

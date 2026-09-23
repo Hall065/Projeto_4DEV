@@ -45,7 +45,7 @@ const social = [
 function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-white">{title}</h3>
+      <h3 className="mono text-[11px] uppercase tracking-[0.2em] text-white/50">{title}</h3>
       <ul className="mt-4 space-y-2.5">
         {links.map((link) => (
           <li key={link.label}>
@@ -54,7 +54,7 @@ function FooterColumn({ title, links }: { title: string; links: FooterLink[] }) 
                 {link.label}
               </SupportChatTrigger>
             ) : (
-              <a href={link.href} className="text-sm text-white/70 transition-colors hover:text-white">
+              <a href={link.href} data-cursor className="text-sm text-white/70 transition-colors hover:text-white">
                 {link.label}
               </a>
             )}
@@ -89,12 +89,12 @@ export function LandingFooter() {
   ]
 
   return (
-    <footer id="suporte" className="hub-chrome text-white">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+    <footer id="suporte" className="bg-hub-navy text-white">
+      <div className="mx-auto max-w-[1200px] px-5 py-16 sm:px-8 lg:px-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="sm:col-span-2 lg:col-span-1">
             <img src={HUB_BRAND_ASSETS.expanded} alt={HUB_BRAND_ASSETS.name} className="h-12 w-auto sm:h-14" />
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/70">{t('landing.footer.tagline')}</p>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/65">{t('landing.footer.tagline')}</p>
             <div className="mt-6 flex gap-3">
               {social.map(({ icon, label, href }) => (
                 <a
@@ -102,6 +102,7 @@ export function LandingFooter() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
+                  data-cursor
                   className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-hub-red"
                   aria-label={label}
                 >
@@ -116,12 +117,10 @@ export function LandingFooter() {
           <FooterColumn title={t('landing.footer.institutional')} links={institutional} />
         </div>
 
-        <div className="mt-12 border-t border-white/10 pt-8 text-center">
-          <p className="text-xs text-white/50">
-            {t('landing.footer.copyright', { year: new Date().getFullYear() })}
-          </p>
-          <p className="mt-2 text-xs text-white/40">
-            <Link to="/login" className="hover:text-white/70">
+        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 text-xs text-white/40 sm:flex-row">
+          <p>{t('landing.footer.copyright', { year: new Date().getFullYear() })}</p>
+          <p className="mono">
+            <Link to="/login" data-cursor className="hover:text-white/70">
               {t('landing.restrictedArea')}
             </Link>
           </p>

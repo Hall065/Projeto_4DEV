@@ -10,6 +10,7 @@ import { ToastProvider } from './contexts/ToastContext'
 import { ConfirmProvider } from './contexts/ConfirmContext'
 import { SupportChatProvider } from './contexts/SupportChatContext'
 import { SupportChatWidget } from './components/support/SupportChatWidget'
+import { BootGate } from './components/fx/BootGate'
 import { AppRoutes } from './routes'
 
 function App() {
@@ -23,9 +24,11 @@ function App() {
             <NotificationProvider>
               <GlobalSearchProvider>
                 <AppearanceProvider>
-                  <AppRoutes />
-                  <GlobalSearchPalette />
-                  <SupportChatWidget />
+                  <BootGate>
+                    <AppRoutes />
+                    <GlobalSearchPalette />
+                    <SupportChatWidget />
+                  </BootGate>
                 </AppearanceProvider>
               </GlobalSearchProvider>
             </NotificationProvider>

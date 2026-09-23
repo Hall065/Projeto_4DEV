@@ -82,7 +82,7 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
       radial-gradient(ellipse 50% 45% at 30% 55%, rgba(168, 197, 255, 0.2), transparent 48%)
     `,
     blobs: [
-      'absolute -left-32 -top-20 h-[32rem] w-[32rem] rounded-full bg-[#021a3a]/28 blur-[90px]',
+      'absolute -left-32 -top-20 h-[32rem] w-[32rem] rounded-full bg-[#0a0c10]/28 blur-[90px]',
       'absolute -right-24 top-[12%] h-[34rem] w-[34rem] rounded-full bg-[#e30613]/22 blur-[100px]',
       'absolute bottom-[-8rem] left-[20%] h-[28rem] w-[28rem] rounded-full bg-[#7ba3f0]/30 blur-[85px]',
     ],
@@ -99,7 +99,7 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
       radial-gradient(ellipse 60% 50% at 45% 100%, rgba(168, 197, 255, 0.32), transparent 50%)
     `,
     blobs: [
-      'absolute left-[-8rem] top-[-6rem] h-[36rem] w-[36rem] rounded-full bg-[#021a3a]/32 blur-[95px]',
+      'absolute left-[-8rem] top-[-6rem] h-[36rem] w-[36rem] rounded-full bg-[#0a0c10]/32 blur-[95px]',
       'absolute right-[-5rem] bottom-[-4rem] h-[30rem] w-[30rem] rounded-full bg-[#4a7cc9]/38 blur-[90px]',
     ],
   },
@@ -130,7 +130,7 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
       radial-gradient(ellipse 65% 50% at 15% 75%, rgba(227, 6, 19, 0.14), transparent 48%)
     `,
     blobs: [
-      'absolute right-0 top-0 h-96 w-96 rounded-full bg-[#021a3a]/18 blur-[80px]',
+      'absolute right-0 top-0 h-96 w-96 rounded-full bg-[#0a0c10]/18 blur-[80px]',
       'absolute bottom-0 left-0 h-80 w-80 rounded-full bg-[#e30613]/14 blur-[75px]',
     ],
   },
@@ -194,7 +194,7 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
       radial-gradient(ellipse 65% 55% at 50% 95%, rgba(74, 124, 201, 0.28), transparent 50%)
     `,
     blobs: [
-      'absolute -left-24 top-0 h-[34rem] w-[34rem] rounded-full bg-[#021a3a]/55 blur-[100px]',
+      'absolute -left-24 top-0 h-[34rem] w-[34rem] rounded-full bg-[#0a0c10]/55 blur-[100px]',
       'absolute right-[-8rem] top-[5%] h-[32rem] w-[32rem] rounded-full bg-[#e30613]/25 blur-[95px]',
       'absolute bottom-[-6rem] left-[30%] h-96 w-96 rounded-full bg-[#1e3a5f]/45 blur-[85px]',
     ],
@@ -230,7 +230,7 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
     `,
     blobs: [
       'absolute -right-12 -top-12 h-[34rem] w-[34rem] rounded-full bg-[#e30613]/40 blur-[100px]',
-      'absolute left-[-8rem] bottom-0 h-[30rem] w-[30rem] rounded-full bg-[#021a3a]/45 blur-[90px]',
+      'absolute left-[-8rem] bottom-0 h-[30rem] w-[30rem] rounded-full bg-[#0a0c10]/45 blur-[90px]',
     ],
     veil: 'bg-gradient-to-b from-white/6 via-transparent to-black/28',
   },
@@ -264,7 +264,7 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
     `,
     blobs: [
       'absolute bottom-[-6rem] left-[-4rem] h-[32rem] w-[32rem] rounded-full bg-[#065f46]/45 blur-[90px]',
-      'absolute right-[-6rem] top-0 h-96 w-96 rounded-full bg-[#021a3a]/40 blur-[85px]',
+      'absolute right-[-6rem] top-0 h-96 w-96 rounded-full bg-[#0a0c10]/40 blur-[85px]',
     ],
     veil: 'bg-gradient-to-b from-white/5 via-transparent to-black/28',
   },

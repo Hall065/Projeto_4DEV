@@ -50,16 +50,26 @@ import { SafeAuthorizationsPage } from '../pages/safe/SafeAuthorizationsPage'
 import { SafeApprovalsPage } from '../pages/safe/SafeApprovalsPage'
 import { SafePortariaPage } from '../pages/safe/SafePortariaPage'
 import { SafeAuthorizationDetailPage } from '../pages/safe/SafeAuthorizationDetailPage'
+import { prefetchCampusMap3DAssets } from '../utils/campusMapAssets'
+import {
+  preloadGridMapPage,
+  preloadLocationPage,
+  preloadSpreadsheetPage,
+} from '../utils/preloadAssets'
 
-const LocationPage = lazy(() =>
-  import('../pages/connect/LocationPage').then((module) => ({ default: module.LocationPage })),
-)
-const GridTaskMapPage = lazy(() =>
-  import('../pages/grid/GridTaskMapPage').then((module) => ({ default: module.GridTaskMapPage })),
-)
-const SpreadsheetHubPage = lazy(() =>
-  import('../pages/spreadsheet/SpreadsheetHubPage').then((module) => ({ default: module.SpreadsheetHubPage })),
-)
+/** Suspense stays until page chunk AND campus map/Three assets are warm. */
+const LocationPage = lazy(async () => {
+  const [mod] = await Promise.all([preloadLocationPage(), prefetchCampusMap3DAssets()])
+  return { default: mod.LocationPage }
+})
+const GridTaskMapPage = lazy(async () => {
+  const [mod] = await Promise.all([preloadGridMapPage(), prefetchCampusMap3DAssets()])
+  return { default: mod.GridTaskMapPage }
+})
+const SpreadsheetHubPage = lazy(async () => {
+  const mod = await preloadSpreadsheetPage()
+  return { default: mod.SpreadsheetHubPage }
+})
 
 function LazyPage({ children }: { children: ReactNode }) {
   return (

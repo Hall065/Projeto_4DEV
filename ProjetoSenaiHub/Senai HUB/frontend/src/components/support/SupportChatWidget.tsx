@@ -47,7 +47,7 @@ export function SupportChatWidget() {
     <div className="flex items-center gap-3">
       <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/15 ring-2 ring-hub-red/80">
         <img src={HUB_BRAND_ASSETS.icon} alt="" aria-hidden className="h-6 w-6 object-contain" />
-        <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#021a3a] bg-emerald-400" />
+        <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-[#0a0c10] bg-emerald-400" />
       </span>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold leading-tight">{t('supportChat.title')}</p>

@@ -33,5 +33,11 @@ export { default as safeLogoIcon } from './safe-logo-icon.png'
 export { default as safeLogoMarkLight } from './safe-logo-mark-light.png'
 export { default as safeLogoMarkDark } from './safe-logo-mark-dark.png'
 
+/** Hero orbit glass chips (Portfolio parity) */
+export { default as hubOrbitChip } from './orbit/hub-orbit.png'
+export { default as connectOrbitChip } from './orbit/connect-orbit.png'
+export { default as gridOrbitChip } from './orbit/grid-orbit.png'
+export { default as safeOrbitChip } from './orbit/safe-orbit.png'
+
 /** @deprecated Prefer hubLogoExpanded */
 export { default as logoSenaiHub } from './hub-logo-expanded.png'

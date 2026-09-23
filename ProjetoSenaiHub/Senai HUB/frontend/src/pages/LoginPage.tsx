@@ -7,6 +7,7 @@ import { AuthField } from '../components/auth/AuthField'
 import { AuthFormCard } from '../components/auth/AuthFormCard'
 import { PasswordToggle } from '../components/auth/PasswordToggle'
 import { useAuth } from '../contexts/AuthContext'
+import { FadeIn, HoverLift, MotionItem, StaggerChildren } from '../motion'
 
 export function LoginPage() {
   const { t } = useTranslation()
@@ -41,65 +42,85 @@ export function LoginPage() {
   }
 
   return (
-    <AuthFormCard
-      title={t('auth.loginTitle')}
-      subtitle={t('auth.loginSubtitle')}
-      footer={
-        <p className="text-hub-text-muted text-sm">
-          {t('auth.adminOnlySignup')}{' '}
-          <Link to="/solicitar-acesso" className="font-medium text-hub-red hover:underline">
-            {t('auth.requestAccess')}
-          </Link>
-        </p>
-      }
-    >
-      <form onSubmit={handleSubmit} className="space-y-5">
-        {sessionExpired && (
-          <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-            {t('auth.sessionExpired')}
+    <FadeIn delay={0.04} y={14}>
+      <AuthFormCard
+        title={t('auth.loginTitle')}
+        subtitle={t('auth.loginSubtitle')}
+        footer={
+          <p className="text-hub-text-muted text-sm">
+            {t('auth.adminOnlySignup')}{' '}
+            <Link to="/solicitar-acesso" className="font-medium text-hub-red hover:underline">
+              {t('auth.requestAccess')}
+            </Link>
           </p>
-        )}
+        }
+      >
+        <form onSubmit={handleSubmit}>
+          <StaggerChildren stagger={0.055} delay={0.1} className="space-y-5">
+            {sessionExpired && (
+              <MotionItem>
+                <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                  {t('auth.sessionExpired')}
+                </p>
+              </MotionItem>
+            )}
 
-        <AuthField
-          label={t('auth.email')}
-          type="email"
-          icon={Mail}
-          placeholder={t('auth.emailPlaceholder')}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          autoComplete="email"
-          required
-        />
+            <MotionItem>
+              <AuthField
+                label={t('auth.email')}
+                type="email"
+                icon={Mail}
+                placeholder={t('auth.emailPlaceholder')}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                autoComplete="email"
+                required
+              />
+            </MotionItem>
 
-        <AuthField
-          label={t('auth.password')}
-          type={showPassword ? 'text' : 'password'}
-          icon={Lock}
-          placeholder={t('auth.passwordPlaceholder')}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoComplete="current-password"
-          required
-          rightSlot={
-            <PasswordToggle
-              visible={showPassword}
-              onToggle={() => setShowPassword((visible) => !visible)}
-              labelShow={t('auth.showPassword')}
-              labelHide={t('auth.hidePassword')}
-            />
-          }
-        />
+            <MotionItem>
+              <AuthField
+                label={t('auth.password')}
+                type={showPassword ? 'text' : 'password'}
+                icon={Lock}
+                placeholder={t('auth.passwordPlaceholder')}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                required
+                rightSlot={
+                  <PasswordToggle
+                    visible={showPassword}
+                    onToggle={() => setShowPassword((visible) => !visible)}
+                    labelShow={t('auth.showPassword')}
+                    labelHide={t('auth.hidePassword')}
+                  />
+                }
+              />
+            </MotionItem>
 
-        <div className="flex justify-end">
-          <Link to="/recuperar-senha" className="text-sm font-medium text-hub-red-link hover:underline">
-            {t('auth.forgotPassword')}
-          </Link>
-        </div>
+            <MotionItem>
+              <div className="flex justify-end">
+                <Link to="/recuperar-senha" className="text-sm font-medium text-hub-red-link hover:underline">
+                  {t('auth.forgotPassword')}
+                </Link>
+              </div>
+            </MotionItem>
 
-        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>}
+            {error && (
+              <MotionItem>
+                <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+              </MotionItem>
+            )}
 
-        <AuthButton isLoading={isSubmitting}>{t('auth.login')}</AuthButton>
-      </form>
-    </AuthFormCard>
+            <MotionItem>
+              <HoverLift>
+                <AuthButton isLoading={isSubmitting}>{t('auth.login')}</AuthButton>
+              </HoverLift>
+            </MotionItem>
+          </StaggerChildren>
+        </form>
+      </AuthFormCard>
+    </FadeIn>
   )
 }

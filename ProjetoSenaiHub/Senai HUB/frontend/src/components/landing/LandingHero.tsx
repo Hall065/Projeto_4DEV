@@ -1,87 +1,159 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { GraduationCap, LayoutGrid, Shield } from 'lucide-react'
-import loginBackground from '../../assets/auth/login-background.png'
+import { motion } from 'framer-motion'
+import { LandingHeroOrbit } from './LandingHeroOrbit'
+import { WordRise } from '../../motion/WordRise'
+import { easing } from '../../motion/tokens'
+import { useMotionPreference } from '../../motion/useMotionPreference'
+
+const ease = easing.marketing
+
+/** Portfolio Intro word stagger (0.08) / Hero line gap (~0.12). */
+const WORD_STAGGER = 0.08
+const TITLE_WORD_DURATION = 1
+const LINE_STAGGER = 0.12
 
 export function LandingHero() {
   const { t } = useTranslation()
-  const [showHighlights, setShowHighlights] = useState(false)
-
-  const highlights = [
-    { icon: GraduationCap, label: t('landing.highlightLearn') },
-    { icon: LayoutGrid, label: t('landing.highlightAllInOne') },
-    { icon: Shield, label: t('landing.highlightSafe') },
-  ]
+  // Decorative landing motion: Settings only (Portfolio parity).
+  const reduceMotion = useMotionPreference('settings')
+  const glowRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const onScroll = () => {
-      setShowHighlights(window.scrollY > 64)
+    if (reduceMotion || !glowRef.current) return
+    let dir = 1
+    let scale = 1
+    let raf = 0
+    const tick = () => {
+      scale += 0.0012 * dir
+      if (scale > 1.15) dir = -1
+      if (scale < 1) dir = 1
+      if (glowRef.current) {
+        glowRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`
+        glowRef.current.style.opacity = String(0.4 + (scale - 1) * 1.2)
+      }
+      raf = requestAnimationFrame(tick)
     }
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [reduceMotion])
+
+  const heroTitle = t('landing.heroTitle')
+  const heroHighlight = t('landing.heroHighlight')
+  const heroHeadlineWords =
+    `${heroTitle} ${heroHighlight}`.trim().split(/\s+/).filter(Boolean).length
+  // After SENAI (delay 0.15) + HUB (+0.12) settle overlap — headline starts mid-rise.
+  const headlineDelay = 0.15 + LINE_STAGGER + 0.2
+  const bodyDelay = headlineDelay + Math.max(0, heroHeadlineWords - 1) * WORD_STAGGER + 0.25
+  const ctaDelay = bodyDelay + 0.2
 
   return (
-    <>
-      <section className="relative flex min-h-[calc(100dvh-4.75rem)] flex-col sm:min-h-[calc(100dvh-5.25rem)]">
-        <img
-          src={loginBackground}
-          alt=""
-          aria-hidden
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[center_30%] opacity-30 sm:object-[72%_center] lg:object-[88%_center]"
-        />
-        <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-r from-white/60 via-white/30 to-transparent sm:from-white/50 lg:from-white/55 lg:via-white/25 xl:from-white/50"
-          aria-hidden
-        />
+    <section
+      id="topo"
+      className="topo-bg relative flex min-h-[100svh] flex-col justify-between overflow-hidden px-5 pb-10 pt-28 sm:px-8 lg:px-12"
+    >
+      <div
+        ref={glowRef}
+        className="hero-glow pointer-events-none absolute left-1/2 top-[38%] h-[42vw] w-[42vw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(227,6,19,0.18),transparent_70%)]"
+        aria-hidden
+      />
 
-        <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 items-center px-4 py-10 sm:px-6 sm:py-12 lg:max-w-[90rem] lg:grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:items-center lg:gap-12 lg:px-10 lg:py-16 xl:gap-16 xl:px-12 2xl:px-16">
-          <div className="glass-panel-solid mx-auto w-full max-w-xl rounded-3xl p-8 sm:max-w-2xl sm:p-10 lg:mx-0 lg:max-w-2xl lg:justify-self-start lg:self-center lg:p-12 xl:max-w-3xl xl:p-14 2xl:max-w-[44rem]">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-hub-red sm:text-sm">
-              {t('landing.platformTag')}
-            </p>
-            <h1 className="mt-4 text-3xl font-bold leading-tight tracking-tight text-hub-navy sm:text-4xl sm:leading-[1.12] lg:mt-5 lg:text-[2.65rem] xl:text-5xl xl:leading-[1.1] 2xl:text-[3.25rem]">
-              {t('landing.heroTitle')}{' '}
-              <span className="text-hub-red">{t('landing.heroHighlight')}</span>
-            </h1>
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-hub-text-muted sm:text-lg lg:mt-8 lg:text-xl lg:leading-relaxed xl:mt-9">
-              {t('landing.heroBody')}
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4 lg:mt-10 xl:mt-12">
-              <Link
-                to="/login"
-                className="inline-flex items-center justify-center rounded-xl bg-hub-red px-7 py-3.5 text-sm font-semibold text-white shadow-md shadow-hub-red/20 transition-colors hover:bg-hub-red-hover lg:px-8 lg:py-4 lg:text-base"
-              >
-                {t('landing.ctaLogin')}
-              </Link>
-              <a
-                href="#recursos"
-                className="glass-input inline-flex items-center justify-center rounded-xl border-hub-navy/20 px-7 py-3.5 text-sm font-semibold text-hub-navy transition-colors hover:bg-white/70 lg:px-8 lg:py-4 lg:text-base"
-              >
-                {t('landing.exploreFeatures')}
-              </a>
+      <div className="relative z-10 mx-auto flex w-full max-w-[1400px] flex-1 flex-col">
+        <motion.p
+          className="mono text-[11px] uppercase tracking-[0.28em] text-[var(--muted)]"
+          initial={reduceMotion ? false : { y: 40, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.85, ease }}
+        >
+          {t('landing.platformTag')}
+        </motion.p>
+
+        <div className="mt-8 flex flex-1 flex-col justify-center lg:mt-4">
+          <div className="relative mx-auto w-full max-w-5xl text-center">
+            {/* Orbit stage sized so front chips stay above the copy block */}
+            <div className="relative min-h-[min(58vw,460px)] pb-6">
+              <LandingHeroOrbit />
+
+              <div className="relative z-10 flex flex-col items-center justify-center pt-[min(6vw,2rem)]">
+                {/* Word-rise clip per line — Portfolio Intro technique, Hero timing between lines */}
+                <h1 className="display text-[clamp(3.5rem,14vw,10.5rem)] text-hub-navy">
+                  <WordRise
+                    text="SENAI"
+                    delay={0.15}
+                    stagger={LINE_STAGGER}
+                    durationSec={TITLE_WORD_DURATION}
+                    yPercent={110}
+                  />
+                </h1>
+                <h1 className="display text-[clamp(3.5rem,14vw,10.5rem)] text-hub-red">
+                  <WordRise
+                    text="HUB"
+                    delay={0.15 + LINE_STAGGER}
+                    stagger={LINE_STAGGER}
+                    durationSec={TITLE_WORD_DURATION}
+                    yPercent={110}
+                  />
+                </h1>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      <div
-        className={`fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 flex-wrap items-center justify-center gap-3 transition-all duration-500 ${
-          showHighlights ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-4 opacity-0'
-        }`}
-      >
-        {highlights.map(({ icon: Icon, label }) => (
-          <span
-            key={label}
-            className="glass-panel-solid inline-flex items-center gap-2 rounded-full border border-white/60 px-4 py-2 text-xs font-medium text-hub-navy shadow-sm sm:text-sm"
+          <p className="relative z-20 mx-auto mt-10 max-w-2xl text-center text-base leading-relaxed text-[var(--ink-soft)] sm:mt-12 sm:text-lg">
+            <WordRise
+              segments={[
+                { text: heroTitle },
+                { text: heroHighlight, className: 'font-semibold text-hub-navy' },
+              ]}
+              delay={headlineDelay}
+              stagger={WORD_STAGGER}
+              durationSec={TITLE_WORD_DURATION}
+              yPercent={120}
+            />
+          </p>
+
+          <motion.p
+            className="relative z-20 mx-auto mt-4 max-w-xl text-center text-sm leading-relaxed text-[var(--muted)] sm:text-base"
+            initial={reduceMotion ? false : { y: 28, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, ease, delay: bodyDelay }}
           >
-            <Icon className="h-4 w-4 text-hub-red" />
-            {label}
-          </span>
-        ))}
+            {t('landing.heroBody')}
+          </motion.p>
+
+          <motion.div
+            className="relative z-20 mt-8 flex flex-col items-center justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-4"
+            initial={reduceMotion ? false : { y: 36, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.75, ease, delay: ctaDelay }}
+          >
+            <Link
+              to="/login"
+              data-cursor
+              className="inline-flex items-center justify-center rounded-full bg-hub-red px-8 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-white shadow-[0_8px_24px_rgba(227,6,19,0.28)] transition hover:brightness-110"
+            >
+              {t('landing.ctaLogin')}
+            </Link>
+            <a
+              href="#recursos"
+              data-cursor
+              className="cta-fill inline-flex items-center justify-center rounded-full border border-[var(--line)] bg-white/70 px-8 py-3.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-hub-navy backdrop-blur"
+            >
+              <span>{t('landing.exploreFeatures')}</span>
+            </a>
+          </motion.div>
+        </div>
       </div>
-    </>
+
+      <motion.div
+        className="relative z-10 mx-auto mt-8 flex w-full max-w-[1400px] items-center justify-between text-[11px] uppercase tracking-[0.22em] text-[var(--muted)]"
+        initial={reduceMotion ? false : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: ctaDelay + 0.15 }}
+      >
+        <span>Scroll para explorar</span>
+        <span className="mono">01 / 06</span>
+      </motion.div>
+    </section>
   )
 }

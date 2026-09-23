@@ -59,9 +59,9 @@ const VARIANT_STYLES: Record<KpiCardVariant, VariantStyle> = {
     iconHover: 'hover:bg-white/28 hover:ring-white/35',
     sparkline: '#f8fafc',
   },
-  /** Navy institucional (#021A3A) com leve fade; vermelho só no chip */
+  /** Preto Portfolio (#0a0c10) com leve fade; vermelho só no chip */
   senai: {
-    fill: 'bg-gradient-to-br from-[#021A3A] via-[#0a2748] to-[#132d52]',
+    fill: 'bg-gradient-to-br from-[#0a0c10] via-[#141820] to-[#1c2230]',
     valueText: 'text-white',
     labelText: 'text-white/75',
     iconBg: 'bg-hub-red/90',

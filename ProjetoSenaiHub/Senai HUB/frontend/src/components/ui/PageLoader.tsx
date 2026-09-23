@@ -1,16 +1,11 @@
-import { Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { MotionPageLoader } from '../fx/MotionPageLoader'
 
 export function PageLoader({ label }: { label?: string }) {
   const { t } = useTranslation()
   const displayLabel = label ?? t('common.loading')
 
-  return (
-    <div className="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-hub-text-muted">
-      <Loader2 className="h-8 w-8 animate-spin text-hub-red" aria-hidden />
-      <p className="text-sm">{displayLabel}</p>
-    </div>
-  )
+  return <MotionPageLoader label={displayLabel} />
 }
 
 export function AppBootSkeleton() {
