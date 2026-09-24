@@ -92,7 +92,7 @@ export function LandingPlatform() {
         <StaggerChildren
           whenVisible
           tone="marketing"
-          className="mt-16 grid items-stretch gap-6 sm:mt-20 lg:grid-cols-2"
+          className="mt-16 grid items-stretch gap-6 sm:mt-20 md:grid-cols-2 xl:grid-cols-3"
           stagger={0.1}
         >
           {MODULE_BRAND_SLUGS.map((slug) => {

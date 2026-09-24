@@ -51,10 +51,10 @@ export function ApplicationHubPage() {
       )}
 
       {!loading && !error && visibleApplications.length > 0 && (
-        <StaggerChildren stagger={0.07} delay={0.08} className="grid gap-6 lg:grid-cols-2">
+        <StaggerChildren stagger={0.07} delay={0.08} className="grid items-stretch gap-6 md:grid-cols-2 xl:grid-cols-3">
           {visibleApplications.map((application) => (
-            <MotionItem key={application.id}>
-              <HoverLift>
+            <MotionItem key={application.id} className="h-full min-w-0">
+              <HoverLift className="h-full">
                 <ApplicationCard application={application} />
               </HoverLift>
             </MotionItem>

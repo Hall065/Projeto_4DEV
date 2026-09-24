@@ -62,11 +62,13 @@ export function HubPreviewMockup() {
                   key={slug}
                   className="group/card flex flex-col overflow-hidden rounded-lg border border-hub-navy/[0.07] bg-white/75 shadow-[0_4px_16px_rgba(10,12,16,0.06),inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-md"
                 >
-                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-hub-bg">
+                  <div className="relative aspect-[5/2] w-full overflow-hidden bg-hub-bg">
                     <img
                       src={cover}
                       alt=""
-                      className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-500 group-hover/card:scale-[1.04]"
+                      className={`absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover/card:scale-[1.04] ${
+                        slug === 'connect' ? 'object-top' : slug === 'safe' ? 'object-[center_30%]' : 'object-center'
+                      }`}
                     />
                     <div
                       className="pointer-events-none absolute inset-0 bg-gradient-to-t from-white/40 via-transparent to-transparent"
