@@ -1,5 +1,5 @@
 {
-  "_formato": "salas: 'num[,num]' -> [nome, tipo] (regiões de seg-N.bin; não listadas = circulação). splits: parte de uma região dentro de rect. manuais: pixels livres (sem sala) dentro de rect. rect = [x0,y0,x1,y1] na imagem seg-N-leitura exibida a 1024 px de largura.",
+  "_formato": "salas: 'num[,num]' -> [nome, tipo] (regiões de seg-N.bin; não listadas = circulação). splits: parte de uma região dentro de rect. manuais: pixels livres (sem sala) dentro de rect. aberturas: parede dentro de rect vira circulação (ou a região 'vira'). rect = [x0,y0,x1,y1] na imagem seg-N-leitura exibida a 1024 px de largura.",
   "tipos": {
     "aula": ["Sala de aula", "#D7E6FA", "#3B73C4"],
     "lab": ["Laboratório", "#D3EFD6", "#2E8B47"],
@@ -27,16 +27,17 @@
   "implantacao": {
     "nivel": 0,
     "areas": [
-      { "tipo": "circulacao", "nome": "Circulação externa", "contorno": false, "poly": [[-5.0, -93.0], [1.3, -93.0], [1.3, -65.48], [26.78, -65.48], [26.78, -60.16], [12.68, -60.16], [12.68, -23.03], [7.38, -23.03], [7.38, -44.59], [-0.75, -44.59], [-0.75, -59.69], [-5.0, -59.69]] },
-      { "tipo": "rampa", "nome": "Rampa", "detalhe": "piso inclinado que acerta o desnível", "poly": [[-0.75, -59.69], [6.7, -59.69], [6.7, -44.59], [-0.75, -44.59]] },
-      { "tipo": "estacionamento", "nome": "E2", "detalhe": "estacionamento (elevado)", "poly": [[1.3, -95.15], [26.78, -95.15], [26.78, -65.48], [1.3, -65.48]] },
-      { "tipo": "estacionamento", "nome": "E1", "detalhe": "estacionamento", "poly": [[12.68, -60.16], [26.78, -60.16], [26.78, 0.12], [7.38, 0.12], [7.38, -23.03], [12.68, -23.03]] }
+      { "tipo": "circulacao", "nome": "Circulação externa", "contorno": false, "poly": [[-5.0, -93.0], [1.3, -93.0], [1.3, -65.48], [27.14, -65.48], [27.14, -60.16], [12.68, -60.16], [12.68, -23.03], [7.38, -23.03], [7.38, -44.59], [-0.75, -44.59], [-0.75, -59.69], [-5.0, -59.69]] },
+      { "tipo": "rampa", "nome": "Rampa", "detalhe": "piso inclinado que acerta o desnível; pouca inclinação (≤ 8%)", "poly": [[-0.75, -59.69], [6.7, -59.69], [6.7, -44.59], [-0.75, -44.59]] },
+      { "tipo": "estacionamento", "nome": "E2", "detalhe": "estacionamento (elevado)", "altura_m": 1.0, "poly": [[1.3, -95.15], [27.14, -95.15], [27.14, -65.48], [1.3, -65.48]] },
+      { "tipo": "estacionamento", "nome": "E1", "detalhe": "estacionamento", "poly": [[12.68, -60.16], [27.14, -60.16], [27.14, 0.12], [7.38, 0.12], [7.38, -23.03], [12.68, -23.03]] }
     ],
+    "_bordaDireita": "x = 27.14 = quina de trás do Bloco D térreo. Na realidade E1/E2 não alinham com a quina; simplificação combinada com o usuário.",
     "linhas": [
-      { "tipo": "grade", "pts": [[12.68, -60.16], [25.85, -60.16]] },
-      { "tipo": "portao", "nome": "portão (pedestres)", "pts": [[12.68, -59.89], [12.68, -52.58]] },
-      { "tipo": "grade", "pts": [[12.68, -52.58], [12.68, -23.03], [7.38, -23.03]] },
-      { "tipo": "desnivel", "nome": "E2 mais alto · sem grade", "pts": [[1.3, -65.48], [26.78, -65.48]] }
+      { "tipo": "grade", "altura_m": 1.8, "pts": [[12.68, -60.16], [27.14, -60.16]] },
+      { "tipo": "portao", "nome": "portão (pedestres)", "altura_m": 1.8, "pts": [[12.68, -59.89], [12.68, -52.58]] },
+      { "tipo": "grade", "altura_m": 1.8, "pts": [[12.68, -52.58], [12.68, -23.03], [7.38, -23.03]] },
+      { "tipo": "desnivel", "nome": "E2 mais alto · sem grade", "pts": [[1.3, -65.48], [27.14, -65.48]] }
     ],
     "escadas": [
       { "nome": "2–3 degraus", "rect": [1.3, -83.45, 3.9, -75.46], "degraus": 3 }
@@ -98,9 +99,9 @@
       "arquivo": "BlocoB-unico", "titulo": "BLOCO B — PAVIMENTO ÚNICO", "pxPorMetro": 32.69,
       "salas": {
         "7": ["Diretoria", "adm"], "10": ["Sanit.", "sanit"], "12": ["S. Masc.", "sanit"], "9": ["Sanit. Fem.", "sanit"],
-        "17": ["OPP", "adm"], "16": ["Switch", "apoio"], "20": ["Secretaria", "adm"], "11": ["Atendimento à Empresa", "adm"],
-        "6": ["Jardim", "externo"], "13": ["Área coberta / acesso", "externo"], "19": ["Arquivo", "adm"],
-        "22": ["Sala (sem identificação)", "apoio"], "4,5": ["Escada", "escada"], "8,18": ["", "externo"]
+        "17": ["Sala OPP", "adm"], "16": ["Switch", "apoio"], "20": ["Secretaria", "adm"], "11": ["Atendimento à Empresa", "adm"],
+        "6": ["Jardim", "externo"], "13,22": ["Área coberta / acesso", "externo"], "19": ["Arquivo", "adm"],
+        "4,5": ["Escada", "escada"], "8,18": ["", "externo"]
       },
       "splits": [
         { "de": 20, "rect": [640, 111, 708, 189], "nome": "CAF", "tipo": "adm" },
@@ -112,7 +113,10 @@
         { "poly": [[733, 110], [797, 106], [893, 448], [893, 462], [733, 462]], "nome": "Jardim", "tipo": "externo" }
       ],
       "aberturas": [
-        { "rect": [710, 430, 729, 450], "motivo": "fim do corredor ao lado da Secretaria dá acesso ao Atend. ao Aluno" }
+        { "rect": [710, 430, 729, 450], "motivo": "fim do corredor ao lado da Secretaria dá acesso ao Atend. ao Aluno" },
+        { "rect": [700, 470, 718, 595], "vira": 13, "motivo": "sala sem identificação (região 22) não existe mais: vira parte da área coberta" },
+        { "rect": [700, 545, 900, 595], "vira": 13, "motivo": "idem, parede de baixo da antiga sala" },
+        { "rect": [878, 515, 902, 562], "vira": 13, "motivo": "idem, parede da direita da antiga sala" }
       ]
     },
     "4": {
@@ -177,10 +181,10 @@
       "arquivo": "BlocoD-superior", "titulo": "BLOCO D — PAVIMENTO SUPERIOR", "pxPorMetro": 21.40,
       "salas": {
         "1": ["Aulas Gerais 4", "aula"], "2": ["Aulas Gerais 2", "aula"], "3": ["Desenho Técnico", "aula"],
-        "6": ["Lab. Informática 16D", "lab"], "7": ["Lab. Informática 14D", "lab"], "10": ["Sala (nome ilegível no scan)", "adm"],
+        "6": ["Lab. Informática 16D", "lab"], "7": ["Lab. Informática 14D", "lab"], "10": ["Sala OPP", "adm"],
         "8": ["WC Fem.", "sanit"], "9": ["WC Masc.", "sanit"], "14": ["Sanit. Masculino", "sanit"], "12": ["Sanit. Feminino", "sanit"],
         "16": ["Lab. Hidráulica e Pneumática", "lab"], "17": ["Lab. CAD/CAM", "lab"], "19": ["Aulas Gerais", "aula"],
-        "18": ["Dep. Prod. Químicos (?)", "apoio"], "20": ["Escada", "escada"], "15": ["Escada", "escada"], "4,5": ["Escada", "escada"]
+        "18": ["Dep. Prod. Químicos", "apoio"], "20": ["Escada", "escada"], "15": ["Escada", "escada"], "4,5": ["Escada", "escada"]
       },
       "splits": [
         { "de": 12, "rect": [555, 403, 577, 503], "nome": "Contr. Energia Solar", "tipo": "apoio" }

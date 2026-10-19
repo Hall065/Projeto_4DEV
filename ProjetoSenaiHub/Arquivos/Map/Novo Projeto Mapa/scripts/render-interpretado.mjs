@@ -50,7 +50,11 @@ for (const [page, pc] of Object.entries(config.paginas)) {
     else if (room[i]) fin[i] = byNum.get(room[i]) ?? CIRC
     else fin[i] = foot[i] === 1 ? CIRC : OUT
   }
-  for (const r of pc.aberturas ?? []) for (let i = 0; i < N; i++) if (fin[i] === WALL && inRect(i, r.rect)) fin[i] = CIRC
+  for (const r of pc.aberturas ?? []) {
+    const alvo = r.vira != null ? byNum.get(r.vira) ?? CIRC : CIRC
+    const pega = alvo === CIRC ? (f) => f === WALL : (f) => f === WALL || f === CIRC
+    for (let i = 0; i < N; i++) if (pega(fin[i]) && inRect(i, r.rect)) fin[i] = alvo
+  }
   for (const s of pc.splits ?? []) {
     const id = entries.push({ nome: s.nome, tipo: s.tipo }) - 1
     for (let i = 0; i < N; i++) if (room[i] === s.de && inRect(i, s.rect)) fin[i] = id

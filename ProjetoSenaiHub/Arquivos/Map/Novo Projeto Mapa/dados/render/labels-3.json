@@ -46,7 +46,7 @@
    "num": 4
   },
   {
-   "nome": "OPP",
+   "nome": "Sala OPP",
    "tipo": "adm",
    "x": 895,
    "y": 224,
@@ -166,24 +166,14 @@
    "num": 16
   },
   {
-   "nome": "Sala (sem identificação)",
-   "tipo": "apoio",
-   "x": 1189,
-   "y": 768,
-   "boxW": 289,
-   "boxH": 167,
-   "area": 39.8,
-   "num": 17
-  },
-  {
    "nome": "Área coberta / acesso",
    "tipo": "externo",
-   "x": 837,
+   "x": 999,
    "y": 820,
-   "boxW": 400,
+   "boxW": 724,
    "boxH": 271,
-   "area": 172.9,
-   "num": 18
+   "area": 215.7,
+   "num": 17
   }
  ],
  "regioes": [
@@ -219,66 +209,61 @@
   },
   {
    "codigo": 17,
-   "nome": "Área coberta / acesso",
-   "tipo": "externo"
-  },
-  {
-   "codigo": 18,
    "nome": "Switch",
    "tipo": "apoio"
   },
   {
-   "codigo": 19,
-   "nome": "OPP",
+   "codigo": 18,
+   "nome": "Sala OPP",
    "tipo": "adm"
   },
   {
-   "codigo": 20,
+   "codigo": 19,
    "nome": "Arquivo",
    "tipo": "adm"
   },
   {
-   "codigo": 21,
+   "codigo": 20,
    "nome": "Secretaria",
    "tipo": "adm"
   },
   {
-   "codigo": 22,
-   "nome": "Sala (sem identificação)",
-   "tipo": "apoio"
+   "codigo": 21,
+   "nome": "Área coberta / acesso",
+   "tipo": "externo"
   },
   {
-   "codigo": 23,
+   "codigo": 22,
    "nome": "Escada",
    "tipo": "escada"
   },
   {
-   "codigo": 24,
+   "codigo": 23,
    "nome": "",
    "tipo": "externo"
   },
   {
-   "codigo": 25,
+   "codigo": 24,
    "nome": "CAF",
    "tipo": "adm"
   },
   {
-   "codigo": 26,
+   "codigo": 25,
    "nome": "Laboratório Maker",
    "tipo": "lab"
   },
   {
-   "codigo": 27,
+   "codigo": 26,
    "nome": "Recepção",
    "tipo": "adm"
   },
   {
-   "codigo": 28,
+   "codigo": 27,
    "nome": "Atend. ao Aluno",
    "tipo": "adm"
   },
   {
-   "codigo": 29,
+   "codigo": 28,
    "nome": "Jardim",
    "tipo": "externo"
   }

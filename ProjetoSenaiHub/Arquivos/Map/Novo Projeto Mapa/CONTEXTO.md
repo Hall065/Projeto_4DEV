@@ -102,7 +102,7 @@ Se editar `salas-config.json`, rode o pipeline de novo e confira as imagens em `
 |---|---|---|---|---|---|
 | 1 | BlocoA-terreo | A térreo (nível 0) | 20.97 | 0.00 | 30 |
 | 2 | BlocoA-superior | A superior (nível 2) | 21.98 | 5.12 | 22 |
-| 3 | BlocoB-unico | B único (nível 0) | 32.69 | 2.50 | 18 |
+| 3 | BlocoB-unico | B único (nível 0) | 32.69 | 2.50 | 17 |
 | 4 | BlocoC-inferior | C inferior (nível 0) | 21.25 | 2.50 | 19 |
 | 5 | BlocoC-superior | C superior (nível 2) | 24.84 | 7.62 | 22 |
 | 6 | BlocoD-terreo | D térreo (nível 0) | 20.38 | 2.50 | 37 |
@@ -110,8 +110,8 @@ Se editar `salas-config.json`, rode o pipeline de novo e confira as imagens em `
 
 - Níveis do Sweet Home 3D: 0 = térreo, 1 = só o teto do pé-direito duplo (sem planta), 2 = superior.
 - No GLB, cada nível = 25,6 unidades = **2,56 m**; o superior fica 5,12 m acima da base do bloco.
-- O Bloco A está **2,5 m abaixo** dos outros no GLB (base 0 contra 2,5 dos demais). Ainda não se sabe se é
-  desnível real do terreno ou erro de modelagem (ver §8).
+- O Bloco A está **2,5 m abaixo** dos outros no GLB (base 0 contra 2,5 dos demais). **É desnível real do
+  terreno** (confirmado pelo usuário em 19/10/2026): o acesso ao A tem 2 escadas e 1 rampa. Manter no 3D.
 - Topos dos blocos: A 7,73 m, B 4,99 m, C 10,25 m, D 10,20 m.
 
 ---
@@ -138,14 +138,15 @@ Se editar `salas-config.json`, rode o pipeline de novo e confira as imagens em `
    superior está errado, não a planta.**
 6. **Implantação, desenhada à mão pelo usuário, sem planta, precisão de ~0,5 m**
    (`referencias/desenho-implantacao-E1-E2.png`, dados em `config → implantacao`, coordenadas do mundo em metros):
-   - **E1**, estacionamento à direita do A: polígono (12.68,−60.16) (26.78,−60.16) (26.78,0.12) (7.38,0.12) (7.38,−23.03) (12.68,−23.03);
-   - **E2**, estacionamento **elevado** entre C/D e A: retângulo x 1.3…26.78, z −95.15…−65.48;
+   - **E1**, estacionamento à direita do A: polígono (12.68,−60.16) (27.14,−60.16) (27.14,0.12) (7.38,0.12) (7.38,−23.03) (12.68,−23.03);
+   - **E2**, estacionamento **elevado** entre C/D e A: retângulo x 1.3…27.14, z −95.15…−65.48, **1 m acima** do pátio;
    - **circulação externa** amarela ligando tudo;
    - **rampa**, perto do A: x −0.75…6.7, z −59.69…−44.59;
    - **escada externa** de 2–3 degraus subindo para o E2: x 1.3…3.9, z −83.45…−75.46;
-   - **grades roxas**: topo do E1 (12.68,−60.16)→(25.85,−60.16) e lateral (12.68,−52.58)→(12.68,−23.03)→(7.38,−23.03);
+   - **grades roxas** (1,8 m): topo do E1 (12.68,−60.16)→(27.14,−60.16) e lateral (12.68,−52.58)→(12.68,−23.03)→(7.38,−23.03);
    - **portão de pedestres** cinza: x 12.68, z −59.89…−52.58;
-   - **borda do desnível do E2**, sem grade: (1.3,−65.48)→(26.78,−65.48);
+   - **borda do desnível do E2**, sem grade: (1.3,−65.48)→(27.14,−65.48);
+   - borda direita de E1/E2 em x = 27.14 = quina de trás do D térreo (simplificação; na realidade não alinha).
    - **porta do D para o E2**: seta de (8.69,−97.6) para (8.69,−92.0).
 
 ---
@@ -200,7 +201,7 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
 - `implantacao`: `areas[{nome,tipo,poly}]`, `linhas[{tipo: grade|portao|desnivel, pts}]`, `escadas`, `portas`
 - `paginas.N`:
   - `salas` `{ "num[,num]": [nome, tipo] }` (regiões do `seg-N.bin`);
-  - `splits`, `manuais` (`rect`/`poly`), `aberturas`, `encaixe`.
+  - `splits`, `manuais` (`rect`/`poly`), `aberturas` (parede → circulação, ou → sala `vira`), `encaixe`.
 - Os `rect`/`poly` das páginas estão na imagem `seg-N-leitura.png` reduzida a 1024 px de largura, **não em metros**.
 
 ---
@@ -219,7 +220,7 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
    - pisos: um objeto por sala, com nome `"<Bloco> <nível> — <nome>"`, material pelo `tipo` (cores da §5,
      depois texturas: piso cerâmico nas salas, cimento nas oficinas, azulejo nos sanitários etc.) e custom
      property `tipo`/`area` (sai no glTF como `extras`);
-   - implantação: E1/E2 (E2 elevado; altura a confirmar), rampa inclinada, escada de 3 degraus, grades como
+   - implantação: E1/E2 (E2 elevado 1 m), rampa inclinada, escada de 3 degraus, grades como
      cercas finas, portão;
    - opcional: importar os GLB originais em coleção oculta só para conferência;
    - **exportar** um GLB por bloco (`BlocoA.glb` … mesmo nome, mesma escala e origem dos atuais, ou seja
@@ -234,13 +235,26 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
 
 ---
 
-## 8. Dúvidas em aberto (perguntar ao usuário)
+## 8. Dúvidas
 
-- O Bloco A é mesmo 2,5 m mais baixo que os outros (desnível do terreno) ou é erro do modelo?
-- Altura real do E2 em relação à rua e aos blocos; inclinação/comprimento da rampa; altura das grades.
-- Borda direita de E1/E2 (x = 26,78) em relação à quina do D, e se a grade do topo do E1 vai até a quina.
-- Alguns nomes de salas vieram de leitura incerta do scan (conferir `dados/salas.csv` com o usuário).
-- Corrigir o A superior no Sweet Home 3D ou só gerar o novo modelo pelas plantas (recomendado: plantas)?
+### Respondidas pelo usuário (19/10/2026, em casa)
+- **Desnível do Bloco A:** real. O A fica 2,5 m abaixo dos outros; há 2 escadas e 1 rampa de acesso.
+- **E2:** 1 m acima do pátio (circulação externa).
+- **Rampa perto do A:** inclinação desconhecida, "bem pouca". Usar inclinação suave (≤ 8%) ao longo do lado maior.
+- **A superior:** gerar só pelas plantas (não corrigir no Sweet Home 3D).
+- **Nomes incertos** (os mapas de risco têm menos de 6 meses e são considerados atuais):
+  - **OPP** = sala dos professores (fora de aula); todas viram "Sala OPP", tipo `adm` (B, C inferior, C superior
+    e a sala ilegível do D superior);
+  - B: a "Sala (sem identificação)" **não existe mais**; a região 22 entrou na "Área coberta / acesso" e as paredes
+    dela foram apagadas (`aberturas[].vira`);
+  - códigos 11C/12C do C inferior e classes dos Resíduos do D térreo: mantidos como estão;
+  - D superior: "Dep. Prod. Químicos" confirmado (salinha sob a escada);
+  - GLP do A térreo (em frente às Bombas, gás): desconsiderado.
+- **Grades e portão:** 1,8 m (`altura_m` nas linhas da implantação).
+- **Borda direita de E1/E2:** na realidade não alinha com a quina do D, mas foi **simplificada** para x = 27,14
+  (quina de trás do D térreo), e a grade do topo do E1 vai até ela.
+
+Não há mais dúvidas em aberto: pode seguir para o Blender (§7).
 
 ---
 

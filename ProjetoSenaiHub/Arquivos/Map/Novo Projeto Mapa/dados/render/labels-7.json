@@ -46,7 +46,7 @@
    "num": 4
   },
   {
-   "nome": "Dep. Prod. Químicos (?)",
+   "nome": "Dep. Prod. Químicos",
    "tipo": "apoio",
    "x": 324,
    "y": 517,
@@ -56,7 +56,7 @@
    "num": 5
   },
   {
-   "nome": "Sala (nome ilegível no scan)",
+   "nome": "Sala OPP",
    "tipo": "adm",
    "x": 945,
    "y": 624,
@@ -224,7 +224,7 @@
   },
   {
    "codigo": 18,
-   "nome": "Sala (nome ilegível no scan)",
+   "nome": "Sala OPP",
    "tipo": "adm"
   },
   {
@@ -254,7 +254,7 @@
   },
   {
    "codigo": 24,
-   "nome": "Dep. Prod. Químicos (?)",
+   "nome": "Dep. Prod. Químicos",
    "tipo": "apoio"
   },
   {

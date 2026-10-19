@@ -53,7 +53,7 @@ BLOCO B;PAVIMENTO ÚNICO;1;Sanit.;Sanitário / Vestiário;3,1
 BLOCO B;PAVIMENTO ÚNICO;2;S. Masc.;Sanitário / Vestiário;2,4
 BLOCO B;PAVIMENTO ÚNICO;3;Diretoria;Administrativo / Atendimento;31,1
 BLOCO B;PAVIMENTO ÚNICO;4;Sanit. Fem.;Sanitário / Vestiário;3,5
-BLOCO B;PAVIMENTO ÚNICO;5;OPP;Administrativo / Atendimento;8,2
+BLOCO B;PAVIMENTO ÚNICO;5;Sala OPP;Administrativo / Atendimento;8,2
 BLOCO B;PAVIMENTO ÚNICO;6;CAF;Administrativo / Atendimento;8,3
 BLOCO B;PAVIMENTO ÚNICO;7;Switch;Apoio / Depósito / Técnico;2,1
 BLOCO B;PAVIMENTO ÚNICO;8;Secretaria;Administrativo / Atendimento;40,7
@@ -64,8 +64,7 @@ BLOCO B;PAVIMENTO ÚNICO;12;Recepção;Administrativo / Atendimento;31,2
 BLOCO B;PAVIMENTO ÚNICO;13;Arquivo;Administrativo / Atendimento;6,7
 BLOCO B;PAVIMENTO ÚNICO;14;Atend. ao Aluno;Administrativo / Atendimento;7,9
 BLOCO B;PAVIMENTO ÚNICO;16;Laboratório Maker;Laboratório;51,1
-BLOCO B;PAVIMENTO ÚNICO;17;Sala (sem identificação);Apoio / Depósito / Técnico;39,8
-BLOCO B;PAVIMENTO ÚNICO;18;Área coberta / acesso;Área externa / coberta;172,9
+BLOCO B;PAVIMENTO ÚNICO;17;Área coberta / acesso;Área externa / coberta;215,7
 BLOCO C;PAVIMENTO INFERIOR;2;Sanitário Masculino;Sanitário / Vestiário;18
 BLOCO C;PAVIMENTO INFERIOR;3;Vestiário Masculino;Sanitário / Vestiário;11,7
 BLOCO C;PAVIMENTO INFERIOR;4;Lab. Projetos Ferramentaria 11C;Laboratório;30,6
@@ -140,8 +139,8 @@ BLOCO D;TÉRREO;36;GLP;Apoio / Depósito / Técnico;5,6
 BLOCO D;TÉRREO;37;Dep. Solda e Ferramentaria;Apoio / Depósito / Técnico;5,6
 BLOCO D;PAVIMENTO SUPERIOR;2;Aulas Gerais 4;Sala de aula;44,1
 BLOCO D;PAVIMENTO SUPERIOR;3;Aulas Gerais 2;Sala de aula;78,9
-BLOCO D;PAVIMENTO SUPERIOR;5;Dep. Prod. Químicos (?);Apoio / Depósito / Técnico;6,3
-BLOCO D;PAVIMENTO SUPERIOR;6;Sala (nome ilegível no scan);Administrativo / Atendimento;10,5
+BLOCO D;PAVIMENTO SUPERIOR;5;Dep. Prod. Químicos;Apoio / Depósito / Técnico;6,3
+BLOCO D;PAVIMENTO SUPERIOR;6;Sala OPP;Administrativo / Atendimento;10,5
 BLOCO D;PAVIMENTO SUPERIOR;7;Aulas Gerais;Sala de aula;37,2
 BLOCO D;PAVIMENTO SUPERIOR;8;Lab. CAD/CAM;Laboratório;59,7
 BLOCO D;PAVIMENTO SUPERIOR;9;Lab. Hidráulica e Pneumática;Laboratório;50,2
