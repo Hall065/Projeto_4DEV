@@ -1,0 +1,286 @@
+{
+ "page": "3",
+ "titulo": "BLOCO B — PAVIMENTO ÚNICO",
+ "arquivo": "BlocoB-unico",
+ "w": 1504,
+ "h": 1046,
+ "salas": [
+  {
+   "nome": "Sanit.",
+   "tipo": "sanit",
+   "x": 645,
+   "y": 205,
+   "boxW": 55,
+   "boxH": 61,
+   "area": 3.1,
+   "num": 1
+  },
+  {
+   "nome": "S. Masc.",
+   "tipo": "sanit",
+   "x": 700,
+   "y": 205,
+   "boxW": 43,
+   "boxH": 61,
+   "area": 2.4,
+   "num": 2
+  },
+  {
+   "nome": "Diretoria",
+   "tipo": "adm",
+   "x": 515,
+   "y": 252,
+   "boxW": 186,
+   "boxH": 160,
+   "area": 31.1,
+   "num": 3
+  },
+  {
+   "nome": "Sanit. Fem.",
+   "tipo": "sanit",
+   "x": 665,
+   "y": 262,
+   "boxW": 94,
+   "boxH": 40,
+   "area": 3.5,
+   "num": 4
+  },
+  {
+   "nome": "OPP",
+   "tipo": "adm",
+   "x": 895,
+   "y": 224,
+   "boxW": 94,
+   "boxH": 102,
+   "area": 8.2,
+   "num": 5
+  },
+  {
+   "nome": "CAF",
+   "tipo": "adm",
+   "x": 990,
+   "y": 223,
+   "boxW": 87,
+   "boxH": 101,
+   "area": 8.3,
+   "num": 6
+  },
+  {
+   "nome": "Switch",
+   "tipo": "apoio",
+   "x": 870,
+   "y": 307,
+   "boxW": 45,
+   "boxH": 50,
+   "area": 2.1,
+   "num": 7
+  },
+  {
+   "nome": "Secretaria",
+   "tipo": "adm",
+   "x": 941,
+   "y": 407,
+   "boxW": 186,
+   "boxH": 253,
+   "area": 40.7,
+   "num": 8
+  },
+  {
+   "nome": "Atendimento à Empresa",
+   "tipo": "adm",
+   "x": 705,
+   "y": 451,
+   "boxW": 135,
+   "boxH": 223,
+   "area": 27.5,
+   "num": 9
+  },
+  {
+   "nome": "Jardim",
+   "tipo": "externo",
+   "x": 1180,
+   "y": 447,
+   "boxW": 206,
+   "boxH": 456,
+   "area": 79.1,
+   "num": 10
+  },
+  {
+   "nome": "Jardim",
+   "tipo": "externo",
+   "x": 478,
+   "y": 508,
+   "boxW": 301,
+   "boxH": 341,
+   "area": 94,
+   "num": 11
+  },
+  {
+   "nome": "Recepção",
+   "tipo": "adm",
+   "x": 774,
+   "y": 614,
+   "boxW": 272,
+   "boxH": 130,
+   "area": 31.2,
+   "num": 12
+  },
+  {
+   "nome": "Arquivo",
+   "tipo": "adm",
+   "x": 944,
+   "y": 607,
+   "boxW": 57,
+   "boxH": 135,
+   "area": 6.7,
+   "num": 13
+  },
+  {
+   "nome": "Atend. ao Aluno",
+   "tipo": "adm",
+   "x": 1007,
+   "y": 607,
+   "boxW": 64,
+   "boxH": 135,
+   "area": 7.9,
+   "num": 14
+  },
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 267,
+   "y": 757,
+   "boxW": 31,
+   "boxH": 15,
+   "area": 0.7,
+   "num": 15
+  },
+  {
+   "nome": "Laboratório Maker",
+   "tipo": "lab",
+   "x": 475,
+   "y": 764,
+   "boxW": 317,
+   "boxH": 165,
+   "area": 51.1,
+   "num": 16
+  },
+  {
+   "nome": "Sala (sem identificação)",
+   "tipo": "apoio",
+   "x": 1189,
+   "y": 768,
+   "boxW": 289,
+   "boxH": 167,
+   "area": 39.8,
+   "num": 17
+  },
+  {
+   "nome": "Área coberta / acesso",
+   "tipo": "externo",
+   "x": 837,
+   "y": 820,
+   "boxW": 400,
+   "boxH": 271,
+   "area": 172.9,
+   "num": 18
+  }
+ ],
+ "regioes": [
+  {
+   "codigo": 11,
+   "nome": "Jardim",
+   "tipo": "externo"
+  },
+  {
+   "codigo": 12,
+   "nome": "Diretoria",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 13,
+   "nome": "Sanit. Fem.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 14,
+   "nome": "Sanit.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 15,
+   "nome": "Atendimento à Empresa",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 16,
+   "nome": "S. Masc.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 17,
+   "nome": "Área coberta / acesso",
+   "tipo": "externo"
+  },
+  {
+   "codigo": 18,
+   "nome": "Switch",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 19,
+   "nome": "OPP",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 20,
+   "nome": "Arquivo",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 21,
+   "nome": "Secretaria",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 22,
+   "nome": "Sala (sem identificação)",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 23,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 24,
+   "nome": "",
+   "tipo": "externo"
+  },
+  {
+   "codigo": 25,
+   "nome": "CAF",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 26,
+   "nome": "Laboratório Maker",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 27,
+   "nome": "Recepção",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 28,
+   "nome": "Atend. ao Aluno",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 29,
+   "nome": "Jardim",
+   "tipo": "externo"
+  }
+ ]
+}

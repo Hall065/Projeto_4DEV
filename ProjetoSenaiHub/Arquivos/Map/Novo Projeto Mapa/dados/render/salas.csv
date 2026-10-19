@@ -1,0 +1,155 @@
+﻿bloco;pavimento;num;nome;tipo;area_m2
+BLOCO A;TÉRREO;1;Passarela coberta;Área externa / coberta;40,9
+BLOCO A;TÉRREO;2;Banda Marcial;Convivência / Alimentação / Eventos;30
+BLOCO A;TÉRREO;3;Banda Marcial;Convivência / Alimentação / Eventos;15,1
+BLOCO A;TÉRREO;4;Portaria / Guarita;Administrativo / Atendimento;15,2
+BLOCO A;TÉRREO;5;Bombas;Apoio / Depósito / Técnico;12,7
+BLOCO A;TÉRREO;6;Manutenção;Apoio / Depósito / Técnico;22,7
+BLOCO A;TÉRREO;7;Manutenção;Apoio / Depósito / Técnico;22
+BLOCO A;TÉRREO;8;Sup. Manut.;Apoio / Depósito / Técnico;11,6
+BLOCO A;TÉRREO;9;Servidor;Apoio / Depósito / Técnico;5,5
+BLOCO A;TÉRREO;10;Dep. Banda;Apoio / Depósito / Técnico;8,1
+BLOCO A;TÉRREO;11;Sanit. Fem. Func.;Sanitário / Vestiário;27,2
+BLOCO A;TÉRREO;12;Depósito;Apoio / Depósito / Técnico;10,2
+BLOCO A;TÉRREO;13;Sala AQV;Convivência / Alimentação / Eventos;17,5
+BLOCO A;TÉRREO;14;Sala AQV;Convivência / Alimentação / Eventos;17,3
+BLOCO A;TÉRREO;15;Sanit. Masc. Func.;Sanitário / Vestiário;18,4
+BLOCO A;TÉRREO;16;Sanitário Masculino;Sanitário / Vestiário;45
+BLOCO A;TÉRREO;17;Sanitário Feminino;Sanitário / Vestiário;28,5
+BLOCO A;TÉRREO;18;Zeladoria / Oficina;Apoio / Depósito / Técnico;41,2
+BLOCO A;TÉRREO;19;Sala Apoio;Apoio / Depósito / Técnico;10,3
+BLOCO A;TÉRREO;20;Sanit. Unissex;Sanitário / Vestiário;10,3
+BLOCO A;TÉRREO;21;Copa;Convivência / Alimentação / Eventos;18,2
+BLOCO A;TÉRREO;22;Cantina;Convivência / Alimentação / Eventos;23,3
+BLOCO A;TÉRREO;23;Refeitório;Convivência / Alimentação / Eventos;131,5
+BLOCO A;TÉRREO;24;Auditório;Convivência / Alimentação / Eventos;297,4
+BLOCO A;TÉRREO;25;Palco;Convivência / Alimentação / Eventos;59,8
+BLOCO A;TÉRREO;26;Despensa;Apoio / Depósito / Técnico;15
+BLOCO A;TÉRREO;27;Desp.;Apoio / Depósito / Técnico;16
+BLOCO A;TÉRREO;28;Cozinha;Convivência / Alimentação / Eventos;23,4
+BLOCO A;TÉRREO;29;Som;Apoio / Depósito / Técnico;10
+BLOCO A;TÉRREO;30;Apoio Palco;Apoio / Depósito / Técnico;9,9
+BLOCO A;PAVIMENTO SUPERIOR;1;Sala Coord.;Administrativo / Atendimento;15,8
+BLOCO A;PAVIMENTO SUPERIOR;2;Arquivo;Administrativo / Atendimento;10,6
+BLOCO A;PAVIMENTO SUPERIOR;5;San. Masc.;Sanitário / Vestiário;8,3
+BLOCO A;PAVIMENTO SUPERIOR;6;San. Fem.;Sanitário / Vestiário;6,8
+BLOCO A;PAVIMENTO SUPERIOR;7;Lab. de Ensaios;Laboratório;20,2
+BLOCO A;PAVIMENTO SUPERIOR;8;Lab. Desenvolvimento de Sistemas;Laboratório;118
+BLOCO A;PAVIMENTO SUPERIOR;9;Robótica;Laboratório;34,5
+BLOCO A;PAVIMENTO SUPERIOR;10;Sala Manut. Micros;Apoio / Depósito / Técnico;27,4
+BLOCO A;PAVIMENTO SUPERIOR;11;San. Fem.;Sanitário / Vestiário;8,2
+BLOCO A;PAVIMENTO SUPERIOR;12;San. Masc.;Sanitário / Vestiário;44,6
+BLOCO A;PAVIMENTO SUPERIOR;13;DEP;Apoio / Depósito / Técnico;9,7
+BLOCO A;PAVIMENTO SUPERIOR;14;Oficina de Baixa e Alta Fusão;Oficina;104,4
+BLOCO A;PAVIMENTO SUPERIOR;15;Lab. de Galvanoplastia;Laboratório;44,9
+BLOCO A;PAVIMENTO SUPERIOR;16;Depósito;Apoio / Depósito / Técnico;18,1
+BLOCO A;PAVIMENTO SUPERIOR;17;Lab. Informática 5A;Laboratório;71,9
+BLOCO A;PAVIMENTO SUPERIOR;18;Aulas Gerais 7A;Sala de aula;74,9
+BLOCO A;PAVIMENTO SUPERIOR;19;Lab. Informática 10A;Laboratório;74,1
+BLOCO A;PAVIMENTO SUPERIOR;20;Lab. Modelagem 3D;Laboratório;74,2
+BLOCO A;PAVIMENTO SUPERIOR;21;Lab. Manufatura Aditiva;Laboratório;77,7
+BLOCO A;PAVIMENTO SUPERIOR;22;Of. Aprendizagem Montagem, Soldagem e Cravação;Oficina;120,8
+BLOCO B;PAVIMENTO ÚNICO;1;Sanit.;Sanitário / Vestiário;3,1
+BLOCO B;PAVIMENTO ÚNICO;2;S. Masc.;Sanitário / Vestiário;2,4
+BLOCO B;PAVIMENTO ÚNICO;3;Diretoria;Administrativo / Atendimento;31,1
+BLOCO B;PAVIMENTO ÚNICO;4;Sanit. Fem.;Sanitário / Vestiário;3,5
+BLOCO B;PAVIMENTO ÚNICO;5;OPP;Administrativo / Atendimento;8,2
+BLOCO B;PAVIMENTO ÚNICO;6;CAF;Administrativo / Atendimento;8,3
+BLOCO B;PAVIMENTO ÚNICO;7;Switch;Apoio / Depósito / Técnico;2,1
+BLOCO B;PAVIMENTO ÚNICO;8;Secretaria;Administrativo / Atendimento;40,7
+BLOCO B;PAVIMENTO ÚNICO;9;Atendimento à Empresa;Administrativo / Atendimento;27,5
+BLOCO B;PAVIMENTO ÚNICO;10;Jardim;Área externa / coberta;79,1
+BLOCO B;PAVIMENTO ÚNICO;11;Jardim;Área externa / coberta;94
+BLOCO B;PAVIMENTO ÚNICO;12;Recepção;Administrativo / Atendimento;31,2
+BLOCO B;PAVIMENTO ÚNICO;13;Arquivo;Administrativo / Atendimento;6,7
+BLOCO B;PAVIMENTO ÚNICO;14;Atend. ao Aluno;Administrativo / Atendimento;7,9
+BLOCO B;PAVIMENTO ÚNICO;16;Laboratório Maker;Laboratório;51,1
+BLOCO B;PAVIMENTO ÚNICO;17;Sala (sem identificação);Apoio / Depósito / Técnico;39,8
+BLOCO B;PAVIMENTO ÚNICO;18;Área coberta / acesso;Área externa / coberta;172,9
+BLOCO C;PAVIMENTO INFERIOR;2;Sanitário Masculino;Sanitário / Vestiário;18
+BLOCO C;PAVIMENTO INFERIOR;3;Vestiário Masculino;Sanitário / Vestiário;11,7
+BLOCO C;PAVIMENTO INFERIOR;4;Lab. Projetos Ferramentaria 11C;Laboratório;30,6
+BLOCO C;PAVIMENTO INFERIOR;5;Lab. CAD/CAM Ferramentaria 12C;Laboratório;29,8
+BLOCO C;PAVIMENTO INFERIOR;6;Sanitário Feminino / Dep. Solda;Sanitário / Vestiário;17,3
+BLOCO C;PAVIMENTO INFERIOR;7;Sanitário;Sanitário / Vestiário;4,2
+BLOCO C;PAVIMENTO INFERIOR;8;Sala do Café;Convivência / Alimentação / Eventos;18,6
+BLOCO C;PAVIMENTO INFERIOR;9;Lab. de Metrologia;Laboratório;36,1
+BLOCO C;PAVIMENTO INFERIOR;10;Sala OPP;Administrativo / Atendimento;11,2
+BLOCO C;PAVIMENTO INFERIOR;11;Sanit. Masc. Alunos;Sanitário / Vestiário;17,6
+BLOCO C;PAVIMENTO INFERIOR;12;Lab. Tridimensional;Laboratório;18,4
+BLOCO C;PAVIMENTO INFERIOR;13;Soldagem;Oficina;77,6
+BLOCO C;PAVIMENTO INFERIOR;14;Área Técnica (quadros);Apoio / Depósito / Técnico;32,1
+BLOCO C;PAVIMENTO INFERIOR;15;Of. Ferramentaria Máquinas CNC;Oficina;207
+BLOCO C;PAVIMENTO INFERIOR;16;Of. Ferramentaria Máquinas Convencionais;Oficina;355,4
+BLOCO C;PAVIMENTO INFERIOR;17;Cabine Primária;Apoio / Depósito / Técnico;22,7
+BLOCO C;PAVIMENTO INFERIOR;18;Área de Caçambas;Área externa / coberta;22,4
+BLOCO C;PAVIMENTO INFERIOR;19;Oficina de Prensas e Injetoras;Oficina;61,1
+BLOCO C;PAVIMENTO SUPERIOR;3;Depósito Inst. Elétricas;Apoio / Depósito / Técnico;9,2
+BLOCO C;PAVIMENTO SUPERIOR;4;Sanitário Masculino;Sanitário / Vestiário;14,2
+BLOCO C;PAVIMENTO SUPERIOR;5;Sanitário Feminino;Sanitário / Vestiário;11,4
+BLOCO C;PAVIMENTO SUPERIOR;6;WC;Sanitário / Vestiário;5,5
+BLOCO C;PAVIMENTO SUPERIOR;7;Oficina de Eletricidade e Instalações Elétricas;Oficina;103,8
+BLOCO C;PAVIMENTO SUPERIOR;8;PTO;Administrativo / Atendimento;33,8
+BLOCO C;PAVIMENTO SUPERIOR;9;Eletrônica Analógica;Laboratório;35,9
+BLOCO C;PAVIMENTO SUPERIOR;10;Lab. de Máquinas Elétricas;Laboratório;84,7
+BLOCO C;PAVIMENTO SUPERIOR;11;Depo. Limpeza;Apoio / Depósito / Técnico;1,8
+BLOCO C;PAVIMENTO SUPERIOR;12;Depo. Limpeza;Apoio / Depósito / Técnico;1,8
+BLOCO C;PAVIMENTO SUPERIOR;13;Servidor;Apoio / Depósito / Técnico;12,2
+BLOCO C;PAVIMENTO SUPERIOR;14;Sala OPP;Administrativo / Atendimento;7,7
+BLOCO C;PAVIMENTO SUPERIOR;15;Vão;Área externa / coberta;32,7
+BLOCO C;PAVIMENTO SUPERIOR;16;Oficina de Operações Mecânicas;Oficina;100,1
+BLOCO C;PAVIMENTO SUPERIOR;17;Automação Predial;Laboratório;39,9
+BLOCO C;PAVIMENTO SUPERIOR;18;Treinamento Olimpíadas;Sala de aula;35,4
+BLOCO C;PAVIMENTO SUPERIOR;19;Eletrônica Digital;Laboratório;35,7
+BLOCO C;PAVIMENTO SUPERIOR;20;Lab. de Projetos;Laboratório;43,4
+BLOCO C;PAVIMENTO SUPERIOR;21;Lab. de Comandos Elétricos;Laboratório;52,4
+BLOCO C;PAVIMENTO SUPERIOR;22;Depósito Inst. Elétricas;Apoio / Depósito / Técnico;11,6
+BLOCO D;TÉRREO;1;Depósito;Apoio / Depósito / Técnico;9,2
+BLOCO D;TÉRREO;2;Civil CAI;Sala de aula;48,4
+BLOCO D;TÉRREO;3;Oficina de Usinagem S1;Oficina;171,2
+BLOCO D;TÉRREO;4;Usinagem CNC;Oficina;100,7
+BLOCO D;TÉRREO;5;Oficina Joalheria;Oficina;86,3
+BLOCO D;TÉRREO;6;Civil FIC;Sala de aula;65,5
+BLOCO D;TÉRREO;7;Civil CAI;Sala de aula;35,5
+BLOCO D;TÉRREO;8;Oficina de Usinagem S2;Oficina;153,8
+BLOCO D;TÉRREO;9;Oficina Eletromecânica;Oficina;102,7
+BLOCO D;TÉRREO;11;Oficina Joalheria;Oficina;35,9
+BLOCO D;TÉRREO;12;Vestiário;Sanitário / Vestiário;13,5
+BLOCO D;TÉRREO;13;Depósito Conserv.;Apoio / Depósito / Técnico;9,8
+BLOCO D;TÉRREO;14;Área externa;Área externa / coberta;279
+BLOCO D;TÉRREO;15;WC Fem.;Sanitário / Vestiário;4,1
+BLOCO D;TÉRREO;16;Almoxarifado;Apoio / Depósito / Técnico;28,3
+BLOCO D;TÉRREO;17;Material Didático;Apoio / Depósito / Técnico;26,3
+BLOCO D;TÉRREO;18;PTO;Administrativo / Atendimento;25,8
+BLOCO D;TÉRREO;19;Aulas Gerais;Sala de aula;39,1
+BLOCO D;TÉRREO;20;Sanit. Masc.;Sanitário / Vestiário;16,7
+BLOCO D;TÉRREO;21;Sanit. Fem.;Sanitário / Vestiário;16,9
+BLOCO D;TÉRREO;22;Servidores;Apoio / Depósito / Técnico;5
+BLOCO D;TÉRREO;23;Sala de Preparação;Apoio / Depósito / Técnico;26,5
+BLOCO D;TÉRREO;24;Biblioteca;Convivência / Alimentação / Eventos;102
+BLOCO D;TÉRREO;25;Sala de Jogos;Convivência / Alimentação / Eventos;10
+BLOCO D;TÉRREO;26;WC Masc.;Sanitário / Vestiário;7,1
+BLOCO D;TÉRREO;27;Dep. Materiais;Apoio / Depósito / Técnico;17,2
+BLOCO D;TÉRREO;29;Resíduos II-B;Apoio / Depósito / Técnico;9,1
+BLOCO D;TÉRREO;30;Resíduos II-A;Apoio / Depósito / Técnico;7,1
+BLOCO D;TÉRREO;31;Resíduos I;Apoio / Depósito / Técnico;7
+BLOCO D;TÉRREO;32;Compressores;Apoio / Depósito / Técnico;31,9
+BLOCO D;TÉRREO;33;Abrigo de Cilindros;Apoio / Depósito / Técnico;7,9
+BLOCO D;TÉRREO;34;Cilindros;Apoio / Depósito / Técnico;3,9
+BLOCO D;TÉRREO;36;GLP;Apoio / Depósito / Técnico;5,6
+BLOCO D;TÉRREO;37;Dep. Solda e Ferramentaria;Apoio / Depósito / Técnico;5,6
+BLOCO D;PAVIMENTO SUPERIOR;2;Aulas Gerais 4;Sala de aula;44,1
+BLOCO D;PAVIMENTO SUPERIOR;3;Aulas Gerais 2;Sala de aula;78,9
+BLOCO D;PAVIMENTO SUPERIOR;5;Dep. Prod. Químicos (?);Apoio / Depósito / Técnico;6,3
+BLOCO D;PAVIMENTO SUPERIOR;6;Sala (nome ilegível no scan);Administrativo / Atendimento;10,5
+BLOCO D;PAVIMENTO SUPERIOR;7;Aulas Gerais;Sala de aula;37,2
+BLOCO D;PAVIMENTO SUPERIOR;8;Lab. CAD/CAM;Laboratório;59,7
+BLOCO D;PAVIMENTO SUPERIOR;9;Lab. Hidráulica e Pneumática;Laboratório;50,2
+BLOCO D;PAVIMENTO SUPERIOR;10;Sanit. Masculino;Sanitário / Vestiário;15,8
+BLOCO D;PAVIMENTO SUPERIOR;11;Contr. Energia Solar;Apoio / Depósito / Técnico;6,9
+BLOCO D;PAVIMENTO SUPERIOR;12;WC Fem.;Sanitário / Vestiário;2,8
+BLOCO D;PAVIMENTO SUPERIOR;13;Lab. Informática 14D;Laboratório;57,6
+BLOCO D;PAVIMENTO SUPERIOR;14;Lab. Informática 16D;Laboratório;27,8
+BLOCO D;PAVIMENTO SUPERIOR;15;Desenho Técnico;Sala de aula;47,9
+BLOCO D;PAVIMENTO SUPERIOR;16;Sanit. Feminino;Sanitário / Vestiário;8,9
+BLOCO D;PAVIMENTO SUPERIOR;17;WC Masc.;Sanitário / Vestiário;2,9

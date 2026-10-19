@@ -1,0 +1,581 @@
+{
+ "page": "6",
+ "titulo": "BLOCO D — TÉRREO",
+ "arquivo": "BlocoD-terreo",
+ "w": 1467,
+ "h": 1072,
+ "salas": [
+  {
+   "nome": "Depósito",
+   "tipo": "apoio",
+   "x": 257,
+   "y": 247,
+   "boxW": 106,
+   "boxH": 44,
+   "area": 9.2,
+   "num": 1
+  },
+  {
+   "nome": "Civil CAI",
+   "tipo": "aula",
+   "x": 382,
+   "y": 302,
+   "boxW": 131,
+   "boxH": 154,
+   "area": 48.4,
+   "num": 2
+  },
+  {
+   "nome": "Oficina de Usinagem S1",
+   "tipo": "oficina",
+   "x": 690,
+   "y": 301,
+   "boxW": 462,
+   "boxH": 155,
+   "area": 171.2,
+   "num": 3
+  },
+  {
+   "nome": "Usinagem CNC",
+   "tipo": "oficina",
+   "x": 1074,
+   "y": 301,
+   "boxW": 269,
+   "boxH": 156,
+   "area": 100.7,
+   "num": 4
+  },
+  {
+   "nome": "Oficina Joalheria",
+   "tipo": "oficina",
+   "x": 1301,
+   "y": 321,
+   "boxW": 172,
+   "boxH": 197,
+   "area": 86.3,
+   "num": 5
+  },
+  {
+   "nome": "Civil FIC",
+   "tipo": "aula",
+   "x": 256,
+   "y": 388,
+   "boxW": 111,
+   "boxH": 254,
+   "area": 65.5,
+   "num": 6
+  },
+  {
+   "nome": "Civil CAI",
+   "tipo": "aula",
+   "x": 383,
+   "y": 457,
+   "boxW": 131,
+   "boxH": 115,
+   "area": 35.5,
+   "num": 7
+  },
+  {
+   "nome": "Oficina de Usinagem S2",
+   "tipo": "oficina",
+   "x": 662,
+   "y": 479,
+   "boxW": 404,
+   "boxH": 158,
+   "area": 153.8,
+   "num": 8
+  },
+  {
+   "nome": "Oficina Eletromecânica",
+   "tipo": "oficina",
+   "x": 1076,
+   "y": 479,
+   "boxW": 268,
+   "boxH": 159,
+   "area": 102.7,
+   "num": 9
+  },
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 318,
+   "y": 538,
+   "boxW": 93,
+   "boxH": 37,
+   "area": 7.9,
+   "num": 10
+  },
+  {
+   "nome": "Oficina Joalheria",
+   "tipo": "oficina",
+   "x": 1311,
+   "y": 492,
+   "boxW": 109,
+   "boxH": 139,
+   "area": 35.9,
+   "num": 11
+  },
+  {
+   "nome": "Vestiário",
+   "tipo": "sanit",
+   "x": 234,
+   "y": 570,
+   "boxW": 63,
+   "boxH": 100,
+   "area": 13.5,
+   "num": 12
+  },
+  {
+   "nome": "Depósito Conserv.",
+   "tipo": "apoio",
+   "x": 119,
+   "y": 690,
+   "boxW": 45,
+   "boxH": 91,
+   "area": 9.8,
+   "num": 13
+  },
+  {
+   "nome": "Área externa",
+   "tipo": "externo",
+   "x": 197,
+   "y": 639,
+   "boxW": 98,
+   "boxH": 544,
+   "area": 279,
+   "num": 14
+  },
+  {
+   "nome": "WC Fem.",
+   "tipo": "sanit",
+   "x": 269,
+   "y": 663,
+   "boxW": 37,
+   "boxH": 46,
+   "area": 4.1,
+   "num": 15
+  },
+  {
+   "nome": "Almoxarifado",
+   "tipo": "apoio",
+   "x": 362,
+   "y": 672,
+   "boxW": 89,
+   "boxH": 133,
+   "area": 28.3,
+   "num": 16
+  },
+  {
+   "nome": "Material Didático",
+   "tipo": "apoio",
+   "x": 451,
+   "y": 672,
+   "boxW": 84,
+   "boxH": 133,
+   "area": 26.3,
+   "num": 17
+  },
+  {
+   "nome": "PTO",
+   "tipo": "adm",
+   "x": 540,
+   "y": 671,
+   "boxW": 86,
+   "boxH": 129,
+   "area": 25.8,
+   "num": 18
+  },
+  {
+   "nome": "Aulas Gerais",
+   "tipo": "aula",
+   "x": 651,
+   "y": 671,
+   "boxW": 129,
+   "boxH": 127,
+   "area": 39.1,
+   "num": 19
+  },
+  {
+   "nome": "Sanit. Masc.",
+   "tipo": "sanit",
+   "x": 758,
+   "y": 687,
+   "boxW": 74,
+   "boxH": 97,
+   "area": 16.7,
+   "num": 20
+  },
+  {
+   "nome": "Sanit. Fem.",
+   "tipo": "sanit",
+   "x": 836,
+   "y": 696,
+   "boxW": 74,
+   "boxH": 80,
+   "area": 16.9,
+   "num": 21
+  },
+  {
+   "nome": "Servidores",
+   "tipo": "apoio",
+   "x": 885,
+   "y": 671,
+   "boxW": 17,
+   "boxH": 129,
+   "area": 5,
+   "num": 22
+  },
+  {
+   "nome": "Sala de Preparação",
+   "tipo": "apoio",
+   "x": 987,
+   "y": 672,
+   "boxW": 87,
+   "boxH": 130,
+   "area": 26.5,
+   "num": 23
+  },
+  {
+   "nome": "Biblioteca",
+   "tipo": "conv",
+   "x": 1179,
+   "y": 673,
+   "boxW": 289,
+   "boxH": 131,
+   "area": 102,
+   "num": 24
+  },
+  {
+   "nome": "Sala de Jogos",
+   "tipo": "conv",
+   "x": 1355,
+   "y": 642,
+   "boxW": 63,
+   "boxH": 66,
+   "area": 10,
+   "num": 25
+  },
+  {
+   "nome": "WC Masc.",
+   "tipo": "sanit",
+   "x": 282,
+   "y": 714,
+   "boxW": 62,
+   "boxH": 48,
+   "area": 7.1,
+   "num": 26
+  },
+  {
+   "nome": "Dep. Materiais",
+   "tipo": "apoio",
+   "x": 104,
+   "y": 819,
+   "boxW": 79,
+   "boxH": 102,
+   "area": 17.2,
+   "num": 27
+  },
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 271,
+   "y": 804,
+   "boxW": 37,
+   "boxH": 19,
+   "area": 1.6,
+   "num": 28
+  },
+  {
+   "nome": "Resíduos II-B",
+   "tipo": "apoio",
+   "x": 320,
+   "y": 835,
+   "boxW": 50,
+   "boxH": 81,
+   "area": 9.1,
+   "num": 29
+  },
+  {
+   "nome": "Resíduos II-A",
+   "tipo": "apoio",
+   "x": 372,
+   "y": 829,
+   "boxW": 37,
+   "boxH": 69,
+   "area": 7.1,
+   "num": 30
+  },
+  {
+   "nome": "Resíduos I",
+   "tipo": "apoio",
+   "x": 420,
+   "y": 829,
+   "boxW": 36,
+   "boxH": 69,
+   "area": 7,
+   "num": 31
+  },
+  {
+   "nome": "Compressores",
+   "tipo": "apoio",
+   "x": 519,
+   "y": 835,
+   "boxW": 141,
+   "boxH": 80,
+   "area": 31.9,
+   "num": 32
+  },
+  {
+   "nome": "Abrigo de Cilindros",
+   "tipo": "apoio",
+   "x": 697,
+   "y": 825,
+   "boxW": 39,
+   "boxH": 85,
+   "area": 7.9,
+   "num": 33
+  },
+  {
+   "nome": "Cilindros",
+   "tipo": "apoio",
+   "x": 779,
+   "y": 823,
+   "boxW": 19,
+   "boxH": 89,
+   "area": 3.9,
+   "num": 34
+  },
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 812,
+   "y": 826,
+   "boxW": 45,
+   "boxH": 83,
+   "area": 8.3,
+   "num": 35
+  },
+  {
+   "nome": "GLP",
+   "tipo": "apoio",
+   "x": 105,
+   "y": 888,
+   "boxW": 78,
+   "boxH": 30,
+   "area": 5.6,
+   "num": 36
+  },
+  {
+   "nome": "Dep. Solda e Ferramentaria",
+   "tipo": "apoio",
+   "x": 861,
+   "y": 847,
+   "boxW": 45,
+   "boxH": 41,
+   "area": 5.6,
+   "num": 37
+  }
+ ],
+ "regioes": [
+  {
+   "codigo": 11,
+   "nome": "Oficina Joalheria",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 12,
+   "nome": "Oficina Joalheria",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 13,
+   "nome": "Biblioteca",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 14,
+   "nome": "Usinagem CNC",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 15,
+   "nome": "Oficina Eletromecânica",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 16,
+   "nome": "Sala de Preparação",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 17,
+   "nome": "",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 18,
+   "nome": "Servidores",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 19,
+   "nome": "Dep. Solda e Ferramentaria",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 20,
+   "nome": "Sanit. Fem.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 21,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 22,
+   "nome": "Oficina de Usinagem S1",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 23,
+   "nome": "Oficina de Usinagem S2",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 24,
+   "nome": "Sanit. Masc.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 25,
+   "nome": "Cilindros",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 26,
+   "nome": "Abrigo de Cilindros",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 27,
+   "nome": "Aulas Gerais",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 28,
+   "nome": "PTO",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 29,
+   "nome": "Material Didático",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 30,
+   "nome": "Civil CAI",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 31,
+   "nome": "Resíduos I",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 32,
+   "nome": "Civil CAI",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 33,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 34,
+   "nome": "Almoxarifado",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 35,
+   "nome": "Resíduos II-A",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 36,
+   "nome": "Resíduos II-B",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 37,
+   "nome": "Depósito",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 38,
+   "nome": "Civil FIC",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 39,
+   "nome": "WC Fem.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 40,
+   "nome": "WC Masc.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 41,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 42,
+   "nome": "Vestiário",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 43,
+   "nome": "",
+   "tipo": "externo"
+  },
+  {
+   "codigo": 44,
+   "nome": "Área externa",
+   "tipo": "externo"
+  },
+  {
+   "codigo": 45,
+   "nome": "Depósito Conserv.",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 46,
+   "nome": "GLP",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 47,
+   "nome": "",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 48,
+   "nome": "Sala de Jogos",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 49,
+   "nome": "Compressores",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 50,
+   "nome": "Dep. Materiais",
+   "tipo": "apoio"
+  }
+ ]
+}

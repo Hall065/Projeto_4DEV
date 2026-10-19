@@ -1,0 +1,281 @@
+{
+ "page": "7",
+ "titulo": "BLOCO D — PAVIMENTO SUPERIOR",
+ "arquivo": "BlocoD-superior",
+ "w": 1494,
+ "h": 1052,
+ "salas": [
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 1247,
+   "y": 159,
+   "boxW": 64,
+   "boxH": 29,
+   "area": 7.8,
+   "num": 1
+  },
+  {
+   "nome": "Aulas Gerais 4",
+   "tipo": "aula",
+   "x": 1321,
+   "y": 244,
+   "boxW": 161,
+   "boxH": 127,
+   "area": 44.1,
+   "num": 2
+  },
+  {
+   "nome": "Aulas Gerais 2",
+   "tipo": "aula",
+   "x": 1321,
+   "y": 423,
+   "boxW": 161,
+   "boxH": 226,
+   "area": 78.9,
+   "num": 3
+  },
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 198,
+   "y": 540,
+   "boxW": 65,
+   "boxH": 87,
+   "area": 10.4,
+   "num": 4
+  },
+  {
+   "nome": "Dep. Prod. Químicos (?)",
+   "tipo": "apoio",
+   "x": 324,
+   "y": 517,
+   "boxW": 75,
+   "boxH": 42,
+   "area": 6.3,
+   "num": 5
+  },
+  {
+   "nome": "Sala (nome ilegível no scan)",
+   "tipo": "adm",
+   "x": 945,
+   "y": 624,
+   "boxW": 69,
+   "boxH": 69,
+   "area": 10.5,
+   "num": 6
+  },
+  {
+   "nome": "Aulas Gerais",
+   "tipo": "aula",
+   "x": 276,
+   "y": 661,
+   "boxW": 125,
+   "boxH": 140,
+   "area": 37.2,
+   "num": 7
+  },
+  {
+   "nome": "Lab. CAD/CAM",
+   "tipo": "lab",
+   "x": 440,
+   "y": 661,
+   "boxW": 199,
+   "boxH": 140,
+   "area": 59.7,
+   "num": 8
+  },
+  {
+   "nome": "Lab. Hidráulica e Pneumática",
+   "tipo": "lab",
+   "x": 625,
+   "y": 660,
+   "boxW": 167,
+   "boxH": 139,
+   "area": 50.2,
+   "num": 9
+  },
+  {
+   "nome": "Sanit. Masculino",
+   "tipo": "sanit",
+   "x": 749,
+   "y": 669,
+   "boxW": 71,
+   "boxH": 122,
+   "area": 15.8,
+   "num": 10
+  },
+  {
+   "nome": "Contr. Energia Solar",
+   "tipo": "apoio",
+   "x": 822,
+   "y": 661,
+   "boxW": 24,
+   "boxH": 137,
+   "area": 6.9,
+   "num": 11
+  },
+  {
+   "nome": "WC Fem.",
+   "tipo": "sanit",
+   "x": 957,
+   "y": 679,
+   "boxW": 43,
+   "boxH": 30,
+   "area": 2.8,
+   "num": 12
+  },
+  {
+   "nome": "Lab. Informática 14D",
+   "tipo": "lab",
+   "x": 1080,
+   "y": 661,
+   "boxW": 194,
+   "boxH": 137,
+   "area": 57.6,
+   "num": 13
+  },
+  {
+   "nome": "Lab. Informática 16D",
+   "tipo": "lab",
+   "x": 1233,
+   "y": 661,
+   "boxW": 94,
+   "boxH": 137,
+   "area": 27.8,
+   "num": 14
+  },
+  {
+   "nome": "Desenho Técnico",
+   "tipo": "aula",
+   "x": 1344,
+   "y": 635,
+   "boxW": 116,
+   "boxH": 192,
+   "area": 47.9,
+   "num": 15
+  },
+  {
+   "nome": "Sanit. Feminino",
+   "tipo": "sanit",
+   "x": 786,
+   "y": 701,
+   "boxW": 47,
+   "boxH": 57,
+   "area": 8.9,
+   "num": 16
+  },
+  {
+   "nome": "WC Masc.",
+   "tipo": "sanit",
+   "x": 957,
+   "y": 714,
+   "boxW": 43,
+   "boxH": 31,
+   "area": 2.9,
+   "num": 17
+  },
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 765,
+   "y": 829,
+   "boxW": 47,
+   "boxH": 90,
+   "area": 9.1,
+   "num": 18
+  }
+ ],
+ "regioes": [
+  {
+   "codigo": 11,
+   "nome": "Aulas Gerais 4",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 12,
+   "nome": "Aulas Gerais 2",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 13,
+   "nome": "Desenho Técnico",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 14,
+   "nome": "Lab. Informática 16D",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 15,
+   "nome": "Lab. Informática 14D",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 16,
+   "nome": "WC Fem.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 17,
+   "nome": "WC Masc.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 18,
+   "nome": "Sala (nome ilegível no scan)",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 19,
+   "nome": "Sanit. Feminino",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 20,
+   "nome": "Sanit. Masculino",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 21,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 22,
+   "nome": "Lab. Hidráulica e Pneumática",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 23,
+   "nome": "Lab. CAD/CAM",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 24,
+   "nome": "Dep. Prod. Químicos (?)",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 25,
+   "nome": "Aulas Gerais",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 26,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 27,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 28,
+   "nome": "Contr. Energia Solar",
+   "tipo": "apoio"
+  }
+ ]
+}

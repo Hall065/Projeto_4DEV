@@ -1,0 +1,461 @@
+{
+ "page": "1",
+ "titulo": "BLOCO A — TÉRREO",
+ "arquivo": "BlocoA-terreo",
+ "w": 1491,
+ "h": 1055,
+ "salas": [
+  {
+   "nome": "Passarela coberta",
+   "tipo": "externo",
+   "x": 827,
+   "y": 140,
+   "boxW": 110,
+   "boxH": 39,
+   "area": 40.9,
+   "num": 1
+  },
+  {
+   "nome": "Banda Marcial",
+   "tipo": "conv",
+   "x": 984,
+   "y": 163,
+   "boxW": 165,
+   "boxH": 82,
+   "area": 30,
+   "num": 2
+  },
+  {
+   "nome": "Banda Marcial",
+   "tipo": "conv",
+   "x": 1139,
+   "y": 162,
+   "boxW": 87,
+   "boxH": 81,
+   "area": 15.1,
+   "num": 3
+  },
+  {
+   "nome": "Portaria / Guarita",
+   "tipo": "adm",
+   "x": 1332,
+   "y": 162,
+   "boxW": 92,
+   "boxH": 81,
+   "area": 15.2,
+   "num": 4
+  },
+  {
+   "nome": "Bombas",
+   "tipo": "apoio",
+   "x": 410,
+   "y": 333,
+   "boxW": 59,
+   "boxH": 90,
+   "area": 12.7,
+   "num": 5
+  },
+  {
+   "nome": "Manutenção",
+   "tipo": "apoio",
+   "x": 1096,
+   "y": 338,
+   "boxW": 161,
+   "boxH": 81,
+   "area": 22.7,
+   "num": 6
+  },
+  {
+   "nome": "Manutenção",
+   "tipo": "apoio",
+   "x": 1265,
+   "y": 347,
+   "boxW": 166,
+   "boxH": 63,
+   "area": 22,
+   "num": 7
+  },
+  {
+   "nome": "Sup. Manut.",
+   "tipo": "apoio",
+   "x": 1397,
+   "y": 348,
+   "boxW": 87,
+   "boxH": 59,
+   "area": 11.6,
+   "num": 8
+  },
+  {
+   "nome": "Servidor",
+   "tipo": "apoio",
+   "x": 263,
+   "y": 352,
+   "boxW": 62,
+   "boxH": 52,
+   "area": 5.5,
+   "num": 9
+  },
+  {
+   "nome": "Dep. Banda",
+   "tipo": "apoio",
+   "x": 337,
+   "y": 352,
+   "boxW": 77,
+   "boxH": 51,
+   "area": 8.1,
+   "num": 10
+  },
+  {
+   "nome": "Sanit. Fem. Func.",
+   "tipo": "sanit",
+   "x": 956,
+   "y": 364,
+   "boxW": 105,
+   "boxH": 70,
+   "area": 27.2,
+   "num": 11
+  },
+  {
+   "nome": "Depósito",
+   "tipo": "apoio",
+   "x": 1399,
+   "y": 412,
+   "boxW": 89,
+   "boxH": 54,
+   "area": 10.2,
+   "num": 12
+  },
+  {
+   "nome": "Sala AQV",
+   "tipo": "conv",
+   "x": 282,
+   "y": 427,
+   "boxW": 100,
+   "boxH": 82,
+   "area": 17.5,
+   "num": 13
+  },
+  {
+   "nome": "Sala AQV",
+   "tipo": "conv",
+   "x": 386,
+   "y": 427,
+   "boxW": 99,
+   "boxH": 82,
+   "area": 17.3,
+   "num": 14
+  },
+  {
+   "nome": "Sanit. Masc. Func.",
+   "tipo": "sanit",
+   "x": 1052,
+   "y": 437,
+   "boxW": 76,
+   "boxH": 110,
+   "area": 18.4,
+   "num": 15
+  },
+  {
+   "nome": "Sanitário Masculino",
+   "tipo": "sanit",
+   "x": 1201,
+   "y": 431,
+   "boxW": 213,
+   "boxH": 92,
+   "area": 45,
+   "num": 16
+  },
+  {
+   "nome": "Sanitário Feminino",
+   "tipo": "sanit",
+   "x": 1248,
+   "y": 522,
+   "boxW": 119,
+   "boxH": 84,
+   "area": 28.5,
+   "num": 17
+  },
+  {
+   "nome": "Zeladoria / Oficina",
+   "tipo": "apoio",
+   "x": 1377,
+   "y": 504,
+   "boxW": 129,
+   "boxH": 120,
+   "area": 41.2,
+   "num": 18
+  },
+  {
+   "nome": "Sala Apoio",
+   "tipo": "apoio",
+   "x": 169,
+   "y": 700,
+   "boxW": 63,
+   "boxH": 80,
+   "area": 10.3,
+   "num": 19
+  },
+  {
+   "nome": "Sanit. Unissex",
+   "tipo": "sanit",
+   "x": 237,
+   "y": 701,
+   "boxW": 63,
+   "boxH": 80,
+   "area": 10.3,
+   "num": 20
+  },
+  {
+   "nome": "Copa",
+   "tipo": "conv",
+   "x": 300,
+   "y": 733,
+   "boxW": 65,
+   "boxH": 133,
+   "area": 18.2,
+   "num": 21
+  },
+  {
+   "nome": "Cantina",
+   "tipo": "conv",
+   "x": 376,
+   "y": 732,
+   "boxW": 77,
+   "boxH": 143,
+   "area": 23.3,
+   "num": 22
+  },
+  {
+   "nome": "Refeitório",
+   "tipo": "conv",
+   "x": 597,
+   "y": 725,
+   "boxW": 272,
+   "boxH": 213,
+   "area": 131.5,
+   "num": 23
+  },
+  {
+   "nome": "Auditório",
+   "tipo": "conv",
+   "x": 1108,
+   "y": 716,
+   "boxW": 412,
+   "boxH": 293,
+   "area": 297.4,
+   "num": 24
+  },
+  {
+   "nome": "Palco",
+   "tipo": "conv",
+   "x": 1394,
+   "y": 725,
+   "boxW": 81,
+   "boxH": 176,
+   "area": 59.8,
+   "num": 25
+  },
+  {
+   "nome": "Despensa",
+   "tipo": "apoio",
+   "x": 195,
+   "y": 833,
+   "boxW": 112,
+   "boxH": 57,
+   "area": 15,
+   "num": 26
+  },
+  {
+   "nome": "Desp.",
+   "tipo": "apoio",
+   "x": 203,
+   "y": 772,
+   "boxW": 130,
+   "boxH": 55,
+   "area": 16,
+   "num": 27
+  },
+  {
+   "nome": "Cozinha",
+   "tipo": "conv",
+   "x": 337,
+   "y": 833,
+   "boxW": 172,
+   "boxH": 59,
+   "area": 23.4,
+   "num": 28
+  },
+  {
+   "nome": "Som",
+   "tipo": "apoio",
+   "x": 842,
+   "y": 836,
+   "boxW": 78,
+   "boxH": 52,
+   "area": 10,
+   "num": 29
+  },
+  {
+   "nome": "Apoio Palco",
+   "tipo": "apoio",
+   "x": 1409,
+   "y": 840,
+   "boxW": 106,
+   "boxH": 45,
+   "area": 9.9,
+   "num": 30
+  }
+ ],
+ "regioes": [
+  {
+   "codigo": 11,
+   "nome": "Sala Apoio",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 12,
+   "nome": "Sanit. Unissex",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 13,
+   "nome": "Servidor",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 14,
+   "nome": "Desp.",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 15,
+   "nome": "Sala AQV",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 16,
+   "nome": "Dep. Banda",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 17,
+   "nome": "Cantina",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 18,
+   "nome": "Sala AQV",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 19,
+   "nome": "Bombas",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 20,
+   "nome": "Refeitório",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 21,
+   "nome": "Som",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 22,
+   "nome": "Banda Marcial",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 23,
+   "nome": "Auditório",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 24,
+   "nome": "Manutenção",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 25,
+   "nome": "Banda Marcial",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 26,
+   "nome": "Manutenção",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 27,
+   "nome": "Portaria / Guarita",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 28,
+   "nome": "Apoio Palco",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 29,
+   "nome": "Palco",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 30,
+   "nome": "Zeladoria / Oficina",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 31,
+   "nome": "Depósito",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 32,
+   "nome": "Sup. Manut.",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 33,
+   "nome": "Passarela coberta",
+   "tipo": "externo"
+  },
+  {
+   "codigo": 34,
+   "nome": "Sanit. Fem. Func.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 35,
+   "nome": "Sanitário Feminino",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 36,
+   "nome": "Copa",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 37,
+   "nome": "Sanit. Masc. Func.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 38,
+   "nome": "Sanitário Masculino",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 39,
+   "nome": "Despensa",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 40,
+   "nome": "Cozinha",
+   "tipo": "conv"
+  }
+ ]
+}

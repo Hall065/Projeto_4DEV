@@ -1,0 +1,306 @@
+{
+ "page": "4",
+ "titulo": "BLOCO C — PAVIMENTO INFERIOR",
+ "arquivo": "BlocoC-inferior",
+ "w": 1466,
+ "h": 1073,
+ "salas": [
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 712,
+   "y": 247,
+   "boxW": 44,
+   "boxH": 87,
+   "area": 7.8,
+   "num": 1
+  },
+  {
+   "nome": "Sanitário Masculino",
+   "tipo": "sanit",
+   "x": 370,
+   "y": 397,
+   "boxW": 70,
+   "boxH": 115,
+   "area": 18,
+   "num": 2
+  },
+  {
+   "nome": "Vestiário Masculino",
+   "tipo": "sanit",
+   "x": 435,
+   "y": 397,
+   "boxW": 48,
+   "boxH": 115,
+   "area": 11.7,
+   "num": 3
+  },
+  {
+   "nome": "Lab. Projetos Ferramentaria 11C",
+   "tipo": "lab",
+   "x": 525,
+   "y": 398,
+   "boxW": 123,
+   "boxH": 115,
+   "area": 30.6,
+   "num": 4
+  },
+  {
+   "nome": "Lab. CAD/CAM Ferramentaria 12C",
+   "tipo": "lab",
+   "x": 652,
+   "y": 398,
+   "boxW": 120,
+   "boxH": 115,
+   "area": 29.8,
+   "num": 5
+  },
+  {
+   "nome": "Sanitário Feminino / Dep. Solda",
+   "tipo": "sanit",
+   "x": 753,
+   "y": 399,
+   "boxW": 73,
+   "boxH": 115,
+   "area": 17.3,
+   "num": 6
+  },
+  {
+   "nome": "Sanitário",
+   "tipo": "sanit",
+   "x": 859,
+   "y": 378,
+   "boxW": 32,
+   "boxH": 60,
+   "area": 4.2,
+   "num": 7
+  },
+  {
+   "nome": "Sala do Café",
+   "tipo": "conv",
+   "x": 912,
+   "y": 398,
+   "boxW": 65,
+   "boxH": 114,
+   "area": 18.6,
+   "num": 8
+  },
+  {
+   "nome": "Lab. de Metrologia",
+   "tipo": "lab",
+   "x": 1023,
+   "y": 397,
+   "boxW": 146,
+   "boxH": 114,
+   "area": 36.1,
+   "num": 9
+  },
+  {
+   "nome": "Sala OPP",
+   "tipo": "adm",
+   "x": 1124,
+   "y": 396,
+   "boxW": 47,
+   "boxH": 115,
+   "area": 11.2,
+   "num": 10
+  },
+  {
+   "nome": "Sanit. Masc. Alunos",
+   "tipo": "sanit",
+   "x": 1189,
+   "y": 395,
+   "boxW": 72,
+   "boxH": 115,
+   "area": 17.6,
+   "num": 11
+  },
+  {
+   "nome": "Lab. Tridimensional",
+   "tipo": "lab",
+   "x": 1269,
+   "y": 385,
+   "boxW": 77,
+   "boxH": 93,
+   "area": 18.4,
+   "num": 12
+  },
+  {
+   "nome": "Soldagem",
+   "tipo": "oficina",
+   "x": 247,
+   "y": 444,
+   "boxW": 167,
+   "boxH": 211,
+   "area": 77.6,
+   "num": 13
+  },
+  {
+   "nome": "Área Técnica (quadros)",
+   "tipo": "apoio",
+   "x": 273,
+   "y": 624,
+   "boxW": 109,
+   "boxH": 98,
+   "area": 32.1,
+   "num": 14
+  },
+  {
+   "nome": "Of. Ferramentaria Máquinas CNC",
+   "tipo": "oficina",
+   "x": 593,
+   "y": 602,
+   "boxW": 413,
+   "boxH": 227,
+   "area": 207,
+   "num": 15
+  },
+  {
+   "nome": "Of. Ferramentaria Máquinas Convencionais",
+   "tipo": "oficina",
+   "x": 1074,
+   "y": 655,
+   "boxW": 479,
+   "boxH": 336,
+   "area": 355.4,
+   "num": 16
+  },
+  {
+   "nome": "Cabine Primária",
+   "tipo": "apoio",
+   "x": 255,
+   "y": 733,
+   "boxW": 69,
+   "boxH": 109,
+   "area": 22.7,
+   "num": 17
+  },
+  {
+   "nome": "Área de Caçambas",
+   "tipo": "externo",
+   "x": 114,
+   "y": 789,
+   "boxW": 132,
+   "boxH": 77,
+   "area": 22.4,
+   "num": 18
+  },
+  {
+   "nome": "Oficina de Prensas e Injetoras",
+   "tipo": "oficina",
+   "x": 591,
+   "y": 789,
+   "boxW": 413,
+   "boxH": 67,
+   "area": 61.1,
+   "num": 19
+  }
+ ],
+ "regioes": [
+  {
+   "codigo": 11,
+   "nome": "Lab. Tridimensional",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 12,
+   "nome": "Sanit. Masc. Alunos",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 13,
+   "nome": "Sala OPP",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 14,
+   "nome": "Of. Ferramentaria Máquinas Convencionais",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 15,
+   "nome": "Lab. de Metrologia",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 16,
+   "nome": "Sala do Café",
+   "tipo": "conv"
+  },
+  {
+   "codigo": 17,
+   "nome": "Sanitário",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 18,
+   "nome": "Sanitário Feminino / Dep. Solda",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 19,
+   "nome": "Oficina de Prensas e Injetoras",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 20,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 21,
+   "nome": "Lab. CAD/CAM Ferramentaria 12C",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 22,
+   "nome": "Lab. Projetos Ferramentaria 11C",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 23,
+   "nome": "Of. Ferramentaria Máquinas CNC",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 24,
+   "nome": "Sanitário Masculino",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 25,
+   "nome": "Cabine Primária",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 26,
+   "nome": "",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 27,
+   "nome": "Área de Caçambas",
+   "tipo": "externo"
+  },
+  {
+   "codigo": 28,
+   "nome": "Área Técnica (quadros)",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 29,
+   "nome": "",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 30,
+   "nome": "Vestiário Masculino",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 31,
+   "nome": "Soldagem",
+   "tipo": "oficina"
+  }
+ ]
+}

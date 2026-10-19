@@ -1,0 +1,346 @@
+{
+ "page": "5",
+ "titulo": "BLOCO C — PAVIMENTO SUPERIOR",
+ "arquivo": "BlocoC-superior",
+ "w": 1430,
+ "h": 1100,
+ "salas": [
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 699,
+   "y": 240,
+   "boxW": 49,
+   "boxH": 97,
+   "area": 7.6,
+   "num": 1
+  },
+  {
+   "nome": "Rampa de Acesso",
+   "tipo": "circ",
+   "x": 816,
+   "y": 383,
+   "boxW": 48,
+   "boxH": 173,
+   "area": 14.9,
+   "num": 2
+  },
+  {
+   "nome": "Depósito Inst. Elétricas",
+   "tipo": "apoio",
+   "x": 311,
+   "y": 524,
+   "boxW": 55,
+   "boxH": 108,
+   "area": 9.2,
+   "num": 3
+  },
+  {
+   "nome": "Sanitário Masculino",
+   "tipo": "sanit",
+   "x": 690,
+   "y": 539,
+   "boxW": 57,
+   "boxH": 136,
+   "area": 14.2,
+   "num": 4
+  },
+  {
+   "nome": "Sanitário Feminino",
+   "tipo": "sanit",
+   "x": 754,
+   "y": 538,
+   "boxW": 64,
+   "boxH": 135,
+   "area": 11.4,
+   "num": 5
+  },
+  {
+   "nome": "WC",
+   "tipo": "sanit",
+   "x": 865,
+   "y": 514,
+   "boxW": 42,
+   "boxH": 88,
+   "area": 5.5,
+   "num": 6
+  },
+  {
+   "nome": "Oficina de Eletricidade e Instalações Elétricas",
+   "tipo": "oficina",
+   "x": 500,
+   "y": 565,
+   "boxW": 318,
+   "boxH": 189,
+   "area": 103.8,
+   "num": 7
+  },
+  {
+   "nome": "PTO",
+   "tipo": "adm",
+   "x": 962,
+   "y": 565,
+   "boxW": 111,
+   "boxH": 190,
+   "area": 33.8,
+   "num": 8
+  },
+  {
+   "nome": "Eletrônica Analógica",
+   "tipo": "lab",
+   "x": 1080,
+   "y": 565,
+   "boxW": 118,
+   "boxH": 190,
+   "area": 35.9,
+   "num": 9
+  },
+  {
+   "nome": "Lab. de Máquinas Elétricas",
+   "tipo": "lab",
+   "x": 1264,
+   "y": 584,
+   "boxW": 245,
+   "boxH": 229,
+   "area": 84.7,
+   "num": 10
+  },
+  {
+   "nome": "Depo. Limpeza",
+   "tipo": "apoio",
+   "x": 680,
+   "y": 644,
+   "boxW": 36,
+   "boxH": 32,
+   "area": 1.8,
+   "num": 11
+  },
+  {
+   "nome": "Depo. Limpeza",
+   "tipo": "apoio",
+   "x": 768,
+   "y": 644,
+   "boxW": 36,
+   "boxH": 32,
+   "area": 1.8,
+   "num": 12
+  },
+  {
+   "nome": "Servidor",
+   "tipo": "apoio",
+   "x": 874,
+   "y": 630,
+   "boxW": 62,
+   "boxH": 60,
+   "area": 12.2,
+   "num": 13
+  },
+  {
+   "nome": "Sala OPP",
+   "tipo": "adm",
+   "x": 637,
+   "y": 752,
+   "boxW": 67,
+   "boxH": 75,
+   "area": 7.7,
+   "num": 14
+  },
+  {
+   "nome": "Vão",
+   "tipo": "externo",
+   "x": 218,
+   "y": 773,
+   "boxW": 75,
+   "boxH": 87,
+   "area": 32.7,
+   "num": 15
+  },
+  {
+   "nome": "Oficina de Operações Mecânicas",
+   "tipo": "oficina",
+   "x": 442,
+   "y": 810,
+   "boxW": 319,
+   "boxH": 192,
+   "area": 100.1,
+   "num": 16
+  },
+  {
+   "nome": "Automação Predial",
+   "tipo": "lab",
+   "x": 760,
+   "y": 811,
+   "boxW": 131,
+   "boxH": 188,
+   "area": 39.9,
+   "num": 17
+  },
+  {
+   "nome": "Treinamento Olimpíadas",
+   "tipo": "aula",
+   "x": 901,
+   "y": 811,
+   "boxW": 118,
+   "boxH": 188,
+   "area": 35.4,
+   "num": 18
+  },
+  {
+   "nome": "Eletrônica Digital",
+   "tipo": "lab",
+   "x": 1021,
+   "y": 811,
+   "boxW": 119,
+   "boxH": 188,
+   "area": 35.7,
+   "num": 19
+  },
+  {
+   "nome": "Lab. de Projetos",
+   "tipo": "lab",
+   "x": 1155,
+   "y": 811,
+   "boxW": 144,
+   "boxH": 188,
+   "area": 43.4,
+   "num": 20
+  },
+  {
+   "nome": "Lab. de Comandos Elétricos",
+   "tipo": "lab",
+   "x": 1308,
+   "y": 802,
+   "boxW": 158,
+   "boxH": 206,
+   "area": 52.4,
+   "num": 21
+  },
+  {
+   "nome": "Depósito Inst. Elétricas",
+   "tipo": "apoio",
+   "x": 637,
+   "y": 849,
+   "boxW": 67,
+   "boxH": 112,
+   "area": 11.6,
+   "num": 22
+  }
+ ],
+ "regioes": [
+  {
+   "codigo": 11,
+   "nome": "Lab. de Máquinas Elétricas",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 12,
+   "nome": "Lab. de Projetos",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 13,
+   "nome": "Eletrônica Analógica",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 14,
+   "nome": "Eletrônica Digital",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 15,
+   "nome": "PTO",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 16,
+   "nome": "Treinamento Olimpíadas",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 17,
+   "nome": "WC",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 18,
+   "nome": "",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 19,
+   "nome": "Depo. Limpeza",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 20,
+   "nome": "Automação Predial",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 21,
+   "nome": "Sanitário Feminino",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 22,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 23,
+   "nome": "Sanitário Masculino",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 24,
+   "nome": "Depo. Limpeza",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 25,
+   "nome": "Sala OPP",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 26,
+   "nome": "Depósito Inst. Elétricas",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 27,
+   "nome": "Oficina de Eletricidade e Instalações Elétricas",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 28,
+   "nome": "Oficina de Operações Mecânicas",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 29,
+   "nome": "Depósito Inst. Elétricas",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 30,
+   "nome": "Servidor",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 31,
+   "nome": "Vão",
+   "tipo": "externo"
+  },
+  {
+   "codigo": 32,
+   "nome": "Lab. de Comandos Elétricos",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 33,
+   "nome": "Rampa de Acesso",
+   "tipo": "circ"
+  }
+ ]
+}

@@ -1,0 +1,346 @@
+{
+ "page": "2",
+ "titulo": "BLOCO A — PAVIMENTO SUPERIOR",
+ "arquivo": "BlocoA-superior",
+ "w": 1485,
+ "h": 1059,
+ "salas": [
+  {
+   "nome": "Sala Coord.",
+   "tipo": "adm",
+   "x": 136,
+   "y": 178,
+   "boxW": 121,
+   "boxH": 62,
+   "area": 15.8,
+   "num": 1
+  },
+  {
+   "nome": "Arquivo",
+   "tipo": "adm",
+   "x": 308,
+   "y": 159,
+   "boxW": 210,
+   "boxH": 26,
+   "area": 10.6,
+   "num": 2
+  },
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 332,
+   "y": 207,
+   "boxW": 157,
+   "boxH": 63,
+   "area": 17.1,
+   "num": 3
+  },
+  {
+   "nome": "Escada",
+   "tipo": "escada",
+   "x": 984,
+   "y": 241,
+   "boxW": 113,
+   "boxH": 61,
+   "area": 15.5,
+   "num": 4
+  },
+  {
+   "nome": "San. Masc.",
+   "tipo": "sanit",
+   "x": 735,
+   "y": 462,
+   "boxW": 49,
+   "boxH": 88,
+   "area": 8.3,
+   "num": 5
+  },
+  {
+   "nome": "San. Fem.",
+   "tipo": "sanit",
+   "x": 894,
+   "y": 454,
+   "boxW": 48,
+   "boxH": 75,
+   "area": 6.8,
+   "num": 6
+  },
+  {
+   "nome": "Lab. de Ensaios",
+   "tipo": "lab",
+   "x": 1296,
+   "y": 459,
+   "boxW": 100,
+   "boxH": 89,
+   "area": 20.2,
+   "num": 7
+  },
+  {
+   "nome": "Lab. Desenvolvimento de Sistemas",
+   "tipo": "lab",
+   "x": 335,
+   "y": 510,
+   "boxW": 319,
+   "boxH": 182,
+   "area": 118,
+   "num": 8
+  },
+  {
+   "nome": "Robótica",
+   "tipo": "lab",
+   "x": 545,
+   "y": 509,
+   "boxW": 95,
+   "boxH": 182,
+   "area": 34.5,
+   "num": 9
+  },
+  {
+   "nome": "Sala Manut. Micros",
+   "tipo": "apoio",
+   "x": 634,
+   "y": 509,
+   "boxW": 75,
+   "boxH": 182,
+   "area": 27.4,
+   "num": 10
+  },
+  {
+   "nome": "San. Fem.",
+   "tipo": "sanit",
+   "x": 735,
+   "y": 554,
+   "boxW": 50,
+   "boxH": 86,
+   "area": 8.2,
+   "num": 11
+  },
+  {
+   "nome": "San. Masc.",
+   "tipo": "sanit",
+   "x": 841,
+   "y": 548,
+   "boxW": 154,
+   "boxH": 102,
+   "area": 44.6,
+   "num": 12
+  },
+  {
+   "nome": "DEP",
+   "tipo": "apoio",
+   "x": 947,
+   "y": 539,
+   "boxW": 47,
+   "boxH": 96,
+   "area": 9.7,
+   "num": 13
+  },
+  {
+   "nome": "Oficina de Baixa e Alta Fusão",
+   "tipo": "oficina",
+   "x": 1145,
+   "y": 548,
+   "boxW": 190,
+   "boxH": 261,
+   "area": 104.4,
+   "num": 14
+  },
+  {
+   "nome": "Lab. de Galvanoplastia",
+   "tipo": "lab",
+   "x": 1394,
+   "y": 506,
+   "boxW": 141,
+   "boxH": 182,
+   "area": 44.9,
+   "num": 15
+  },
+  {
+   "nome": "Depósito",
+   "tipo": "apoio",
+   "x": 1407,
+   "y": 640,
+   "boxW": 116,
+   "boxH": 76,
+   "area": 18.1,
+   "num": 16
+  },
+  {
+   "nome": "Lab. Informática 5A",
+   "tipo": "lab",
+   "x": 175,
+   "y": 769,
+   "boxW": 201,
+   "boxH": 174,
+   "area": 71.9,
+   "num": 17
+  },
+  {
+   "nome": "Aulas Gerais 7A",
+   "tipo": "aula",
+   "x": 387,
+   "y": 769,
+   "boxW": 210,
+   "boxH": 175,
+   "area": 74.9,
+   "num": 18
+  },
+  {
+   "nome": "Lab. Informática 10A",
+   "tipo": "lab",
+   "x": 600,
+   "y": 769,
+   "boxW": 207,
+   "boxH": 175,
+   "area": 74.1,
+   "num": 19
+  },
+  {
+   "nome": "Lab. Modelagem 3D",
+   "tipo": "lab",
+   "x": 810,
+   "y": 770,
+   "boxW": 207,
+   "boxH": 177,
+   "area": 74.2,
+   "num": 20
+  },
+  {
+   "nome": "Lab. Manufatura Aditiva",
+   "tipo": "lab",
+   "x": 1025,
+   "y": 771,
+   "boxW": 215,
+   "boxH": 178,
+   "area": 77.7,
+   "num": 21
+  },
+  {
+   "nome": "Of. Aprendizagem Montagem, Soldagem e Cravação",
+   "tipo": "oficina",
+   "x": 1300,
+   "y": 770,
+   "boxW": 329,
+   "boxH": 182,
+   "area": 120.8,
+   "num": 22
+  }
+ ],
+ "regioes": [
+  {
+   "codigo": 11,
+   "nome": "Lab. Informática 5A",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 12,
+   "nome": "Lab. Desenvolvimento de Sistemas",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 13,
+   "nome": "Aulas Gerais 7A",
+   "tipo": "aula"
+  },
+  {
+   "codigo": 14,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 15,
+   "nome": "Lab. Informática 10A",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 16,
+   "nome": "Robótica",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 17,
+   "nome": "Sala Manut. Micros",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 18,
+   "nome": "San. Fem.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 19,
+   "nome": "San. Masc.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 20,
+   "nome": "Lab. Modelagem 3D",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 21,
+   "nome": "San. Masc.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 22,
+   "nome": "San. Fem.",
+   "tipo": "sanit"
+  },
+  {
+   "codigo": 23,
+   "nome": "Lab. Manufatura Aditiva",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 24,
+   "nome": "Of. Aprendizagem Montagem, Soldagem e Cravação",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 25,
+   "nome": "Lab. de Ensaios",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 26,
+   "nome": "Depósito",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 27,
+   "nome": "Lab. de Galvanoplastia",
+   "tipo": "lab"
+  },
+  {
+   "codigo": 28,
+   "nome": "Escada",
+   "tipo": "escada"
+  },
+  {
+   "codigo": 29,
+   "nome": "Sala Coord.",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 30,
+   "nome": "Arquivo",
+   "tipo": "adm"
+  },
+  {
+   "codigo": 31,
+   "nome": "DEP",
+   "tipo": "apoio"
+  },
+  {
+   "codigo": 32,
+   "nome": "Oficina de Baixa e Alta Fusão",
+   "tipo": "oficina"
+  },
+  {
+   "codigo": 33,
+   "nome": "",
+   "tipo": "circ"
+  }
+ ]
+}
