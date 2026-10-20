@@ -1,2 +1,6 @@
 # intermediários regeneráveis pelo scripts/rodar-pipeline.ps1 (~30 MB)
 work/
+# regeneráveis pelo scripts/blender/gerar-campus.py (Campus.glb = soma dos outros GLB)
+saida/blender/Campus.blend
+saida/blender/Campus.blend1
+saida/blender/glb/Campus.glb

@@ -1,9 +1,9 @@
 # Novo Projeto Mapa — contexto completo para continuar em outro PC
 
 > **Para o agente que abrir este arquivo num chat novo:** leia tudo antes de mexer em qualquer coisa.
-> Aqui está o que já foi feito (SENAI, 19/10/2026), como os dados se encaixam e qual é o próximo passo:
-> **gerar no Blender os modelos 3D do campus com as salas separadas e texturizadas**, validar com renders
-> e só depois substituir os GLB que o site usa.
+> Aqui está o que já foi feito (SENAI e casa, 19/10/2026) e como os dados se encaixam. Os modelos 3D com as
+> salas separadas **já são gerados no Blender** (§7); falta o usuário aprovar os renders antes de
+> substituir os GLB que o site usa.
 
 ---
 
@@ -48,6 +48,8 @@ ProjetoSenaiHub/
 │       │   ├── compose-interpretado.ps1← 3. plantas finais com legenda
 │       │   ├── montagem-align.mjs      ← 4. encaixa cada planta nas paredes do GLB
 │       │   ├── compose-montagem.ps1    ← 5. montagem do campus + implantação
+│       │   ├── extrair-geometria.mjs   ← 6. ids-N.png → dados/salas-geo.json (polígonos em metros)
+│       │   ├── blender/gerar-campus.py ← 7. modelos 3D + renders (roda à parte, ver §7)
 │       │   └── ferramentas/            ← glb-inspect, glb-render, sh3d-summary (diagnóstico)
 │       ├── config/salas-config.json    ← TODAS as decisões manuais (nomes, tipos, junções, implantação)
 │       ├── dados/                      ← saídas intermediárias versionadas (entrada do Blender)
@@ -56,6 +58,7 @@ ProjetoSenaiHub/
 │       │   ├── salas.csv               ← lista de salas com área (m²)
 │       │   └── render/fill-N.png, ids-N.png, labels-N.json, salas.csv
 │       ├── saida/                      ← imagens finais validadas pelo usuário
+│       │   └── blender/                ← GLB gerados (glb/), renders e visualizar.html
 │       └── referencias/                ← desenhos/feedback do usuário (ver §6)
 └── Senai HUB/frontend/
     ├── public/models/campus/BlocoA.glb … BlocoD.glb   ← modelos que o site carrega HOJE
@@ -206,32 +209,44 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
 
 ---
 
-## 7. Próximo passo: Blender (plano sugerido)
+## 7. Blender
 
-1. **Extrair geometria** (Node ou Python): para cada página, ler `ids-N.png` e vetorizar.
-   - Contornos de cada região (marching squares + simplificação de ~0,05 m).
-   - Máscara de parede (código 1) → polígonos.
-   - Converter tudo para metros com a fórmula da §6.
-   - Gravar `dados/salas-geo.json`: `{pagina, bloco, nivel, piso_m, salas:[{codigo,nome,tipo,poly}], paredes:[poly]}`.
-   - Aplicar as junções: dentro de `juncoes[].retangulo`, parede vira circulação.
-2. **Script Blender** (`scripts/blender/gerar-campus.py`, rodando com `blender -b -P`):
-   - paredes: extrudar os polígonos de parede de `piso_m` até `piso_m + pé-direito`
-     (≈2,56 m por nível; térreo do A e do C com pé-direito duplo onde não houver superior);
-   - pisos: um objeto por sala, com nome `"<Bloco> <nível> — <nome>"`, material pelo `tipo` (cores da §5,
-     depois texturas: piso cerâmico nas salas, cimento nas oficinas, azulejo nos sanitários etc.) e custom
-     property `tipo`/`area` (sai no glTF como `extras`);
-   - implantação: E1/E2 (E2 elevado 1 m), rampa inclinada, escada de 3 degraus, grades como
-     cercas finas, portão;
-   - opcional: importar os GLB originais em coleção oculta só para conferência;
-   - **exportar** um GLB por bloco (`BlocoA.glb` … mesmo nome, mesma escala e origem dos atuais, ou seja
-     voltar para decímetros e Y-up) + um `Campus.glb` com tudo.
-3. **Validar**:
-   - render de cima em ortográfico, comparado com `saida/Montagem-implantacao.png`;
-   - render em perspectiva de cada bloco;
-   - abrir no viewer do site (`npm run dev` em `Senai HUB/frontend`, página do mapa).
-   Salvar os renders em `saida/blender/` e mostrar ao usuário.
-4. Só depois de aprovado: trocar os GLB em `frontend/public/models/campus/` (e ajustar `campusBlocks.ts` se
-   houver novos arquivos). Tamanho alvo por bloco ≤ ~1,5 MB (os atuais têm 0,2–1,4 MB).
+### Feito (19/10/2026, em casa, Blender 5.1)
+1. **`scripts/extrair-geometria.mjs`** (roda no fim do `rodar-pipeline.ps1`) → `dados/salas-geo.json`:
+   - contornos pelas bordas dos pixels de `ids-N.png` + Douglas-Peucker de 1,5 px (~7 cm), em metros (§6);
+   - **arcos de porta removidos:** traço fino de parede (some numa abertura 3×3) só fica se fizer parte de uma
+     reta ≥ 1,2 m; o resto volta para a sala vizinha. Paredes de linha dupla (comuns no D) ficam;
+     `--diag work` grava `work/arcos-N.png` (vermelho = removido);
+   - junções C↔D: parede dentro de `juncoes[].retangulo` vira circulação;
+   - por página: `piso_m`, `alturaParede_m` (até o piso do superior do mesmo bloco, senão até `topoBloco_m`),
+     `salas[{codigo,nome,tipo,area_m2,loops}]`, `circulacao`, `paredes`; mais a `implantacao`.
+2. **`scripts/blender/gerar-campus.py`**:
+   `blender -b --factory-startup -P scripts\blender\gerar-campus.py -- [--sem-render] [--blend]`
+   - paredes extrudadas (curva 2D preenchida → malha, buracos por par/ímpar), laje de 12 cm sob cada piso;
+   - um objeto por sala `"<Bloco><nível> — <nome>"` (ex.: `A0 — Cantina`), material pela cor do tipo,
+     `extras` no glTF: `tipo`, `nome`, `area_m2`, `bloco`, `nivel`, `pavimento`, `piso_m`;
+   - implantação: pátio, E1, E2 (+1 m, recortado onde entra a escada), rampa, escada de 3 degraus, grades e
+     portão (montantes a cada 15/10 cm, postes a cada ~2,5 m);
+   - exporta `saida/blender/glb/BlocoA..D.glb`, `Externo.glb`, `Campus.glb` (decímetros, Y para cima, mesmo
+     referencial dos GLB do site) e renders em `saida/blender/` (`campus-topo`, `campus-perspectiva`,
+     `BlocoX`, `originais-*`, `comparacao-topo` = novo × contorno do GLB atual em vermelho).
+   - Tamanhos: A 985 KB, B 303 KB, C 530 KB, D 954 KB, Externo 278 KB (os atuais somam 3,6 MB).
+3. **Validação:** encaixe confere com `Montagem-implantacao.png`; os GLB abrem no Three.js (GLTFLoader) com
+   materiais e no mesmo referencial — `saida/blender/visualizar.html` (servir a pasta por HTTP).
+
+### Suposições a confirmar com o usuário
+- Pátio, E1 e base da grade na altura de B/C/D (`alturaPatio_m` = 2,5); E2 = pátio + 1 m.
+- Rampa desce do lado do pátio (z menor) para o A, a 8%: cobre só ~1,2 m dos 2,5 m de desnível.
+- Térreo com paredes até o piso do superior (pé-direito duplo, 5,12 m), como nos GLB atuais; **sem telhado**
+  (dá para ver as salas de cima). Portas são vãos de altura inteira (sem verga).
+- Escadas internas são só piso colorido (sem degraus).
+
+### Próximo
+- Usuário aprovar os renders; depois trocar os GLB em `frontend/public/models/campus/`. O `Externo.glb` não é
+  carregado pelo site: precisa entrar em `campusBlocks.ts` (ou ir junto de algum bloco).
+- Conferir no viewer do site: marcadores/pontos fixos no Bloco D podem estar no referencial antigo (D girado).
+- Opcional: texturas (piso cerâmico, cimento nas oficinas, azulejo nos sanitários), telhado opcional,
+  degraus nas escadas internas.
 
 ---
 
@@ -254,7 +269,7 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
 - **Borda direita de E1/E2:** na realidade não alinha com a quina do D, mas foi **simplificada** para x = 27,14
   (quina de trás do D térreo), e a grade do topo do E1 vai até ela.
 
-Não há mais dúvidas em aberto: pode seguir para o Blender (§7).
+Dúvidas de dados encerradas; as suposições do 3D estão em §7.
 
 ---
 
@@ -263,5 +278,8 @@ Não há mais dúvidas em aberto: pode seguir para o Blender (§7).
 **19/10/2026, SENAI (máquina ECFP505D1249348):** plantas interpretadas das 7 páginas, montagem do campus
 sobre os GLB, rotação do D, junções C↔D, corredor/jardim do B, implantação (E1, E2, rampa, grades, portão,
 escada), organização nesta pasta e mapa `ids-N.png` para a etapa do Blender.
+
+**19/10/2026, em casa (Desktop-Hall):** dúvidas respondidas (§8), nomes corrigidos, implantação final;
+extração de geometria + gerador Blender com GLB por bloco, área externa e renders de conferência (§7).
 
 Registro detalhado no Obsidian do usuário: vault Hall (nota `Referências/Modelos 3D Campus SENAI HUB`).

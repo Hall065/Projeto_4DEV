@@ -461,6 +461,8 @@
  "implantacao": {
   "origem": "desenho do usuário sobre a montagem (sem planta)",
   "nivel": 0,
+  "alturaPatio_m": 2.5,
+  "_alturas": "alturaPatio_m = altura do pátio no mundo (mesma base de B/C/D; o A fica 2,5 m abaixo). altura_m das áreas = acima do pátio; das linhas = altura da grade/portão.",
   "areas": [
    {
     "tipo": "circulacao",
@@ -521,6 +523,8 @@
     "tipo": "rampa",
     "nome": "Rampa",
     "detalhe": "piso inclinado que acerta o desnível; pouca inclinação (≤ 8%)",
+    "inclinacao": 0.08,
+    "ladoAlto": "-z",
     "poly": [
      [
       -0.75,
@@ -669,7 +673,9 @@
      3.9,
      -75.46
     ],
-    "degraus": 3
+    "degraus": 3,
+    "sobePara": "+x",
+    "ate": "E2"
    }
   ],
   "portas": [

@@ -1,4 +1,5 @@
-﻿# Pipeline completo do Novo Projeto Mapa: segmentação -> render por tipo -> plantas finais -> encaixe nos GLB -> montagem.
+﻿# Pipeline completo do Novo Projeto Mapa: segmentação -> render por tipo -> plantas finais -> encaixe nos GLB -> montagem
+# -> geometria para o Blender (dados/salas-geo.json). Os modelos 3D saem de scripts/blender/gerar-campus.py.
 # Uso (de qualquer pasta): powershell -ExecutionPolicy Bypass -File "Arquivos\Map\Novo Projeto Mapa\scripts\rodar-pipeline.ps1" [pasta GLB]
 # Requisitos: Windows PowerShell 5+ (System.Drawing) e Node 18+. Sem dependências npm.
 param([string]$GlbDir)
@@ -28,3 +29,5 @@ if ($LASTEXITCODE) { throw 'montagem-align falhou' }
 Copy-Item (Join-Path $work 'montagem.json') $dados -Force
 Copy-Item (Join-Path $work 'juncao-*.png') $dados -Force
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $here 'compose-montagem.ps1') $render (Join-Path $dados 'montagem.json') $config $saida
+node (Join-Path $here 'extrair-geometria.mjs') $dados
+if ($LASTEXITCODE) { throw 'extrair-geometria falhou' }

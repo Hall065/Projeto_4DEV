@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Campus SENAI HUB — modelos gerados no Blender</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #e8edf5; font: 13px system-ui, sans-serif; }
+  #info { position: absolute; top: 10px; left: 10px; background: #fffd; padding: 8px 10px; border-radius: 6px; }
+  #info label { display: block; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="info"><b>Modelos gerados</b> (servir esta pasta por HTTP, ex.: <code>npx serve</code>)<div id="lista"></div><div id="sel"></div></div>
+<script type="module">
+import * as THREE from 'three'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+const ARQUIVOS = ['BlocoA', 'BlocoB', 'BlocoC', 'BlocoD', 'Externo']
+const renderer = new THREE.WebGLRenderer({ antialias: true })
+renderer.setPixelRatio(devicePixelRatio)
+renderer.setSize(innerWidth, innerHeight)
+document.body.appendChild(renderer.domElement)
+const scene = new THREE.Scene()
+scene.background = new THREE.Color('#e8edf5')
+const camera = new THREE.PerspectiveCamera(45, innerWidth / innerHeight, 1, 20000)
+const controls = new OrbitControls(camera, renderer.domElement)
+scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.6))
+const sol = new THREE.DirectionalLight(0xffffff, 1.6)
+sol.position.set(400, 800, 300)
+scene.add(sol)
+
+const root = new THREE.Group()
+scene.add(root)
+const loader = new GLTFLoader()
+const lista = document.getElementById('lista')
+for (const nome of ARQUIVOS) {
+  const gltf = await loader.loadAsync(`glb/${nome}.glb`)
+  gltf.scene.name = nome
+  root.add(gltf.scene)
+  const label = document.createElement('label')
+  label.innerHTML = `<input type="checkbox" checked> ${nome}`
+  label.querySelector('input').onchange = (e) => { gltf.scene.visible = e.target.checked }
+  lista.appendChild(label)
+}
+const box = new THREE.Box3().setFromObject(root)
+const centro = box.getCenter(new THREE.Vector3()), tam = box.getSize(new THREE.Vector3()).length()
+controls.target.copy(centro)
+camera.position.copy(centro).add(new THREE.Vector3(0.6, 0.9, 0.7).multiplyScalar(tam * 0.7))
+controls.update()
+window.__campus = { box: [box.min.toArray(), box.max.toArray()], objetos: root.children.map((c) => [c.name, c.children[0]?.children.length ?? 0]) }
+
+const ray = new THREE.Raycaster(), sel = document.getElementById('sel')
+renderer.domElement.addEventListener('click', (ev) => {
+  ray.setFromCamera(new THREE.Vector2((ev.clientX / innerWidth) * 2 - 1, -(ev.clientY / innerHeight) * 2 + 1), camera)
+  const hit = ray.intersectObjects(root.children, true)[0]
+  if (!hit) return
+  const o = hit.object, ud = o.userData
+  sel.textContent = `${o.name}${ud.tipo ? ` · ${ud.tipo}` : ''}${ud.area_m2 ? ` · ${ud.area_m2} m²` : ''}`
+})
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight) })
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera) })
+</script>
+</body>
+</html>
