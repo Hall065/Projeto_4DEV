@@ -220,6 +220,12 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
    - **escadas internas:** linhas finas paralelas próximas (≥ 3 num raio de 0,9 m, até 3,6 m de comprimento,
      grupo ≥ 0,6 m) viram `degraus`; o que fica entre degraus (inclusive linha de percurso e marcas dela) vira
      `escadas`. No diag: azul = degrau, azul claro = piso da escada;
+   - **escadas 3D** (`escadas` no fim do JSON): cada escada vira lances (colunas de degraus lado a lado, ângulo
+     livre) e é casada entre plantas (C/D compartilhada aparece em 4 páginas). Degraus maciços subindo por igual
+     de `de` a `ate`; em U, 1º lance → patamar a meia altura → 2º lance. 1º lance = o que aparece na planta de
+     baixo; sem ela, mesmo giro da torre do A (referência do usuário, 19/10/2026: começa no térreo, termina no
+     andar 1). Sem planta casada, `de`/`ate` saem do espelho que cabe (14–21 cm): andar de baixo, de cima ou
+     telhado. Ajustes em `config/salas-config.json → escadas3d`; o log marca `[a confirmar]`;
    - junções C↔D: parede dentro de `juncoes[].retangulo` vira circulação;
    - por página: `piso_m`, `alturaParede_m` (até o piso do superior do mesmo bloco, senão até `topoBloco_m`),
      `salas[{codigo,nome,tipo,area_m2,loops}]`, `circulacao`, `paredes`, `escadas`, `degraus`; mais a
@@ -229,15 +235,17 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
    - paredes extrudadas (curva 2D preenchida → malha, buracos por par/ímpar), laje de 12 cm sob cada piso;
    - um objeto por sala `"<Bloco><nível> — <nome>"` (ex.: `A0 — Cantina`), material pela cor do tipo,
      `extras` no glTF: `tipo`, `nome`, `area_m2`, `bloco`, `nivel`, `pavimento`, `piso_m`;
-   - escadas internas: piso cinza (`<Bloco><nível> — Escadas`) com frisos de 12 cm nos degraus
-     (`— Degraus`), em vez das paredes inteiras que os traços dos degraus viravam (closes em
-     `saida/blender/escada-A-superior.png` e `escada-D-superior.png`);
+   - escadas internas: `<Bloco> — Escada N` (degraus e patamar maciços, extras `de_m`, `ate_m`, `degraus`);
+     o piso do andar de cima é recortado sobre a escada; se não há planta embaixo (torre do A), as paredes do
+     andar de cima descem até o chão em volta da escada. Linhas de percurso/bordas de patamar não viram
+     parede. Imagens: `saida/blender/escada-torre-A-site.png`, `escada-torre-A-corte.png`,
+     `escada-C-D-corte.png`;
    - implantação: pátio, E1, E2 (+1 m, recortado onde entra a escada), rampa, escada de 3 degraus, grades e
      portão (montantes a cada 15/10 cm, postes a cada ~2,5 m);
    - exporta `saida/blender/glb/BlocoA..D.glb`, `Externo.glb`, `Campus.glb` (decímetros, Y para cima, mesmo
      referencial dos GLB do site) e renders em `saida/blender/` (`campus-topo`, `campus-perspectiva`,
      `BlocoX`, `originais-*`, `comparacao-topo` = novo × contorno do GLB atual em vermelho).
-   - Tamanhos: A 929 KB, B 299 KB, C 497 KB, D 891 KB, Externo 278 KB (os atuais somam 3,6 MB).
+   - Tamanhos: A 817 KB, B 278 KB, C 479 KB, D 864 KB, Externo 278 KB (os atuais somam 3,6 MB).
 3. **Validação:** encaixe confere com `Montagem-implantacao.png`; os GLB abrem no Three.js (GLTFLoader) com
    materiais e no mesmo referencial — `saida/blender/visualizar.html` (servir a pasta por HTTP).
 
@@ -246,15 +254,25 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
 - Rampa desce do lado do pátio (z menor) para o A, a 8%: cobre só ~1,2 m dos 2,5 m de desnível.
 - Térreo com paredes até o piso do superior (pé-direito duplo, 5,12 m), como nos GLB atuais; **sem telhado**
   (dá para ver as salas de cima). Portas são vãos de altura inteira (sem verga).
-- Escadas internas são piso plano com frisos marcando os degraus (sem rampa/degrau de verdade subindo até o
-  outro piso). Mureta entre lances desenhada com traço grosso continua como parede inteira.
+- Escadas (log do `extrair-geometria.mjs`):
+  - torre do A superior (−5,2; −18,1): U 0 → 5,12 m, 15 + 18 degraus — **confirmada pelo usuário**. Embaixo dela
+    a planta do A térreo tem salas (encaixe A térreo × A superior a conferir);
+  - C/D compartilhada (−3,2; −121,2): U 2,5 → 7,62 m, 13 + 13 (2º lance cortado no desenho, completado);
+  - interna do A (−0,8; −49,1): U 0 → 5,12 m, 11 + 11, espelho 23 cm, patamar do lado +z (leitura minha);
+  - acessos A ↔ pátio: (−8,3; −57,2) reta 0 → 2,5 m subindo para +x; (1,6; −43,8) desenho em grade, 5 degraus
+    de 50 cm (sentido e degraus incertos);
+  - B (−25,6; −92,1): reta 2,5 → 4,99 m (até o telhado do B?);
+  - D (11,3; −148): reta 13 degraus 2,5 → 7,62 m, espelho 39 cm (falta o 2º lance no desenho);
+  - D (11,1; −118,5): 8 degraus 2,5 → 3,86 m; D (−2,9; −150,2): U 2,5 → 5,22 m (destino desconhecido);
+  - D (29,6; −101,5): U 7,62 → 10,2 m (acesso ao telhado?).
+  Mureta entre lances desenhada com traço grosso continua como parede inteira.
 
 ### Próximo
 - Usuário aprovar os renders; depois trocar os GLB em `frontend/public/models/campus/`. O `Externo.glb` não é
   carregado pelo site: precisa entrar em `campusBlocks.ts` (ou ir junto de algum bloco).
 - Conferir no viewer do site: marcadores/pontos fixos no Bloco D podem estar no referencial antigo (D girado).
 - Opcional: texturas (piso cerâmico, cimento nas oficinas, azulejo nos sanitários), telhado opcional,
-  escadas internas com degraus subindo de verdade.
+  confirmar com o usuário as escadas marcadas `[a confirmar]`.
 
 ---
 

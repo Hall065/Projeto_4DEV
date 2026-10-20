@@ -62,9 +62,6 @@ MAT_RAMPA = material("Rampa", "#CDBF9E")
 MAT_ESCADA = material("Escada externa", "#B9BEC6")
 MAT_GRADE = material("Grade", "#3A3550", rough=0.4, metal=0.6)
 MAT_PORTAO = material("Portão", "#8A8F98", rough=0.4, metal=0.6)
-MAT_DEGRAU = material("Degrau", "#8E97A5")
-DEGRAU_M = 0.12
-
 
 def mat_tipo(tipo):
     rot, fundo, _borda = TIPOS.get(tipo, TIPOS["apoio"])
@@ -162,6 +159,7 @@ for c in list(bpy.data.collections):
 
 # ---------------------------------------------------------------- blocos
 ROTULO_NIVEL = {0: "térreo", 2: "superior"}
+pisos_pagina = {}
 for pg in geo["paginas"]:
     b, n = pg["bloco"], pg["nivel"]
     col = colecao(f"Bloco {b}")
@@ -169,12 +167,11 @@ for pg in geo["paginas"]:
     pref = f"{b}{n}"
     base = {"bloco": b, "nivel": n, "pagina": pg["pagina"], "piso_m": piso}
     prisma(f"{pref} — Paredes", [l["pts"] for l in pg["paredes"]], piso - LAJE_M, piso + h, MAT_PAREDE, col, {**base, "tipo": "parede"})
+    pisos = pisos_pagina.setdefault(pg["pagina"], [])
     if pg["circulacao"]:
-        prisma(f"{pref} — Circulação", [l["pts"] for l in pg["circulacao"]], piso - LAJE_M, piso, MAT_CIRC, col, {**base, "tipo": "circ"})
+        pisos.append(prisma(f"{pref} — Circulação", [l["pts"] for l in pg["circulacao"]], piso - LAJE_M, piso, MAT_CIRC, col, {**base, "tipo": "circ"}))
     if pg.get("escadas"):
-        prisma(f"{pref} — Escadas", [l["pts"] for l in pg["escadas"]], piso - LAJE_M, piso, mat_tipo("escada"), col, {**base, "tipo": "escada"})
-    if pg.get("degraus"):
-        prisma(f"{pref} — Degraus", [l["pts"] for l in pg["degraus"]], piso - LAJE_M, piso + DEGRAU_M, MAT_DEGRAU, col, {**base, "tipo": "degrau"})
+        pisos.append(prisma(f"{pref} — Piso das escadas", [l["pts"] for l in pg["escadas"]], piso - LAJE_M, piso, mat_tipo("escada"), col, {**base, "tipo": "escada"}))
     grupos = {}
     for s in pg["salas"]:
         nome = s["nome"] or TIPOS.get(s["tipo"], ["Sala"])[0]
@@ -183,8 +180,58 @@ for pg in geo["paginas"]:
         g["area"] += s["area_m2"]
     for (nome, tipo), g in grupos.items():
         mat = MAT_CIRC if tipo == "circ" else mat_tipo(tipo)
-        prisma(f"{pref} — {nome}", g["loops"], piso - LAJE_M, piso, mat, col,
-               {**base, "tipo": tipo, "nome": nome, "area_m2": round(g["area"], 1), "pavimento": ROTULO_NIVEL.get(n, str(n))})
+        pisos.append(prisma(f"{pref} — {nome}", g["loops"], piso - LAJE_M, piso, mat, col,
+                            {**base, "tipo": tipo, "nome": nome, "area_m2": round(g["area"], 1), "pavimento": ROTULO_NIVEL.get(n, str(n))}))
+
+# ---------------------------------------------------------------- escadas internas
+def blocos_obj(nome, blocos, mat, col, props):
+    """blocos = [{poly: 4 cantos [x, z], z0, z1}] em metros → um objeto com um prisma por bloco."""
+    bm = bmesh.new()
+    for b in blocos:
+        base = [bm.verts.new((*bpt(x, z), b["z0"] * S)) for x, z in b["poly"]]
+        topo = [bm.verts.new((*bpt(x, z), b["z1"] * S)) for x, z in b["poly"]]
+        bm.faces.new(base)
+        bm.faces.new(topo)
+        for i in range(len(base)):
+            j = (i + 1) % len(base)
+            bm.faces.new((base[i], base[j], topo[j], topo[i]))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    me = bpy.data.meshes.new(nome)
+    bm.to_mesh(me)
+    bm.free()
+    me.materials.append(mat)
+    ob = bpy.data.objects.new(nome, me)
+    col.objects.link(ob)
+    for k, v in props.items():
+        ob[k] = v
+    return ob
+
+
+def intersecta(ob, cortador):
+    mod = ob.modifiers.new("intersecao", "BOOLEAN")
+    mod.operation = "INTERSECT"
+    mod.solver = "EXACT"
+    mod.object = cortador
+    aplica_modificadores(ob)
+    bpy.data.objects.remove(cortador)
+
+
+paginas_geo = {pg["pagina"]: pg for pg in geo["paginas"]}
+for i, esc in enumerate(geo.get("escadas", []), 1):
+    col = colecao(f"Bloco {esc['bloco']}")
+    nome = f"{esc['bloco']} — Escada {i}"
+    blocos_obj(nome, esc["blocos"], mat_tipo("escada"), col,
+               {"tipo": "escada", "bloco": esc["bloco"], "de_m": esc["de_m"], "ate_m": esc["ate_m"], "degraus": esc["degraus"]})
+    for p in esc["cortar"]:
+        piso = paginas_geo[p]["piso_m"]
+        for ob in pisos_pagina.get(p, []):
+            cortes = [prisma("_corte", [v], piso - LAJE_M - 0.05, piso + 0.05, MAT_PAREDE, col) for v in esc["vazio"]]
+            subtrai(ob, cortes)
+    pa = esc.get("paredesAbaixo")
+    if pa:
+        pg = paginas_geo[pa["pagina"]]
+        ob = prisma(f"{nome} — Paredes", [l["pts"] for l in pg["paredes"]], pa["z0"], pa["z1"], MAT_PAREDE, col, {"tipo": "parede"})
+        intersecta(ob, prisma("_regiao", [pa["poly"]], pa["z0"] - 0.1, pa["z1"] + 0.1, MAT_PAREDE, col))
 
 # ---------------------------------------------------------------- implantação
 imp = cfg["implantacao"]

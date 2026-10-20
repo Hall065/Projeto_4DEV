@@ -53,6 +53,14 @@
     { "nome": "Corredor do C → escada → corredor do D (térreo)", "paginas": [4, 6], "eixo": "x", "sondas": [-9, 3], "perto": -118.5, "trecho": [-8.3, 1.6] },
     { "nome": "Rampa do C → corredor do D (superior)", "paginas": [5, 7], "eixo": "x", "sondas": [-10, -6], "perto": -118.3, "trecho": [-12.8, -7.6] }
   ],
+  "_escadas3d": "escadas internas em 3D (extrair-geometria.mjs). perto = centro aproximado [x, z] no mapa do site; de/ate = pisos em m; tipo U | reta; sobe (reta) = lado para onde sobe; primeiro (U) = lado do 1º lance; patamar (U) = lado do patamar; lados em +x | -x | +z | -z. Escada sem entrada aqui segue as regras automáticas e sai marcada [a confirmar].",
+  "escadas3d": [
+    { "nome": "torre do A superior", "perto": [-5.2, -18.1], "tipo": "U", "de": 0, "ate": 5.12, "primeiro": "-z", "patamar": "+x", "motivo": "referência do usuário (19/10/2026): sobe do térreo pelo lance de z menor, volta no patamar e chega no superior" },
+    { "nome": "C/D compartilhada", "perto": [-3.2, -121.2], "tipo": "U", "primeiro": "+x", "patamar": "-z", "motivo": "a planta de baixo (C inferior/D térreo) só mostra o lance de x maior; corrimão termina do lado do patamar" },
+    { "nome": "interna do A", "perto": [-0.8, -49.1], "tipo": "U", "patamar": "+z", "motivo": "linha do meio passa dos degraus do lado +z (patamar); 1º lance pelo giro da referência", "confirmar": true },
+    { "nome": "acesso A ↔ pátio (lado do B)", "perto": [-8.3, -57.2], "tipo": "reta", "de": 0, "ate": 2.5, "sobe": "+x", "motivo": "setas da planta apontam para +x; 2 escadas + 1 rampa no desnível do A" },
+    { "nome": "acesso A ↔ pátio (junto da passarela)", "perto": [1.6, -43.8], "tipo": "reta", "de": 0, "ate": 2.5, "motivo": "desenho em grade, sentido incerto", "confirmar": true }
+  ],
   "paginas": {
     "1": {
       "arquivo": "BlocoA-terreo", "titulo": "BLOCO A — TÉRREO", "pxPorMetro": 20.97,

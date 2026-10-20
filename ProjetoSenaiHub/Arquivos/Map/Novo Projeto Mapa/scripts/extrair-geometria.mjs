@@ -236,7 +236,7 @@ function marcaEscadas(r, w, h, ppm) {
     if ((eixoX >= DEGRAU_MIN_LINHAS && corrida(x, y, 0, 1) <= Lmax) || (eixoY >= DEGRAU_MIN_LINHAS && corrida(x, y, 1, 0) <= Lmax)) marca[i] = 1
   }
   const Lmin = DEGRAU_GRUPO_MIN_M * ppm, G = Math.round(ESCADA_VAO_M * ppm)
-  const visto = new Uint8Array(N), grupo = new Uint8Array(N), caixas = []
+  const visto = new Uint8Array(N), grupo = new Uint8Array(N), caixas = [], grupos = []
   let degraus = 0
   for (let s = 0; s < N; s++) {
     if (!marca[s] || visto[s]) continue
@@ -257,6 +257,7 @@ function marcaEscadas(r, w, h, ppm) {
     for (const i of comp) { r[i] = DEGRAU; grupo[i] = 1 }
     degraus += comp.length
     caixas.push([x0, y0, x1, y1])
+    grupos.push(comp)
   }
   const V = Math.round(ESCADA_VAO_M * ppm)
   const achaDegrau = (x, y, dx, dy) => {
@@ -297,7 +298,91 @@ function marcaEscadas(r, w, h, ppm) {
       if (fina(j)) { r[j] = DEGRAU; fila.push(j); degraus++ }
     }
   }
-  return degraus
+  return { degraus, grupos, grossa }
+}
+
+// Lances de cada escada (pixels dos degraus de grupos a até ESCADA_JUNTA_M): ângulo dos degraus pelo histograma mais
+// concentrado da projeção na normal; colunas (lances lado a lado) separadas por vão sem degrau ao longo do degrau;
+// em cada coluna, uma linha de degrau por pico do histograma ao longo da subida.
+const ESCADA_JUNTA_M = 1.0, LANCE_VAO_M = 0.12, LANCE_LARGURA_MIN_M = 0.4, LINHAS_MIN = 5, LIVRE_MAX_M = 3
+function analisaEscadas(grupos, r, grossa, w, h, ppm) {
+  const J = ESCADA_JUNTA_M * ppm
+  const caixa = (g) => {
+    let x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1
+    for (const i of g) { const x = i % w, y = (i / w) | 0; x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y) }
+    return [x0, y0, x1, y1]
+  }
+  const cx = grupos.map(caixa), pai = grupos.map((_, i) => i)
+  const raiz = (i) => (pai[i] === i ? i : (pai[i] = raiz(pai[i])))
+  for (let i = 0; i < grupos.length; i++) for (let j = i + 1; j < grupos.length; j++) {
+    const [a, b] = [cx[i], cx[j]]
+    if (a[0] - J <= b[2] && b[0] - J <= a[2] && a[1] - J <= b[3] && b[1] - J <= a[3]) pai[raiz(i)] = raiz(j)
+  }
+  const juntos = new Map()
+  grupos.forEach((g, i) => { const k = raiz(i); juntos.set(k, (juntos.get(k) ?? []).concat(g)) })
+
+  const out = []
+  for (const pix of juntos.values()) {
+    const P = pix.map((i) => [i % w, (i / w) | 0])
+    let melhor = -1, theta = 0
+    for (let a = 0; a < 180; a += 0.5) {
+      const t = (a * Math.PI) / 180, s = Math.sin(t), c = Math.cos(t), hist = new Map()
+      for (const [x, y] of P) { const k = Math.round(-x * s + y * c); hist.set(k, (hist.get(k) ?? 0) + 1) }
+      let sc = 0
+      for (const n of hist.values()) sc += n * n
+      if (sc > melhor) { melhor = sc; theta = t }
+    }
+    const t = [Math.cos(theta), Math.sin(theta)], n = [-Math.sin(theta), Math.cos(theta)]
+    const UV = P.map(([x, y]) => [x * t[0] + y * t[1], x * n[0] + y * n[1]])
+    const umin = Math.floor(Math.min(...UV.map((p) => p[0])))
+    const hu = new Array(Math.ceil(Math.max(...UV.map((p) => p[0]))) - umin + 2).fill(0)
+    for (const [u] of UV) hu[Math.floor(u) - umin]++
+    const corte = Math.max(...hu) * 0.1, vao = Math.max(2, Math.round(LANCE_VAO_M * ppm))
+    const colunas = []
+    for (let k = 0; k < hu.length;) {
+      if (hu[k] <= corte) { k++; continue }
+      let fim = k, buraco = 0
+      for (let q = k; q < hu.length; q++) {
+        if (hu[q] > corte) { fim = q; buraco = 0 } else if (++buraco >= vao) break
+      }
+      colunas.push([k + umin, fim + umin + 1])
+      k = fim + 1
+    }
+    const lances = []
+    for (const [u0, u1] of colunas) {
+      if (u1 - u0 < LANCE_LARGURA_MIN_M * ppm) continue
+      const vs = UV.filter(([u]) => u >= u0 && u < u1).map(([, v]) => v)
+      const vmin = Math.floor(Math.min(...vs)), hv = new Array(Math.ceil(Math.max(...vs)) - vmin + 2).fill(0)
+      for (const v of vs) hv[Math.floor(v) - vmin]++
+      const lim = (u1 - u0) * 0.4, linhas = []
+      for (let k = 0; k < hv.length;) {
+        if (hv[k] < lim) { k++; continue }
+        let s = 0, m = 0
+        for (; k < hv.length && hv[k] >= lim * 0.5; k++) { s += hv[k]; m += hv[k] * (k + vmin + 0.5) }
+        linhas.push(m / s)
+      }
+      if (linhas.length >= 2) lances.push({ u0, u1, linhas })
+    }
+    if (lances.reduce((s, l) => s + l.linhas.length, 0) < LINHAS_MIN) continue
+    const livre = (l, lado) => {
+      const v0 = lado < 0 ? l.linhas[0] : l.linhas.at(-1), ds = []
+      for (const f of [0.25, 0.5, 0.75]) {
+        const u = l.u0 + (l.u1 - l.u0) * f
+        let d = 0
+        for (; d < LIVRE_MAX_M * ppm; d++) {
+          const v = v0 + lado * (d + 1), X = Math.round(u * t[0] + v * n[0]), Y = Math.round(u * t[1] + v * n[1])
+          if (X < 0 || Y < 0 || X >= w || Y >= h) break
+          const i = Y * w + X
+          if (r[i] === 0 || grossa[i]) break
+        }
+        ds.push(d)
+      }
+      return ds.sort((a, b) => a - b)[1]
+    }
+    for (const l of lances) l.livre = [livre(l, -1), livre(l, 1)]
+    out.push({ t, n, lances, pixels: pix.length })
+  }
+  return out
 }
 
 const area = (pts) => { let s = 0; for (let i = 0, n = pts.length; i < n; i++) { const [x0, y0] = pts[i], [x1, y1] = pts[(i + 1) % n]; s += x0 * y1 - x1 * y0 } return s / 2 }
@@ -306,6 +391,154 @@ const paginas = Object.entries(montagem.paginas).map(([n, pg]) => ({ n: Number(n
 const proximoPiso = (pg) => {
   const acima = paginas.filter((o) => o.pg.bloco === pg.bloco && o.pg.pisoAltura_m > pg.pisoAltura_m + 0.1).map((o) => o.pg.pisoAltura_m)
   return acima.length ? Math.min(...acima) : null
+}
+
+// Escada 3D: degraus como blocos maciços do piso de baixo até a altura de cada degrau, subindo por igual de `de` até
+// `ate`. Escada em U: 1º lance até o patamar (meia altura), 2º lance de volta até o andar de cima. O 1º lance é o que
+// aparece na planta de baixo; sem ela, gira para o mesmo lado da escada de referência (torre do A, seta do usuário).
+// Ajustes por escada em salas-config.json → escadas3d (perto [x, z], de, ate, tipo, sobe, primeiro, patamar, ignorar).
+const GIRO_REF = 1, ESPELHO_MAX_M = 0.21, ESPELHO_PADRAO_M = 0.17, LAJE_M = 0.12, PATAMAR_PADRAO_M = 1.2
+const cfgEscadas = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(dadosDir, '..', 'config', 'salas-config.json'), 'utf8')).escadas3d ?? [] } catch { return [] }
+})()
+const lancesPorPagina = []
+function montaEscadas() {
+  const eixo = (s) => ({ '+x': [1, 0], '-x': [-1, 0], '+z': [0, 1], '-z': [0, -1] })[s]
+  const dot = (a, b) => a[0] * b[0] + a[1] * b[1]
+  const mundo = (e, U, V) => [e.origem[0] + U * e.eU[0] + V * e.eV[0], e.origem[1] + U * e.eU[1] + V * e.eV[1]].map((q) => +q.toFixed(3))
+  const local = (e, p) => { const d = [p[0] - e.origem[0], p[1] - e.origem[1]]; return [dot(d, e.eU), dot(d, e.eV)] }
+  const ret = (e, u0, u1, v0, v1) => [mundo(e, u0, v0), mundo(e, u1, v0), mundo(e, u1, v1), mundo(e, u0, v1)]
+  const cantos = (e) => e.lances.flatMap((l) => [mundo(e, l.u0, l.linhas[0]), mundo(e, l.u1, l.linhas.at(-1))])
+  const caixa = (e) => { const p = cantos(e); return [Math.min(...p.map((q) => q[0])), Math.min(...p.map((q) => q[1])), Math.max(...p.map((q) => q[0])), Math.max(...p.map((q) => q[1]))] }
+  const cx = lancesPorPagina.map(caixa), pai = cx.map((_, i) => i)
+  const raiz = (i) => (pai[i] === i ? i : (pai[i] = raiz(pai[i])))
+  for (let i = 0; i < cx.length; i++) for (let j = i + 1; j < cx.length; j++) {
+    const [a, b] = [cx[i], cx[j]], J = ESCADA_JUNTA_M
+    if (a[0] - J <= b[2] && b[0] - J <= a[2] && a[1] - J <= b[3] && b[1] - J <= a[3]) pai[raiz(i)] = raiz(j)
+  }
+  const grupos = new Map()
+  lancesPorPagina.forEach((e, i) => { const k = raiz(i); grupos.set(k, (grupos.get(k) ?? []).concat([e])) })
+
+  const escadas = []
+  for (const membros of grupos.values()) {
+    const fonte = membros.reduce((a, b) => (b.pixels > a.pixels ? b : a))
+    const cb = caixa(fonte), centro = [(cb[0] + cb[2]) / 2, (cb[1] + cb[3]) / 2]
+    const cfg = cfgEscadas.find((c) => Math.hypot(c.perto[0] - centro[0], c.perto[1] - centro[1]) < 2.5) ?? {}
+    const id = `${fonte.bloco}@${centro[0].toFixed(1)},${centro[1].toFixed(1)}`
+    if (cfg.ignorar) { console.log(`escada ${id}: ignorada (${cfg.motivo ?? 'config'})`); continue }
+    let cols = fonte.lances.map((l) => ({ ...l })).sort((a, b) => a.u0 - b.u0)
+    const tipo = cfg.tipo ?? (cols.length >= 2 ? 'U' : 'reta')
+    if (tipo === 'U' && cols.length === 1) { const l = cols[0], m = (l.u0 + l.u1) / 2; cols = [{ ...l, u1: m }, { ...l, u0: m }] }
+    if (tipo === 'U' && cols.length > 2) cols = [...cols].sort((a, b) => b.linhas.length - a.linhas.length).slice(0, 2).sort((a, b) => a.u0 - b.u0)
+    if (tipo === 'reta' && cols.length > 1) {
+      const maior = cols.reduce((a, b) => (b.linhas.length > a.linhas.length ? b : a))
+      cols = [{ ...maior, u0: Math.min(...cols.map((l) => l.u0)), u1: Math.max(...cols.map((l) => l.u1)) }]
+    }
+    const L = tipo === 'U' ? 2 * Math.max(...cols.map((l) => l.linhas.length)) : cols[0].linhas.length
+    const pisos = [...new Set(membros.map((m) => m.piso_m))].sort((a, b) => a - b)
+    let de = pisos[0], ate = pisos.length > 1 ? pisos.at(-1) : null
+    if (ate == null) {
+      const p = de, pg = paginas.find((o) => o.n === fonte.pagina).pg
+      const doBloco = paginas.filter((o) => o.pg.bloco === fonte.bloco).map((o) => o.pg.pisoAltura_m)
+      const acima = doBloco.filter((q) => q > p + 0.1), abaixo = doBloco.filter((q) => q < p - 0.1)
+      const opcoes = [acima.length && [p, Math.min(...acima)], abaixo.length && [Math.max(...abaixo), p], pg.topoBloco_m && [p, pg.topoBloco_m]]
+      const ok = opcoes.find((o) => o && (o[1] - o[0]) / L >= 0.14 && (o[1] - o[0]) / L <= ESPELHO_MAX_M)
+      ;[de, ate] = ok ?? [p, +(p + ESPELHO_PADRAO_M * L).toFixed(2)]
+    }
+    de = cfg.de ?? de
+    ate = cfg.ate ?? ate
+    const confirmar = cfg.confirmar ?? !cfg.perto
+    const H = ate - de
+    const baixo = membros.filter((m) => m !== fonte && Math.abs(m.piso_m - de) < 0.05)
+    const pontosBaixo = baixo.flatMap((m) => m.lances.flatMap((l) => l.linhas.map((v) => local(fonte, mundo(m, (l.u0 + l.u1) / 2, v)))))
+    const semPisoEmbaixo = !membros.some((m) => Math.abs(m.piso_m - de) < 0.05)
+    const blocos = [], vazio = []
+    const z0 = +(de - LAJE_M).toFixed(3)
+    let total = 0
+    const nivel = (k) => +(de + (k * H) / total).toFixed(3)
+    const lance = (col, linhas, k0) => {
+      for (let k = 0; k + 1 < linhas.length; k++) {
+        const [a, b] = [linhas[k], linhas[k + 1]]
+        blocos.push({ poly: ret(fonte, col.u0, col.u1, Math.min(a, b), Math.max(a, b)), z0, z1: nivel(k0 + k + 1) })
+      }
+      vazio.push(ret(fonte, col.u0, col.u1, Math.min(...linhas), Math.max(...linhas)))
+    }
+    const inicio = (col, v, lado) => {
+      if (!semPisoEmbaixo) return
+      const d = Math.min(Math.max(col.livre[lado < 0 ? 0 : 1], 0.6), 1.5)
+      blocos.push({ poly: ret(fonte, col.u0, col.u1, Math.min(v, v + lado * d), Math.max(v, v + lado * d)), z0, z1: +(de - 0.005).toFixed(3) })
+    }
+    let resumo
+    if (tipo === 'reta') {
+      const col = cols[0]
+      let sobe = cfg.sobe ? Math.sign(dot(eixo(cfg.sobe), fonte.eV)) : 0
+      if (!sobe && pontosBaixo.length) {
+        const bv = pontosBaixo.map((p) => p[1]), [v0, v1] = [col.linhas[0], col.linhas.at(-1)]
+        sobe = Math.min(...bv) - v0 < v1 - Math.max(...bv) ? 1 : -1
+      }
+      sobe ||= 1
+      const linhas = sobe > 0 ? col.linhas : [...col.linhas].reverse()
+      total = linhas.length
+      lance(col, linhas, 0)
+      inicio(col, linhas[0], -sobe)
+      resumo = `reta, ${total} degraus`
+    } else {
+      const [A, B] = cols
+      const lado = cfg.patamar ? Math.sign(dot(eixo(cfg.patamar), fonte.eV))
+        : Math.min(A.livre[1], B.livre[1]) > Math.min(A.livre[0], B.livre[0]) ? 1 : -1
+      const meio = (l) => (l.u0 + l.u1) / 2
+      let primeiro
+      if (cfg.primeiro) primeiro = dot(eixo(cfg.primeiro), fonte.eU) * (meio(B) - meio(A)) > 0 ? B : A
+      else {
+        const cobre = (l) => pontosBaixo.filter(([u]) => u >= l.u0 && u <= l.u1).length
+        if (pontosBaixo.length && cobre(A) !== cobre(B)) primeiro = cobre(A) > cobre(B) ? A : B
+        else {
+          const d = fonte.eV.map((q) => q * lado), s = Math.sign(meio(B) - meio(A)), o = fonte.eU.map((q) => q * s)
+          primeiro = (d[0] * o[1] - d[1] * o[0]) * GIRO_REF > 0 ? A : B
+        }
+      }
+      const segundo = primeiro === A ? B : A
+      const a = lado > 0 ? [...primeiro.linhas] : [...primeiro.linhas].reverse()
+      const b = lado > 0 ? [...segundo.linhas].reverse() : [...segundo.linhas]
+      const passo = (ls) => ls.slice(1).map((v, i) => Math.abs(v - ls[i])).sort((x, y) => x - y)[(ls.length - 1) >> 1]
+      const n = Math.max(a.length, b.length)
+      if (a.length < 0.75 * n) for (const p = passo(a); a.length < n;) a.unshift(a[0] - lado * p)
+      if (b.length < 0.75 * n) for (const p = passo(b); b.length < n;) b.push(b.at(-1) - lado * p)
+      total = a.length + b.length
+      lance(primeiro, a, 0)
+      const largura = Math.max(primeiro.u1 - primeiro.u0, segundo.u1 - segundo.u0)
+      const paredes = [primeiro, segundo].map((l) => {
+        const fim = lado > 0 ? l.linhas.at(-1) : l.linhas[0], d = l.livre[lado > 0 ? 1 : 0]
+        return fim + lado * (d >= 0.8 ? Math.min(d, Math.max(largura * 1.1, PATAMAR_PADRAO_M)) : PATAMAR_PADRAO_M)
+      })
+      const muro = lado > 0 ? Math.min(...paredes) : Math.max(...paredes)
+      const alturaPatamar = nivel(a.length)
+      const fimA = a.at(-1), fimB = b[0], vaoU0 = Math.min(primeiro.u1, segundo.u1) , vaoU1 = Math.max(primeiro.u0, segundo.u0)
+      const patamar = [[primeiro.u0, primeiro.u1, fimA], [segundo.u0, segundo.u1, fimB]]
+      if (vaoU1 > vaoU0) patamar.push([vaoU0, vaoU1, lado > 0 ? Math.max(fimA, fimB) : Math.min(fimA, fimB)])
+      for (const [u0, u1, v] of patamar) {
+        const p = ret(fonte, u0, u1, Math.min(v, muro), Math.max(v, muro))
+        blocos.push({ poly: p, z0, z1: alturaPatamar })
+        vazio.push(p)
+      }
+      lance(segundo, b, a.length)
+      inicio(primeiro, a[0], -lado)
+      resumo = `U, ${a.length} + ${b.length} degraus, patamar a ${alturaPatamar} m`
+    }
+    const espelho = +(H / total).toFixed(3)
+    const blocosMembros = new Set(membros.map((m) => m.bloco))
+    const cortar = paginas.filter((o) => blocosMembros.has(o.pg.bloco) && o.pg.pisoAltura_m > de + 0.05 && o.pg.pisoAltura_m < ate + 0.05).map((o) => o.n)
+    let paredesAbaixo = null
+    if (semPisoEmbaixo) {
+      const loc = blocos.flatMap((b) => b.poly.map((p) => local(fonte, p))), m = 0.45
+      const [u0, u1] = [Math.min(...loc.map((p) => p[0])) - m, Math.max(...loc.map((p) => p[0])) + m]
+      const [v0, v1] = [Math.min(...loc.map((p) => p[1])) - m, Math.max(...loc.map((p) => p[1])) + m]
+      paredesAbaixo = { pagina: fonte.pagina, poly: ret(fonte, u0, u1, v0, v1), z0, z1: +(fonte.piso_m - LAJE_M).toFixed(3) }
+    }
+    console.log(`escada ${id}: ${resumo}, ${de} → ${ate} m, espelho ${espelho} m, desenho da pág. ${fonte.pagina}${membros.length > 1 ? ` (+ pág. ${membros.filter((m) => m !== fonte).map((m) => m.pagina).join(', ')})` : ''}${confirmar ? ' [a confirmar]' : ''}`)
+    escadas.push({ id, bloco: fonte.bloco, pagina: fonte.pagina, tipo, de_m: de, ate_m: ate, espelho_m: espelho, degraus: total, blocos, vazio, cortar, paredesAbaixo, confirmar })
+  }
+  return escadas
 }
 
 const result = { origem: 'extrair-geometria.mjs sobre dados/render/ids-N.png + montagem.json', unidade: 'metros', eixos: montagem.eixos, paginas: [] }
@@ -320,7 +553,16 @@ for (const { n, pg } of paginas) {
 
   const original = DIAG ? Uint8Array.from(r) : null
   const arcos = removeArcos(r, w, h, ppm)
-  const degraus = marcaEscadas(r, w, h, ppm)
+  const { degraus, grupos, grossa } = marcaEscadas(r, w, h, ppm)
+  const k = pg.s / ppm, c = toWorld(0, 0)
+  const vetorMundo = ([dx, dy]) => { const a = toWorld(dx, dy); const v = [a[0] - c[0], a[1] - c[1]], m = Math.hypot(...v); return v.map((q) => q / m) }
+  for (const e of analisaEscadas(grupos, r, grossa, w, h, ppm)) {
+    lancesPorPagina.push({
+      pagina: n, bloco: pg.bloco, piso_m: pg.pisoAltura_m, pixels: e.pixels,
+      origem: c, eU: vetorMundo(e.t), eV: vetorMundo(e.n),
+      lances: e.lances.map((l) => ({ u0: l.u0 * k, u1: l.u1 * k, linhas: l.linhas.map((v) => v * k), livre: l.livre.map((d) => d * k) })),
+    })
+  }
   if (DIAG) {
     const rgb = Buffer.alloc(w * h * 3, 255)
     for (let i = 0; i < w * h; i++) {
@@ -374,6 +616,7 @@ for (const { n, pg } of paginas) {
   const nPts = (ls) => ls.reduce((s, l) => s + l.pts.length, 0)
   console.log(`${n} ${pg.arquivo}: ${salas.length} regiões, paredes ${nPts(result.paginas.at(-1).paredes)} pts, altura ${altura} m, ${arcos} px de arco removidos, ${degraus} px de degrau${abertos ? `, ${abertos} px de parede abertos nas junções` : ''}`)
 }
+result.escadas = montaEscadas()
 result.implantacao = montagem.implantacao
 fs.writeFileSync(outFile, JSON.stringify(result))
 console.log(`→ ${outFile} (${(fs.statSync(outFile).size / 1024).toFixed(0)} KB)`)
