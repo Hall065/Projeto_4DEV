@@ -380,7 +380,8 @@ function analisaEscadas(grupos, r, grossa, w, h, ppm) {
       return ds.sort((a, b) => a - b)[1]
     }
     for (const l of lances) l.livre = [livre(l, -1), livre(l, 1)]
-    out.push({ t, n, lances, pixels: pix.length })
+    const cx = P.reduce((s, p) => s + p[0], 0) / P.length, cy = P.reduce((s, p) => s + p[1], 0) / P.length
+    out.push({ t, n, lances, pixels: pix.length, cx, cy })
   }
   return out
 }
@@ -397,7 +398,9 @@ const proximoPiso = (pg) => {
 // `ate`. Escada em U: 1º lance até o patamar (meia altura), 2º lance de volta até o andar de cima. O 1º lance é o que
 // aparece na planta de baixo; sem ela, gira para o mesmo lado da escada de referência (torre do A, seta do usuário).
 // Ajustes por escada em salas-config.json → escadas3d (perto [x, z], de, ate, tipo, sobe, primeiro, patamar, ignorar).
-const GIRO_REF = 1, ESPELHO_MAX_M = 0.21, ESPELHO_PADRAO_M = 0.17, LAJE_M = 0.12, PATAMAR_PADRAO_M = 1.2
+// Desenho com poucos degraus para a altura (espelho > ESPELHO_MAX_M): os degraus são redistribuídos no mesmo trecho
+// desenhado com espelho ESPELHO_ALVO_M, sem sair da planta.
+const GIRO_REF = 1, ESPELHO_MAX_M = 0.21, ESPELHO_ALVO_M = 0.18, ESPELHO_PADRAO_M = 0.17, LAJE_M = 0.12, PATAMAR_PADRAO_M = 1.2
 const cfgEscadas = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(dadosDir, '..', 'config', 'salas-config.json'), 'utf8')).escadas3d ?? [] } catch { return [] }
 })()
@@ -468,16 +471,32 @@ function montaEscadas() {
       const d = Math.min(Math.max(col.livre[lado < 0 ? 0 : 1], 0.6), 1.5)
       blocos.push({ poly: ret(fonte, col.u0, col.u1, Math.min(v, v + lado * d), Math.max(v, v + lado * d)), z0, z1: +(de - 0.005).toFixed(3) })
     }
+    const passo = (ls) => ls.slice(1).map((v, i) => Math.abs(v - ls[i])).sort((x, y) => x - y)[(ls.length - 1) >> 1]
+    const reamostra = (ls, n) => Array.from({ length: n }, (_, i) => ls[0] + ((ls.at(-1) - ls[0]) * i) / (n - 1))
     let resumo
     if (tipo === 'reta') {
-      const col = cols[0]
+      const col = { ...cols[0] }
+      // a planta de baixo mostra o começo da escada e a de cima o resto: degraus de baixo fora do trecho de cima
+      // entram na mesma escada, e o vão entre os dois desenhos ganha degraus no mesmo passo
+      const vmin = Math.min(...col.linhas), vmax = Math.max(...col.linhas), p = passo(col.linhas)
+      const extra = pontosBaixo.filter(([u, v]) => u >= col.u0 - 0.5 && u <= col.u1 + 0.5 && (v < vmin - p / 2 || v > vmax + p / 2)).map(([, v]) => v)
+      if (extra.length) {
+        const ls = [...col.linhas, ...extra].sort((a, b) => a - b), cheio = [ls[0]]
+        for (let i = 1; i < ls.length; i++) {
+          const n = Math.round((ls[i] - ls[i - 1]) / p)
+          for (let k = 1; k < n; k++) cheio.push(ls[i - 1] + ((ls[i] - ls[i - 1]) * k) / n)
+          cheio.push(ls[i])
+        }
+        col.linhas = cheio
+      }
       let sobe = cfg.sobe ? Math.sign(dot(eixo(cfg.sobe), fonte.eV)) : 0
       if (!sobe && pontosBaixo.length) {
         const bv = pontosBaixo.map((p) => p[1]), [v0, v1] = [col.linhas[0], col.linhas.at(-1)]
         sobe = Math.min(...bv) - v0 < v1 - Math.max(...bv) ? 1 : -1
       }
       sobe ||= 1
-      const linhas = sobe > 0 ? col.linhas : [...col.linhas].reverse()
+      let linhas = sobe > 0 ? col.linhas : [...col.linhas].reverse()
+      if (H / linhas.length > ESPELHO_MAX_M) linhas = reamostra(linhas, Math.ceil(H / ESPELHO_ALVO_M))
       total = linhas.length
       lance(col, linhas, 0)
       inicio(col, linhas[0], -sobe)
@@ -498,12 +517,15 @@ function montaEscadas() {
         }
       }
       const segundo = primeiro === A ? B : A
-      const a = lado > 0 ? [...primeiro.linhas] : [...primeiro.linhas].reverse()
-      const b = lado > 0 ? [...segundo.linhas].reverse() : [...segundo.linhas]
-      const passo = (ls) => ls.slice(1).map((v, i) => Math.abs(v - ls[i])).sort((x, y) => x - y)[(ls.length - 1) >> 1]
+      let a = lado > 0 ? [...primeiro.linhas] : [...primeiro.linhas].reverse()
+      let b = lado > 0 ? [...segundo.linhas].reverse() : [...segundo.linhas]
       const n = Math.max(a.length, b.length)
       if (a.length < 0.75 * n) for (const p = passo(a); a.length < n;) a.unshift(a[0] - lado * p)
       if (b.length < 0.75 * n) for (const p = passo(b); b.length < n;) b.push(b.at(-1) - lado * p)
+      if (H / (a.length + b.length) > ESPELHO_MAX_M) {
+        const N = Math.ceil(H / ESPELHO_ALVO_M), na = Math.round((N * a.length) / (a.length + b.length))
+        ;[a, b] = [reamostra(a, na), reamostra(b, N - na)]
+      }
       total = a.length + b.length
       lance(primeiro, a, 0)
       const largura = Math.max(primeiro.u1 - primeiro.u0, segundo.u1 - segundo.u0)
@@ -557,6 +579,11 @@ for (const { n, pg } of paginas) {
   const k = pg.s / ppm, c = toWorld(0, 0)
   const vetorMundo = ([dx, dy]) => { const a = toWorld(dx, dy); const v = [a[0] - c[0], a[1] - c[1]], m = Math.hypot(...v); return v.map((q) => q / m) }
   for (const e of analisaEscadas(grupos, r, grossa, w, h, ppm)) {
+    if (process.env.DEBUG_ESCADAS) {
+      const W = (u, v) => toWorld(u * e.t[0] + v * e.n[0], u * e.t[1] + v * e.n[1]).map((q) => q.toFixed(2)).join(',')
+      console.log(`  p${n} escada: mundo (${toWorld(e.cx, e.cy).map((q) => q.toFixed(2))}), eU (${vetorMundo(e.t).map((q) => q.toFixed(2))}) eV (${vetorMundo(e.n).map((q) => q.toFixed(2))})`)
+      for (const l of e.lances) console.log(`     lance ${l.linhas.length} linhas, largura ${((l.u1 - l.u0) * k).toFixed(2)} m, de (${W((l.u0 + l.u1) / 2, l.linhas[0])}) a (${W((l.u0 + l.u1) / 2, l.linhas.at(-1))}), passo ${(((l.linhas.at(-1) - l.linhas[0]) / (l.linhas.length - 1)) * k).toFixed(2)} m, livre ${l.livre.map((d) => (d * k).toFixed(2))}`)
+    }
     lancesPorPagina.push({
       pagina: n, bloco: pg.bloco, piso_m: pg.pisoAltura_m, pixels: e.pixels,
       origem: c, eU: vetorMundo(e.t), eV: vetorMundo(e.n),

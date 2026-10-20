@@ -224,8 +224,11 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
      livre) e é casada entre plantas (C/D compartilhada aparece em 4 páginas). Degraus maciços subindo por igual
      de `de` a `ate`; em U, 1º lance → patamar a meia altura → 2º lance. 1º lance = o que aparece na planta de
      baixo; sem ela, mesmo giro da torre do A (referência do usuário, 19/10/2026: começa no térreo, termina no
-     andar 1). Sem planta casada, `de`/`ate` saem do espelho que cabe (14–21 cm): andar de baixo, de cima ou
-     telhado. Ajustes em `config/salas-config.json → escadas3d`; o log marca `[a confirmar]`;
+     andar 1). Térreo e superior são partes da mesma escada (usuário): o que a planta de baixo desenha além do
+     trecho de cima entra na mesma escada, com degraus no vão entre os dois desenhos. Espelho acima de 21 cm
+     (desenho com poucos degraus) é redistribuído no mesmo trecho a 18 cm. Sem planta casada, `de`/`ate` saem do
+     espelho que cabe (14–21 cm). Ajustes em `config/salas-config.json → escadas3d`; o log marca `[a confirmar]`.
+     As plantas não foram deslocadas: as paredes do térreo e do superior já casam (deslocar pela escada piora);
    - junções C↔D: parede dentro de `juncoes[].retangulo` vira circulação;
    - por página: `piso_m`, `alturaParede_m` (até o piso do superior do mesmo bloco, senão até `topoBloco_m`),
      `salas[{codigo,nome,tipo,area_m2,loops}]`, `circulacao`, `paredes`, `escadas`, `degraus`; mais a
@@ -239,13 +242,13 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
      o piso do andar de cima é recortado sobre a escada; se não há planta embaixo (torre do A), as paredes do
      andar de cima descem até o chão em volta da escada. Linhas de percurso/bordas de patamar não viram
      parede. Imagens: `saida/blender/escada-torre-A-site.png`, `escada-torre-A-corte.png`,
-     `escada-C-D-corte.png`;
+     `escada-C-D-corte.png`, `escada-D-lateral-corte.png`;
    - implantação: pátio, E1, E2 (+1 m, recortado onde entra a escada), rampa, escada de 3 degraus, grades e
      portão (montantes a cada 15/10 cm, postes a cada ~2,5 m);
    - exporta `saida/blender/glb/BlocoA..D.glb`, `Externo.glb`, `Campus.glb` (decímetros, Y para cima, mesmo
      referencial dos GLB do site) e renders em `saida/blender/` (`campus-topo`, `campus-perspectiva`,
      `BlocoX`, `originais-*`, `comparacao-topo` = novo × contorno do GLB atual em vermelho).
-   - Tamanhos: A 817 KB, B 278 KB, C 479 KB, D 864 KB, Externo 278 KB (os atuais somam 3,6 MB).
+   - Tamanhos: A 829 KB, B 278 KB, C 479 KB, D 923 KB, Externo 278 KB (os atuais somam 3,6 MB).
 3. **Validação:** encaixe confere com `Montagem-implantacao.png`; os GLB abrem no Three.js (GLTFLoader) com
    materiais e no mesmo referencial — `saida/blender/visualizar.html` (servir a pasta por HTTP).
 
@@ -255,16 +258,16 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
 - Térreo com paredes até o piso do superior (pé-direito duplo, 5,12 m), como nos GLB atuais; **sem telhado**
   (dá para ver as salas de cima). Portas são vãos de altura inteira (sem verga).
 - Escadas (log do `extrair-geometria.mjs`):
-  - torre do A superior (−5,2; −18,1): U 0 → 5,12 m, 15 + 18 degraus — **confirmada pelo usuário**. Embaixo dela
-    a planta do A térreo tem salas (encaixe A térreo × A superior a conferir);
+  - torre do A superior (−5,2; −18,1): U 0 → 5,12 m, 15 + 18 degraus — **confirmada pelo usuário**. O A térreo
+    não desenha escada embaixo dela (lá tem salas); as paredes do superior descem até o chão em volta;
   - C/D compartilhada (−3,2; −121,2): U 2,5 → 7,62 m, 13 + 13 (2º lance cortado no desenho, completado);
-  - interna do A (−0,8; −49,1): U 0 → 5,12 m, 11 + 11, espelho 23 cm, patamar do lado +z (leitura minha);
-  - acessos A ↔ pátio: (−8,3; −57,2) reta 0 → 2,5 m subindo para +x; (1,6; −43,8) desenho em grade, 5 degraus
-    de 50 cm (sentido e degraus incertos);
-  - B (−25,6; −92,1): reta 2,5 → 4,99 m (até o telhado do B?);
-  - D (11,3; −148): reta 13 degraus 2,5 → 7,62 m, espelho 39 cm (falta o 2º lance no desenho);
-  - D (11,1; −118,5): 8 degraus 2,5 → 3,86 m; D (−2,9; −150,2): U 2,5 → 5,22 m (destino desconhecido);
-  - D (29,6; −101,5): U 7,62 → 10,2 m (acesso ao telhado?).
+  - interna do A (−0,8; −49,1): U 0 → 5,12 m, 15 + 14, mesma escada no térreo e no superior;
+  - D lateral (11,3; −148): reta 2,5 → 7,62 m, 29 degraus = 7 do térreo + 13 do superior em sequência;
+  - D meio (11,1; −118,5) e anexo de baixo (−2,9; −150,2): só o térreo desenha; D torre (29,6; −101,5): só o
+    superior desenha. Todas 2,5 → 7,62 m (usuário), degraus redistribuídos no trecho desenhado;
+  - acessos A ↔ pátio: (−8,3; −57,2) reta 0 → 2,5 m subindo para +x; (1,6; −43,8) desenho em grade (sentido
+    incerto);
+  - B (−25,6; −92,1): reta 2,5 → 4,99 m (usuário não sabe; fica assim).
   Mureta entre lances desenhada com traço grosso continua como parede inteira.
 
 ### Próximo
