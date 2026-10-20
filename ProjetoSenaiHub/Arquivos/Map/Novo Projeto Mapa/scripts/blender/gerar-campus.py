@@ -181,7 +181,7 @@ for pg in geo["paginas"]:
                {**base, "tipo": tipo, "nome": nome, "area_m2": round(g["area"], 1), "pavimento": ROTULO_NIVEL.get(n, str(n))})
 
 # ---------------------------------------------------------------- implantação
-imp = geo["implantacao"]
+imp = cfg["implantacao"]
 col = colecao("Externo")
 P = imp.get("alturaPatio_m", 2.5)
 areas = {a["nome"]: a for a in imp["areas"]}

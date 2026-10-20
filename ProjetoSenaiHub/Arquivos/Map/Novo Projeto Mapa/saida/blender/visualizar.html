@@ -52,7 +52,7 @@ const centro = box.getCenter(new THREE.Vector3()), tam = box.getSize(new THREE.V
 controls.target.copy(centro)
 camera.position.copy(centro).add(new THREE.Vector3(0.6, 0.9, 0.7).multiplyScalar(tam * 0.7))
 controls.update()
-window.__campus = { box: [box.min.toArray(), box.max.toArray()], objetos: root.children.map((c) => [c.name, c.children[0]?.children.length ?? 0]) }
+window.__campus = { THREE, camera, controls, root, box: [box.min.toArray(), box.max.toArray()] }
 
 const ray = new THREE.Raycaster(), sel = document.getElementById('sel')
 renderer.domElement.addEventListener('click', (ev) => {
