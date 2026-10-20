@@ -62,6 +62,8 @@ MAT_RAMPA = material("Rampa", "#CDBF9E")
 MAT_ESCADA = material("Escada externa", "#B9BEC6")
 MAT_GRADE = material("Grade", "#3A3550", rough=0.4, metal=0.6)
 MAT_PORTAO = material("Portão", "#8A8F98", rough=0.4, metal=0.6)
+MAT_DEGRAU = material("Degrau", "#8E97A5")
+DEGRAU_M = 0.12
 
 
 def mat_tipo(tipo):
@@ -169,6 +171,10 @@ for pg in geo["paginas"]:
     prisma(f"{pref} — Paredes", [l["pts"] for l in pg["paredes"]], piso - LAJE_M, piso + h, MAT_PAREDE, col, {**base, "tipo": "parede"})
     if pg["circulacao"]:
         prisma(f"{pref} — Circulação", [l["pts"] for l in pg["circulacao"]], piso - LAJE_M, piso, MAT_CIRC, col, {**base, "tipo": "circ"})
+    if pg.get("escadas"):
+        prisma(f"{pref} — Escadas", [l["pts"] for l in pg["escadas"]], piso - LAJE_M, piso, mat_tipo("escada"), col, {**base, "tipo": "escada"})
+    if pg.get("degraus"):
+        prisma(f"{pref} — Degraus", [l["pts"] for l in pg["degraus"]], piso - LAJE_M, piso + DEGRAU_M, MAT_DEGRAU, col, {**base, "tipo": "degrau"})
     grupos = {}
     for s in pg["salas"]:
         nome = s["nome"] or TIPOS.get(s["tipo"], ["Sala"])[0]

@@ -185,6 +185,121 @@ function removeArcos(r, w, h, ppm) {
   return tirar.length
 }
 
+// Degraus de escada vêm desenhados como linhas finas paralelas bem próximas (~0,3 m). Linha fina com pelo menos
+// DEGRAU_MIN_LINHAS travessias de parede num raio de DEGRAU_RAIO_M (num eixo), e no máximo
+// DEGRAU_LARGURA_MAX_M de comprimento, vira DEGRAU; grupos menores que DEGRAU_GRUPO_MIN_M são descartados.
+// Pixel com degrau dos dois lados (num eixo, até ESCADA_VAO_M, sem cruzar parede grossa) vira ESCADA, ou DEGRAU se
+// for linha fina (linha de percurso, borda de patamar); linhas finas ligadas a esses DEGRAUs até ESCADA_SOBRA_M fora
+// do grupo também viram DEGRAU. Paredes grossas não são tocadas, exceto pontos menores que ESCADA_PONTO_M (marcas da
+// linha de percurso).
+const DEGRAU = 3, ESCADA = 4
+const DEGRAU_RAIO_M = 0.9, DEGRAU_MIN_LINHAS = 3, DEGRAU_LARGURA_MAX_M = 3.6, DEGRAU_GRUPO_MIN_M = 0.6, ESCADA_VAO_M = 0.45, ESCADA_SOBRA_M = 0.6, ESCADA_PONTO_M = 0.3
+function marcaEscadas(r, w, h, ppm) {
+  const N = w * h, isW = (i) => r[i] === 1
+  const grossa = new Uint8Array(N)
+  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+    let ok = true
+    for (let dy = -1; dy <= 1 && ok; dy++) for (let dx = -1; dx <= 1 && ok; dx++) ok = isW((y + dy) * w + x + dx)
+    if (ok) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) grossa[(y + dy) * w + x + dx] = 1
+  }
+  const R = Math.round(DEGRAU_RAIO_M * ppm)
+  const travessias = (x, y, dx, dy) => {
+    let n = 0, dentro = true
+    for (let t = 1; t <= R; t++) {
+      const X = x + dx * t, Y = y + dy * t
+      if (X < 0 || Y < 0 || X >= w || Y >= h) break
+      const i = Y * w + X
+      if (r[i] === 0) break
+      const parede = isW(i)
+      if (parede && grossa[i]) break
+      if (parede && !dentro) n++
+      dentro = parede
+    }
+    return n
+  }
+  const Lmax = Math.round(DEGRAU_LARGURA_MAX_M * ppm)
+  const corrida = (x, y, dx, dy) => {
+    let n = 1
+    for (const s of [1, -1]) for (let t = 1; t <= Lmax; t++) {
+      const X = x + dx * t * s, Y = y + dy * t * s
+      if (X < 0 || Y < 0 || X >= w || Y >= h || !isW(Y * w + X) || grossa[Y * w + X]) break
+      n++
+    }
+    return n
+  }
+  const marca = new Uint8Array(N)
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const i = y * w + x
+    if (!isW(i) || grossa[i]) continue
+    const eixoX = travessias(x, y, 1, 0) + travessias(x, y, -1, 0)
+    const eixoY = travessias(x, y, 0, 1) + travessias(x, y, 0, -1)
+    if ((eixoX >= DEGRAU_MIN_LINHAS && corrida(x, y, 0, 1) <= Lmax) || (eixoY >= DEGRAU_MIN_LINHAS && corrida(x, y, 1, 0) <= Lmax)) marca[i] = 1
+  }
+  const Lmin = DEGRAU_GRUPO_MIN_M * ppm, G = Math.round(ESCADA_VAO_M * ppm)
+  const visto = new Uint8Array(N), grupo = new Uint8Array(N), caixas = []
+  let degraus = 0
+  for (let s = 0; s < N; s++) {
+    if (!marca[s] || visto[s]) continue
+    const comp = [s]
+    visto[s] = 1
+    let x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1
+    for (let k = 0; k < comp.length; k++) {
+      const i = comp[k], x = i % w, y = (i / w) | 0
+      x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y)
+      for (let dy = -G; dy <= G; dy++) for (let dx = -G; dx <= G; dx++) {
+        const X = x + dx, Y = y + dy
+        if (X < 0 || Y < 0 || X >= w || Y >= h) continue
+        const j = Y * w + X
+        if (marca[j] && !visto[j]) { visto[j] = 1; comp.push(j) }
+      }
+    }
+    if (Math.min(x1 - x0, y1 - y0) < Lmin) continue
+    for (const i of comp) { r[i] = DEGRAU; grupo[i] = 1 }
+    degraus += comp.length
+    caixas.push([x0, y0, x1, y1])
+  }
+  const V = Math.round(ESCADA_VAO_M * ppm)
+  const achaDegrau = (x, y, dx, dy) => {
+    for (let t = 1; t <= V; t++) {
+      const X = x + dx * t, Y = y + dy * t
+      if (X < 0 || Y < 0 || X >= w || Y >= h) return false
+      const j = Y * w + X
+      if (grupo[j]) return true
+      if (grossa[j]) return false
+    }
+    return false
+  }
+  const entre = (x, y) => (achaDegrau(x, y, 1, 0) && achaDegrau(x, y, -1, 0)) || (achaDegrau(x, y, 0, 1) && achaDegrau(x, y, 0, -1))
+  const P = Math.round(ESCADA_PONTO_M * ppm)
+  const ponto = (i) => {
+    const x = i % w, y = (i / w) | 0
+    let x0 = x, x1 = x, y0 = y, y1 = y
+    while (x0 > 0 && grossa[y * w + x0 - 1] && x - x0 < P) x0--
+    while (x1 < w - 1 && grossa[y * w + x1 + 1] && x1 - x < P) x1++
+    while (y0 > 0 && grossa[(y0 - 1) * w + x] && y - y0 < P) y0--
+    while (y1 < h - 1 && grossa[(y1 + 1) * w + x] && y1 - y < P) y1++
+    return x1 - x0 < P && y1 - y0 < P
+  }
+  const fina = (i) => isW(i) && (!grossa[i] || ponto(i))
+  const fila = []
+  for (const [x0, y0, x1, y1] of caixas) for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) {
+    const i = y * w + x
+    if (r[i] === DEGRAU || (grossa[i] && !ponto(i)) || !entre(x, y)) continue
+    if (fina(i)) { r[i] = DEGRAU; fila.push(i); degraus++ } else r[i] = ESCADA
+  }
+  const E = Math.round(ESCADA_SOBRA_M * ppm)
+  for (let k = 0; k < fila.length; k++) {
+    const x = fila[k] % w, y = (fila[k] / w) | 0
+    for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const X = x + dx, Y = y + dy
+      if (X < 0 || Y < 0 || X >= w || Y >= h || !caixas.some(([a, b, c, d]) => X >= a - E && X <= c + E && Y >= b - E && Y <= d + E)) continue
+      const j = Y * w + X
+      if (fina(j)) { r[j] = DEGRAU; fila.push(j); degraus++ }
+    }
+  }
+  return degraus
+}
+
 const area = (pts) => { let s = 0; for (let i = 0, n = pts.length; i < n; i++) { const [x0, y0] = pts[i], [x1, y1] = pts[(i + 1) % n]; s += x0 * y1 - x1 * y0 } return s / 2 }
 
 const paginas = Object.entries(montagem.paginas).map(([n, pg]) => ({ n: Number(n), pg }))
@@ -205,10 +320,12 @@ for (const { n, pg } of paginas) {
 
   const original = DIAG ? Uint8Array.from(r) : null
   const arcos = removeArcos(r, w, h, ppm)
+  const degraus = marcaEscadas(r, w, h, ppm)
   if (DIAG) {
     const rgb = Buffer.alloc(w * h * 3, 255)
     for (let i = 0; i < w * h; i++) {
-      const c = original[i] === 1 ? (r[i] === 1 ? [20, 20, 20] : [230, 30, 30]) : r[i] ? [235, 235, 235] : [255, 255, 255]
+      const c = r[i] === DEGRAU ? [30, 90, 230] : r[i] === ESCADA ? [170, 200, 250]
+        : original[i] === 1 ? (r[i] === 1 ? [20, 20, 20] : [230, 30, 30]) : r[i] ? [235, 235, 235] : [255, 255, 255]
       rgb[i * 3] = c[0]; rgb[i * 3 + 1] = c[1]; rgb[i * 3 + 2] = c[2]
     }
     writePng(path.join(DIAG, `arcos-${n}.png`), w, h, rgb)
@@ -225,9 +342,9 @@ for (const { n, pg } of paginas) {
     }
   }
 
-  const vetor = (alvo) => {
+  const vetor = (alvo, buf = r) => {
     const loops = []
-    for (const lp of traceLoops(r, w, h, alvo)) {
+    for (const lp of traceLoops(buf, w, h, alvo)) {
       const s = simplifyLoop(lp, SIMPLIFICA_PX)
       if (s.length < 3) continue
       const mundo = s.map(([X, Y]) => toWorld(X, Y).map((v) => +v.toFixed(3)))
@@ -252,10 +369,10 @@ for (const { n, pg } of paginas) {
   result.paginas.push({
     pagina: n, arquivo: pg.arquivo, titulo: pg.titulo, bloco: pg.bloco, nivel: pg.nivel,
     piso_m: pg.pisoAltura_m, base_m: pg.baseBloco_m, topo_m: pg.topoBloco_m, alturaParede_m: altura,
-    salas, circulacao: vetor(2), paredes: vetor(1),
+    salas, circulacao: vetor(2), paredes: vetor(1), escadas: vetor(ESCADA, r.map((c) => (c === DEGRAU ? ESCADA : c))), degraus: vetor(DEGRAU),
   })
   const nPts = (ls) => ls.reduce((s, l) => s + l.pts.length, 0)
-  console.log(`${n} ${pg.arquivo}: ${salas.length} regiões, paredes ${nPts(result.paginas.at(-1).paredes)} pts, altura ${altura} m, ${arcos} px de arco removidos${abertos ? `, ${abertos} px de parede abertos nas junções` : ''}`)
+  console.log(`${n} ${pg.arquivo}: ${salas.length} regiões, paredes ${nPts(result.paginas.at(-1).paredes)} pts, altura ${altura} m, ${arcos} px de arco removidos, ${degraus} px de degrau${abertos ? `, ${abertos} px de parede abertos nas junções` : ''}`)
 }
 result.implantacao = montagem.implantacao
 fs.writeFileSync(outFile, JSON.stringify(result))

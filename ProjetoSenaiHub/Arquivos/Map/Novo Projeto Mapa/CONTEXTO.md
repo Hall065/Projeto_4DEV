@@ -217,20 +217,27 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
    - **arcos de porta removidos:** traço fino de parede (some numa abertura 3×3) só fica se fizer parte de uma
      reta ≥ 1,2 m; o resto volta para a sala vizinha. Paredes de linha dupla (comuns no D) ficam;
      `--diag work` grava `work/arcos-N.png` (vermelho = removido);
+   - **escadas internas:** linhas finas paralelas próximas (≥ 3 num raio de 0,9 m, até 3,6 m de comprimento,
+     grupo ≥ 0,6 m) viram `degraus`; o que fica entre degraus (inclusive linha de percurso e marcas dela) vira
+     `escadas`. No diag: azul = degrau, azul claro = piso da escada;
    - junções C↔D: parede dentro de `juncoes[].retangulo` vira circulação;
    - por página: `piso_m`, `alturaParede_m` (até o piso do superior do mesmo bloco, senão até `topoBloco_m`),
-     `salas[{codigo,nome,tipo,area_m2,loops}]`, `circulacao`, `paredes`; mais a `implantacao`.
+     `salas[{codigo,nome,tipo,area_m2,loops}]`, `circulacao`, `paredes`, `escadas`, `degraus`; mais a
+     `implantacao`.
 2. **`scripts/blender/gerar-campus.py`**:
    `blender -b --factory-startup -P scripts\blender\gerar-campus.py -- [--sem-render] [--blend]`
    - paredes extrudadas (curva 2D preenchida → malha, buracos por par/ímpar), laje de 12 cm sob cada piso;
    - um objeto por sala `"<Bloco><nível> — <nome>"` (ex.: `A0 — Cantina`), material pela cor do tipo,
      `extras` no glTF: `tipo`, `nome`, `area_m2`, `bloco`, `nivel`, `pavimento`, `piso_m`;
+   - escadas internas: piso cinza (`<Bloco><nível> — Escadas`) com frisos de 12 cm nos degraus
+     (`— Degraus`), em vez das paredes inteiras que os traços dos degraus viravam (closes em
+     `saida/blender/escada-A-superior.png` e `escada-D-superior.png`);
    - implantação: pátio, E1, E2 (+1 m, recortado onde entra a escada), rampa, escada de 3 degraus, grades e
      portão (montantes a cada 15/10 cm, postes a cada ~2,5 m);
    - exporta `saida/blender/glb/BlocoA..D.glb`, `Externo.glb`, `Campus.glb` (decímetros, Y para cima, mesmo
      referencial dos GLB do site) e renders em `saida/blender/` (`campus-topo`, `campus-perspectiva`,
      `BlocoX`, `originais-*`, `comparacao-topo` = novo × contorno do GLB atual em vermelho).
-   - Tamanhos: A 985 KB, B 303 KB, C 530 KB, D 954 KB, Externo 278 KB (os atuais somam 3,6 MB).
+   - Tamanhos: A 929 KB, B 299 KB, C 497 KB, D 891 KB, Externo 278 KB (os atuais somam 3,6 MB).
 3. **Validação:** encaixe confere com `Montagem-implantacao.png`; os GLB abrem no Three.js (GLTFLoader) com
    materiais e no mesmo referencial — `saida/blender/visualizar.html` (servir a pasta por HTTP).
 
@@ -239,14 +246,15 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
 - Rampa desce do lado do pátio (z menor) para o A, a 8%: cobre só ~1,2 m dos 2,5 m de desnível.
 - Térreo com paredes até o piso do superior (pé-direito duplo, 5,12 m), como nos GLB atuais; **sem telhado**
   (dá para ver as salas de cima). Portas são vãos de altura inteira (sem verga).
-- Escadas internas são só piso colorido (sem degraus).
+- Escadas internas são piso plano com frisos marcando os degraus (sem rampa/degrau de verdade subindo até o
+  outro piso). Mureta entre lances desenhada com traço grosso continua como parede inteira.
 
 ### Próximo
 - Usuário aprovar os renders; depois trocar os GLB em `frontend/public/models/campus/`. O `Externo.glb` não é
   carregado pelo site: precisa entrar em `campusBlocks.ts` (ou ir junto de algum bloco).
 - Conferir no viewer do site: marcadores/pontos fixos no Bloco D podem estar no referencial antigo (D girado).
 - Opcional: texturas (piso cerâmico, cimento nas oficinas, azulejo nos sanitários), telhado opcional,
-  degraus nas escadas internas.
+  escadas internas com degraus subindo de verdade.
 
 ---
 
