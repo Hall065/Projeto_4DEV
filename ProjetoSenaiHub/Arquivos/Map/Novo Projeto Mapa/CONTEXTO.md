@@ -248,7 +248,7 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
    - exporta `saida/blender/glb/BlocoA..D.glb`, `Externo.glb`, `Campus.glb` (decímetros, Y para cima, mesmo
      referencial dos GLB do site) e renders em `saida/blender/` (`campus-topo`, `campus-perspectiva`,
      `BlocoX`, `originais-*`, `comparacao-topo` = novo × contorno do GLB atual em vermelho).
-   - Tamanhos: A 829 KB, B 278 KB, C 479 KB, D 923 KB, Externo 278 KB (os atuais somam 3,6 MB).
+   - Tamanhos: A 824 KB, B 279 KB, C 484 KB, D 924 KB, Externo 278 KB (os atuais somam 3,6 MB).
 3. **Validação:** encaixe confere com `Montagem-implantacao.png`; os GLB abrem no Three.js (GLTFLoader) com
    materiais e no mesmo referencial — `saida/blender/visualizar.html` (servir a pasta por HTTP).
 
@@ -268,7 +268,8 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
   - acessos A ↔ pátio: (−8,3; −57,2) reta 0 → 2,5 m subindo para +x; (1,6; −43,8) desenho em grade (sentido
     incerto);
   - B (−25,6; −92,1): reta 2,5 → 4,99 m (usuário não sabe; fica assim).
-  Mureta entre lances desenhada com traço grosso continua como parede inteira.
+  Sem parede no meio da escada (usuário, 19/10/2026): mureta entre lances e linha do meio somem em todas as
+  plantas do bloco dentro da área da escada (recuo de 10 cm das bordas; em U, mais 50 cm do lado da entrada).
 
 ### Próximo
 - Usuário aprovar os renders; depois trocar os GLB em `frontend/public/models/campus/`. O `Externo.glb` não é

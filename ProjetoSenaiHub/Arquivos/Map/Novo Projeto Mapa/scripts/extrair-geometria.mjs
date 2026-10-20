@@ -400,7 +400,7 @@ const proximoPiso = (pg) => {
 // Ajustes por escada em salas-config.json → escadas3d (perto [x, z], de, ate, tipo, sobe, primeiro, patamar, ignorar).
 // Desenho com poucos degraus para a altura (espelho > ESPELHO_MAX_M): os degraus são redistribuídos no mesmo trecho
 // desenhado com espelho ESPELHO_ALVO_M, sem sair da planta.
-const GIRO_REF = 1, ESPELHO_MAX_M = 0.21, ESPELHO_ALVO_M = 0.18, ESPELHO_PADRAO_M = 0.17, LAJE_M = 0.12, PATAMAR_PADRAO_M = 1.2
+const AREA_RECUO_M = 0.1, AREA_ENTRADA_M = 0.5, GIRO_REF = 1, ESPELHO_MAX_M = 0.21, ESPELHO_ALVO_M = 0.18, ESPELHO_PADRAO_M = 0.17, LAJE_M = 0.12, PATAMAR_PADRAO_M = 1.2
 const cfgEscadas = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(dadosDir, '..', 'config', 'salas-config.json'), 'utf8')).escadas3d ?? [] } catch { return [] }
 })()
@@ -473,7 +473,7 @@ function montaEscadas() {
     }
     const passo = (ls) => ls.slice(1).map((v, i) => Math.abs(v - ls[i])).sort((x, y) => x - y)[(ls.length - 1) >> 1]
     const reamostra = (ls, n) => Array.from({ length: n }, (_, i) => ls[0] + ((ls.at(-1) - ls[0]) * i) / (n - 1))
-    let resumo
+    let resumo, entrada = 0
     if (tipo === 'reta') {
       const col = { ...cols[0] }
       // a planta de baixo mostra o começo da escada e a de cima o resto: degraus de baixo fora do trecho de cima
@@ -505,6 +505,7 @@ function montaEscadas() {
       const [A, B] = cols
       const lado = cfg.patamar ? Math.sign(dot(eixo(cfg.patamar), fonte.eV))
         : Math.min(A.livre[1], B.livre[1]) > Math.min(A.livre[0], B.livre[0]) ? 1 : -1
+      entrada = -lado
       const meio = (l) => (l.u0 + l.u1) / 2
       let primeiro
       if (cfg.primeiro) primeiro = dot(eixo(cfg.primeiro), fonte.eU) * (meio(B) - meio(A)) > 0 ? B : A
@@ -550,20 +551,23 @@ function montaEscadas() {
     const espelho = +(H / total).toFixed(3)
     const blocosMembros = new Set(membros.map((m) => m.bloco))
     const cortar = paginas.filter((o) => blocosMembros.has(o.pg.bloco) && o.pg.pisoAltura_m > de + 0.05 && o.pg.pisoAltura_m < ate + 0.05).map((o) => o.n)
+    const loc = blocos.flatMap((b) => b.poly.map((p) => local(fonte, p)))
+    const caixaLocal = (m, v0 = 0, v1 = 0) => ret(fonte, Math.min(...loc.map((p) => p[0])) - m, Math.max(...loc.map((p) => p[0])) + m,
+      Math.min(...loc.map((p) => p[1])) - m - v0, Math.max(...loc.map((p) => p[1])) + m + v1)
+    // mureta entre lances e linha do meio da escada saem: nada de parede dentro da área da escada; em U a ponta da
+    // mureta passa do 1º degrau do lado da entrada (oposto ao patamar)
+    const area = caixaLocal(-AREA_RECUO_M, entrada < 0 ? AREA_ENTRADA_M : 0, entrada > 0 ? AREA_ENTRADA_M : 0)
     let paredesAbaixo = null
-    if (semPisoEmbaixo) {
-      const loc = blocos.flatMap((b) => b.poly.map((p) => local(fonte, p))), m = 0.45
-      const [u0, u1] = [Math.min(...loc.map((p) => p[0])) - m, Math.max(...loc.map((p) => p[0])) + m]
-      const [v0, v1] = [Math.min(...loc.map((p) => p[1])) - m, Math.max(...loc.map((p) => p[1])) + m]
-      paredesAbaixo = { pagina: fonte.pagina, poly: ret(fonte, u0, u1, v0, v1), z0, z1: +(fonte.piso_m - LAJE_M).toFixed(3) }
-    }
+    if (semPisoEmbaixo) paredesAbaixo = { pagina: fonte.pagina, poly: caixaLocal(0.45), z0, z1: +(fonte.piso_m - LAJE_M).toFixed(3) }
     console.log(`escada ${id}: ${resumo}, ${de} → ${ate} m, espelho ${espelho} m, desenho da pág. ${fonte.pagina}${membros.length > 1 ? ` (+ pág. ${membros.filter((m) => m !== fonte).map((m) => m.pagina).join(', ')})` : ''}${confirmar ? ' [a confirmar]' : ''}`)
-    escadas.push({ id, bloco: fonte.bloco, pagina: fonte.pagina, tipo, de_m: de, ate_m: ate, espelho_m: espelho, degraus: total, blocos, vazio, cortar, paredesAbaixo, confirmar })
+    const paginasBlocos = paginas.filter((o) => blocosMembros.has(o.pg.bloco)).map((o) => o.n)
+    escadas.push({ id, bloco: fonte.bloco, pagina: fonte.pagina, tipo, de_m: de, ate_m: ate, espelho_m: espelho, degraus: total, blocos, vazio, cortar, area, paginasBlocos, paredesAbaixo, confirmar })
   }
   return escadas
 }
 
 const result = { origem: 'extrair-geometria.mjs sobre dados/render/ids-N.png + montagem.json', unidade: 'metros', eixos: montagem.eixos, paginas: [] }
+const lidas = []
 for (const { n, pg } of paginas) {
   const { w, h, r } = readPngR(path.join(dadosDir, 'render', `ids-${n}.png`))
   const labels = JSON.parse(fs.readFileSync(path.join(dadosDir, 'render', `labels-${n}.json`), 'utf8'))
@@ -598,6 +602,34 @@ for (const { n, pg } of paginas) {
       rgb[i * 3] = c[0]; rgb[i * 3 + 1] = c[1]; rgb[i * 3 + 2] = c[2]
     }
     writePng(path.join(DIAG, `arcos-${n}.png`), w, h, rgb)
+  }
+  lidas.push({ n, pg, w, h, r, labels, ppm, toWorld, arcos, degraus })
+}
+
+const dentro = (poly, x, z) => {
+  let ok = false
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, zi] = poly[i], [xj, zj] = poly[j]
+    if ((zi > z) !== (zj > z) && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) ok = !ok
+  }
+  return ok
+}
+result.escadas = montaEscadas()
+for (const { n, pg, w, h, r, labels, ppm, toWorld, arcos, degraus } of lidas) {
+  const paraPixel = ([x, z]) => {
+    const a = (x - pg.t[0]) / pg.s, b = (z - pg.t[1]) / pg.s
+    return [(pg.M[0] * a + pg.M[2] * b) * ppm, (pg.M[1] * a + pg.M[3] * b) * ppm]
+  }
+  let semMureta = 0
+  for (const e of result.escadas) {
+    if (!e.paginasBlocos.includes(n)) continue
+    const px = e.area.map(paraPixel)
+    const X0 = Math.max(0, Math.floor(Math.min(...px.map((p) => p[0])))), X1 = Math.min(w - 1, Math.ceil(Math.max(...px.map((p) => p[0]))))
+    const Y0 = Math.max(0, Math.floor(Math.min(...px.map((p) => p[1])))), Y1 = Math.min(h - 1, Math.ceil(Math.max(...px.map((p) => p[1]))))
+    for (let Y = Y0; Y <= Y1; Y++) for (let X = X0; X <= X1; X++) {
+      const i = Y * w + X
+      if (r[i] === 1 && dentro(e.area, ...toWorld(X + 0.5, Y + 0.5))) { r[i] = ESCADA; semMureta++ }
+    }
   }
 
   let abertos = 0
@@ -641,9 +673,8 @@ for (const { n, pg } of paginas) {
     salas, circulacao: vetor(2), paredes: vetor(1), escadas: vetor(ESCADA, r.map((c) => (c === DEGRAU ? ESCADA : c))), degraus: vetor(DEGRAU),
   })
   const nPts = (ls) => ls.reduce((s, l) => s + l.pts.length, 0)
-  console.log(`${n} ${pg.arquivo}: ${salas.length} regiões, paredes ${nPts(result.paginas.at(-1).paredes)} pts, altura ${altura} m, ${arcos} px de arco removidos, ${degraus} px de degrau${abertos ? `, ${abertos} px de parede abertos nas junções` : ''}`)
+  console.log(`${n} ${pg.arquivo}: ${salas.length} regiões, paredes ${nPts(result.paginas.at(-1).paredes)} pts, altura ${altura} m, ${arcos} px de arco removidos, ${degraus} px de degrau${semMureta ? `, ${semMureta} px de parede tirados de dentro das escadas` : ''}${abertos ? `, ${abertos} px de parede abertos nas junções` : ''}`)
 }
-result.escadas = montaEscadas()
 result.implantacao = montagem.implantacao
 fs.writeFileSync(outFile, JSON.stringify(result))
 console.log(`→ ${outFile} (${(fs.statSync(outFile).size / 1024).toFixed(0)} KB)`)
