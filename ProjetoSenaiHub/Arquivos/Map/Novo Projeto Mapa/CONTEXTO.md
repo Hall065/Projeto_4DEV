@@ -242,13 +242,13 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
      o piso do andar de cima é recortado sobre a escada; se não há planta embaixo (torre do A), as paredes do
      andar de cima descem até o chão em volta da escada. Linhas de percurso/bordas de patamar não viram
      parede. Imagens: `saida/blender/escada-torre-A-site.png`, `escada-torre-A-corte.png`,
-     `escada-C-D-corte.png`, `escada-D-lateral-corte.png`;
+     `escada-C-D-corte.png`, `escada-D-lateral-corte.png`, `escada-A-interna.png` (viewer, de cima);
    - implantação: pátio, E1, E2 (+1 m, recortado onde entra a escada), rampa, escada de 3 degraus, grades e
      portão (montantes a cada 15/10 cm, postes a cada ~2,5 m);
    - exporta `saida/blender/glb/BlocoA..D.glb`, `Externo.glb`, `Campus.glb` (decímetros, Y para cima, mesmo
      referencial dos GLB do site) e renders em `saida/blender/` (`campus-topo`, `campus-perspectiva`,
      `BlocoX`, `originais-*`, `comparacao-topo` = novo × contorno do GLB atual em vermelho).
-   - Tamanhos: A 824 KB, B 279 KB, C 484 KB, D 924 KB, Externo 278 KB (os atuais somam 3,6 MB).
+   - Tamanhos: A 733 KB, B 273 KB, C 451 KB, D 872 KB, Externo 278 KB (os atuais somam 3,6 MB).
 3. **Validação:** encaixe confere com `Montagem-implantacao.png`; os GLB abrem no Three.js (GLTFLoader) com
    materiais e no mesmo referencial — `saida/blender/visualizar.html` (servir a pasta por HTTP).
 
@@ -274,6 +274,11 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
   plantas do bloco dentro da área da escada (recuo de 10 cm das bordas; em U, mais 50 cm do lado da entrada).
   Só o lance que sai do chão é maciço; patamar e 2º lance são laje de 20 cm em degraus (maciços até o chão
   pareciam um muro no meio da escada).
+  Em volta da escada 3D (até 1,2 m) não sobra desenho 2D (usuário: "ta meio bagunçado", 19/10/2026): degraus,
+  piso de escada e a sala "Escada" que encosta nela viram piso comum; parede solta e pedaço de sala < 1,5 m²
+  fechados nessa faixa também. Nos andares que a escada atravessa, o vão no piso é o retângulo da escada inteira
+  (lances, patamar e o olho entre os lances). Com `--diag <pasta>`, o extrator grava `escada-N-pN.png` (planta em
+  volta de cada escada, blocos em vermelho e vão em verde).
 
 ### Próximo
 - Usuário aprovar os renders; depois trocar os GLB em `frontend/public/models/campus/`. O `Externo.glb` não é

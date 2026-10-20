@@ -400,7 +400,9 @@ const proximoPiso = (pg) => {
 // Ajustes por escada em salas-config.json → escadas3d (perto [x, z], de, ate, tipo, sobe, primeiro, patamar, ignorar).
 // Desenho com poucos degraus para a altura (espelho > ESPELHO_MAX_M): os degraus são redistribuídos no mesmo trecho
 // desenhado com espelho ESPELHO_ALVO_M, sem sair da planta.
-const LAJE_ESCADA_M = 0.2, AREA_RECUO_M = 0.1, AREA_ENTRADA_M = 0.5, GIRO_REF = 1, ESPELHO_MAX_M = 0.21, ESPELHO_ALVO_M = 0.18, ESPELHO_PADRAO_M = 0.17, LAJE_M = 0.12, PATAMAR_PADRAO_M = 1.2
+// até ENTORNO_M da escada 3D o desenho 2D da escada vira piso comum; parede solta ali e sala com menos de SOLTO_MAX_M2
+// também
+const ENTORNO_M = 1.2, SOLTO_MAX_M2 = 1.5, LAJE_ESCADA_M = 0.2, AREA_RECUO_M = 0.1, AREA_ENTRADA_M = 0.5, GIRO_REF = 1, ESPELHO_MAX_M = 0.21, ESPELHO_ALVO_M = 0.18, ESPELHO_PADRAO_M = 0.17, LAJE_M = 0.12, PATAMAR_PADRAO_M = 1.2
 const cfgEscadas = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(dadosDir, '..', 'config', 'salas-config.json'), 'utf8')).escadas3d ?? [] } catch { return [] }
 })()
@@ -566,11 +568,16 @@ function montaEscadas() {
     // mureta entre lances e linha do meio da escada saem: nada de parede dentro da área da escada; em U a ponta da
     // mureta passa do 1º degrau do lado da entrada (oposto ao patamar)
     const area = caixaLocal(-AREA_RECUO_M, entrada < 0 ? AREA_ENTRADA_M : 0, entrada > 0 ? AREA_ENTRADA_M : 0)
+    // vão nos andares de cima: retângulo da escada inteira (lances, patamar e o espaço entre os lances)
+    const poco = blocos.filter((b) => b.z1 > de + 0.01).flatMap((b) => b.poly.map((p) => local(ref, p)))
+    vazio.splice(0, vazio.length, ret(ref, Math.min(...poco.map((p) => p[0])), Math.max(...poco.map((p) => p[0])),
+      Math.min(...poco.map((p) => p[1])), Math.max(...poco.map((p) => p[1]))))
     let paredesAbaixo = null
     if (semPisoEmbaixo) paredesAbaixo = { pagina: fonte.pagina, poly: caixaLocal(0.45), z0, z1: +(fonte.piso_m - LAJE_M).toFixed(3) }
     console.log(`escada ${id}: ${resumo}, ${de} → ${ate} m, espelho ${espelho} m, desenho da pág. ${fonte.pagina}${membros.length > 1 ? ` (+ pág. ${membros.filter((m) => m !== fonte).map((m) => m.pagina).join(', ')})` : ''}${confirmar ? ' [a confirmar]' : ''}`)
     const paginasBlocos = paginas.filter((o) => blocosMembros.has(o.pg.bloco)).map((o) => o.n)
-    escadas.push({ id, bloco: fonte.bloco, pagina: fonte.pagina, tipo, de_m: de, ate_m: ate, espelho_m: espelho, degraus: total, blocos, vazio, cortar, area, paginasBlocos, paredesAbaixo, confirmar })
+    const entorno = caixaLocal(ENTORNO_M)
+    escadas.push({ id, bloco: fonte.bloco, pagina: fonte.pagina, tipo, de_m: de, ate_m: ate, espelho_m: espelho, degraus: total, blocos, vazio, cortar, area, entorno, paginasBlocos, paredesAbaixo, confirmar })
   }
   return escadas
 }
@@ -629,16 +636,67 @@ for (const { n, pg, w, h, r, labels, ppm, toWorld, arcos, degraus } of lidas) {
     const a = (x - pg.t[0]) / pg.s, b = (z - pg.t[1]) / pg.s
     return [(pg.M[0] * a + pg.M[2] * b) * ppm, (pg.M[1] * a + pg.M[3] * b) * ppm]
   }
-  let semMureta = 0
-  for (const e of result.escadas) {
-    if (!e.paginasBlocos.includes(n)) continue
-    const px = e.area.map(paraPixel)
+  let semMureta = 0, desenho2d = 0, pedacos = 0
+  const varre = (poly, fn) => {
+    const px = poly.map(paraPixel)
     const X0 = Math.max(0, Math.floor(Math.min(...px.map((p) => p[0])))), X1 = Math.min(w - 1, Math.ceil(Math.max(...px.map((p) => p[0]))))
     const Y0 = Math.max(0, Math.floor(Math.min(...px.map((p) => p[1])))), Y1 = Math.min(h - 1, Math.ceil(Math.max(...px.map((p) => p[1]))))
-    for (let Y = Y0; Y <= Y1; Y++) for (let X = X0; X <= X1; X++) {
-      const i = Y * w + X
-      if (r[i] === 1 && dentro(e.area, ...toWorld(X + 0.5, Y + 0.5))) { r[i] = ESCADA; semMureta++ }
+    for (let Y = Y0; Y <= Y1; Y++) for (let X = X0; X <= X1; X++) if (dentro(poly, ...toWorld(X + 0.5, Y + 0.5))) fn(Y * w + X)
+  }
+  // em volta da escada 3D, o desenho 2D (degraus e a sala "Escada" que encosta nela, inteira) e os pedaços soltos de
+  // parede ou de sala viram piso comum; nos andares que a escada atravessa, o vão é cortado depois no Blender
+  const salaEscada = new Set(labels.regioes.filter((g) => g.tipo === 'escada').map((g) => g.codigo))
+  const mascara = new Uint8Array(w * h), visto = new Uint8Array(w * h), fila = new Int32Array(w * h)
+  for (const e of result.escadas) {
+    if (!e.paginasBlocos.includes(n)) continue
+    varre(e.area, (i) => { if (r[i] === 1) { r[i] = ESCADA; semMureta++ } })
+    const dentroEntorno = []
+    varre(e.entorno, (i) => {
+      mascara[i] = 1; dentroEntorno.push(i)
+      if (salaEscada.has(r[i])) {
+        const v = r[i]
+        let n1 = 0
+        fila[n1++] = i; r[i] = 2
+        for (let n0 = 0; n0 < n1; n0++) {
+          const j0 = fila[n0], x = j0 % w
+          for (const j of [x > 0 ? j0 - 1 : -1, x < w - 1 ? j0 + 1 : -1, j0 - w, j0 + w]) if (j >= 0 && j < w * h && r[j] === v) { r[j] = 2; fila[n1++] = j }
+        }
+        desenho2d += n1
+      } else if (r[i] === ESCADA || r[i] === DEGRAU) { r[i] = 2; desenho2d++ }
+    })
+    for (const i0 of dentroEntorno) {
+      const v = r[i0]
+      if (visto[i0] || (v !== 1 && v < 10)) continue
+      let n0 = 0, n1 = 0, solto = true
+      fila[n1++] = i0; visto[i0] = 1
+      while (n0 < n1) {
+        const i = fila[n0++], x = i % w
+        for (const j of [x > 0 ? i - 1 : -1, x < w - 1 ? i + 1 : -1, i - w, i + w]) {
+          if (j < 0 || j >= w * h || r[j] !== v || visto[j]) continue
+          if (!mascara[j]) { solto = false; continue }
+          visto[j] = 1; fila[n1++] = j
+        }
+      }
+      if (solto && (v === 1 || n1 < SOLTO_MAX_M2 * ppm * ppm)) for (let k = 0; k < n1; k++) { r[fila[k]] = 2; pedacos++ }
     }
+    for (const i of dentroEntorno) { mascara[i] = 0; visto[i] = 0 }
+  }
+  if (DIAG) for (const [k, e] of result.escadas.entries()) {
+    if (!e.paginasBlocos.includes(n)) continue
+    const px = e.entorno.map(paraPixel), Z = 3, M = 2 * ppm
+    const X0 = Math.max(0, Math.floor(Math.min(...px.map((p) => p[0])) - M)), X1 = Math.min(w - 1, Math.ceil(Math.max(...px.map((p) => p[0])) + M))
+    const Y0 = Math.max(0, Math.floor(Math.min(...px.map((p) => p[1])) - M)), Y1 = Math.min(h - 1, Math.ceil(Math.max(...px.map((p) => p[1])) + M))
+    const cw = (X1 - X0 + 1) * Z, ch = (Y1 - Y0 + 1) * Z, rgb = Buffer.alloc(cw * ch * 3, 255)
+    const cor = (c) => c === 0 ? [255, 255, 255] : c === 1 ? [20, 20, 20] : c === 2 ? [215, 215, 215] : c === ESCADA ? [170, 200, 250] : c === DEGRAU ? [30, 90, 230] : [240, 200 - (c * 37) % 80, 120 + (c * 53) % 100]
+    for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) { const c = cor(r[(Y0 + Math.floor(y / Z)) * w + X0 + Math.floor(x / Z)]); rgb.set(c, (y * cw + x) * 3) }
+    for (const b of [...e.blocos, ...(e.cortar.includes(n) ? e.vazio.map((poly) => ({ poly, vazio: true })) : [])]) {
+      const q = b.poly.map(paraPixel).map(([x, y]) => [(x - X0) * Z, (y - Y0) * Z])
+      for (let j = 0; j < q.length; j++) {
+        const [a, c] = [q[j], q[(j + 1) % q.length]], L = Math.ceil(Math.hypot(c[0] - a[0], c[1] - a[1]))
+        for (let t = 0; t <= L; t++) { const x = Math.round(a[0] + ((c[0] - a[0]) * t) / L), y = Math.round(a[1] + ((c[1] - a[1]) * t) / L); if (x >= 0 && y >= 0 && x < cw && y < ch) rgb.set(b.vazio ? [20, 170, 60] : [230, 30, 30], (y * cw + x) * 3) }
+      }
+    }
+    writePng(path.join(DIAG, `escada-${k + 1}-p${n}.png`), cw, ch, rgb)
   }
 
   let abertos = 0
@@ -682,7 +740,7 @@ for (const { n, pg, w, h, r, labels, ppm, toWorld, arcos, degraus } of lidas) {
     salas, circulacao: vetor(2), paredes: vetor(1), escadas: vetor(ESCADA, r.map((c) => (c === DEGRAU ? ESCADA : c))), degraus: vetor(DEGRAU),
   })
   const nPts = (ls) => ls.reduce((s, l) => s + l.pts.length, 0)
-  console.log(`${n} ${pg.arquivo}: ${salas.length} regiões, paredes ${nPts(result.paginas.at(-1).paredes)} pts, altura ${altura} m, ${arcos} px de arco removidos, ${degraus} px de degrau${semMureta ? `, ${semMureta} px de parede tirados de dentro das escadas` : ''}${abertos ? `, ${abertos} px de parede abertos nas junções` : ''}`)
+  console.log(`${n} ${pg.arquivo}: ${salas.length} regiões, paredes ${nPts(result.paginas.at(-1).paredes)} pts, altura ${altura} m, ${arcos} px de arco removidos, ${degraus} px de degrau${semMureta ? `, ${semMureta} px de parede tirados de dentro das escadas` : ''}${desenho2d ? `, ${desenho2d} px de desenho 2D de escada trocados pela 3D` : ''}${pedacos ? `, ${pedacos} px de pedaços soltos em volta das escadas` : ''}${abertos ? `, ${abertos} px de parede abertos nas junções` : ''}`)
 }
 result.implantacao = montagem.implantacao
 fs.writeFileSync(outFile, JSON.stringify(result))
