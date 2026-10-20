@@ -261,7 +261,9 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
   - torre do A superior (−5,2; −18,1): U 0 → 5,12 m, 15 + 18 degraus — **confirmada pelo usuário**. O A térreo
     não desenha escada embaixo dela (lá tem salas); as paredes do superior descem até o chão em volta;
   - C/D compartilhada (−3,2; −121,2): U 2,5 → 7,62 m, 13 + 13 (2º lance cortado no desenho, completado);
-  - interna do A (−0,8; −49,1): U 0 → 5,12 m, 15 + 14, mesma escada no térreo e no superior;
+  - interna do A, atrás do Lab. Desenvolvimento de Sistemas (−0,8; −49,1): U 0 → 5,12 m, 15 + 14, mesma escada
+    no térreo e no superior; deslocada 0,8 m para −x (lado do refeitório) para caber nas paredes do térreo
+    (usuário; o desenho do superior fica ~0,8 m para fora);
   - D lateral (11,3; −148): reta 2,5 → 7,62 m, 29 degraus = 7 do térreo + 13 do superior em sequência;
   - D meio (11,1; −118,5) e anexo de baixo (−2,9; −150,2): só o térreo desenha; D torre (29,6; −101,5): só o
     superior desenha. Todas 2,5 → 7,62 m (usuário), degraus redistribuídos no trecho desenhado;
@@ -270,6 +272,8 @@ Visual: paredes (30,38,51), divisas entre salas (96,108,124), sala = cor do tipo
   - B (−25,6; −92,1): reta 2,5 → 4,99 m (usuário não sabe; fica assim).
   Sem parede no meio da escada (usuário, 19/10/2026): mureta entre lances e linha do meio somem em todas as
   plantas do bloco dentro da área da escada (recuo de 10 cm das bordas; em U, mais 50 cm do lado da entrada).
+  Só o lance que sai do chão é maciço; patamar e 2º lance são laje de 20 cm em degraus (maciços até o chão
+  pareciam um muro no meio da escada).
 
 ### Próximo
 - Usuário aprovar os renders; depois trocar os GLB em `frontend/public/models/campus/`. O `Externo.glb` não é

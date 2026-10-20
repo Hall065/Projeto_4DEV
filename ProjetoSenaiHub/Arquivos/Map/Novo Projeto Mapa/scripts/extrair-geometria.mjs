@@ -553,8 +553,15 @@ function montaEscadas() {
     const espelho = +(H / total).toFixed(3)
     const blocosMembros = new Set(membros.map((m) => m.bloco))
     const cortar = paginas.filter((o) => blocosMembros.has(o.pg.bloco) && o.pg.pisoAltura_m > de + 0.05 && o.pg.pisoAltura_m < ate + 0.05).map((o) => o.n)
-    const loc = blocos.flatMap((b) => b.poly.map((p) => local(fonte, p)))
-    const caixaLocal = (m, v0 = 0, v1 = 0) => ret(fonte, Math.min(...loc.map((p) => p[0])) - m, Math.max(...loc.map((p) => p[0])) + m,
+    let ref = fonte
+    if (cfg.deslocar) {
+      const [dx, dz] = cfg.deslocar, mv = (poly) => poly.map(([x, z]) => [+(x + dx).toFixed(3), +(z + dz).toFixed(3)])
+      for (const b of blocos) b.poly = mv(b.poly)
+      vazio.splice(0, vazio.length, ...vazio.map(mv))
+      ref = { ...fonte, origem: [fonte.origem[0] + dx, fonte.origem[1] + dz] }
+    }
+    const loc = blocos.flatMap((b) => b.poly.map((p) => local(ref, p)))
+    const caixaLocal = (m, v0 = 0, v1 = 0) => ret(ref, Math.min(...loc.map((p) => p[0])) - m, Math.max(...loc.map((p) => p[0])) + m,
       Math.min(...loc.map((p) => p[1])) - m - v0, Math.max(...loc.map((p) => p[1])) + m + v1)
     // mureta entre lances e linha do meio da escada saem: nada de parede dentro da área da escada; em U a ponta da
     // mureta passa do 1º degrau do lado da entrada (oposto ao patamar)
