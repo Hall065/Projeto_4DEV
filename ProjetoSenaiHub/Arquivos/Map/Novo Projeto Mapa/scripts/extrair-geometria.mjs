@@ -400,7 +400,7 @@ const proximoPiso = (pg) => {
 // Ajustes por escada em salas-config.json → escadas3d (perto [x, z], de, ate, tipo, sobe, primeiro, patamar, ignorar).
 // Desenho com poucos degraus para a altura (espelho > ESPELHO_MAX_M): os degraus são redistribuídos no mesmo trecho
 // desenhado com espelho ESPELHO_ALVO_M, sem sair da planta.
-const AREA_RECUO_M = 0.1, AREA_ENTRADA_M = 0.5, GIRO_REF = 1, ESPELHO_MAX_M = 0.21, ESPELHO_ALVO_M = 0.18, ESPELHO_PADRAO_M = 0.17, LAJE_M = 0.12, PATAMAR_PADRAO_M = 1.2
+const LAJE_ESCADA_M = 0.2, AREA_RECUO_M = 0.1, AREA_ENTRADA_M = 0.5, GIRO_REF = 1, ESPELHO_MAX_M = 0.21, ESPELHO_ALVO_M = 0.18, ESPELHO_PADRAO_M = 0.17, LAJE_M = 0.12, PATAMAR_PADRAO_M = 1.2
 const cfgEscadas = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(dadosDir, '..', 'config', 'salas-config.json'), 'utf8')).escadas3d ?? [] } catch { return [] }
 })()
@@ -462,7 +462,9 @@ function montaEscadas() {
     const lance = (col, linhas, k0) => {
       for (let k = 0; k + 1 < linhas.length; k++) {
         const [a, b] = [linhas[k], linhas[k + 1]]
-        blocos.push({ poly: ret(fonte, col.u0, col.u1, Math.min(a, b), Math.max(a, b)), z0, z1: nivel(k0 + k + 1) })
+        // o lance que sai do chão é maciço; os de cima são laje em degraus, senão viram muro no meio da escada
+        const base = k0 ? Math.max(z0, nivel(k0 + k) - LAJE_ESCADA_M) : z0
+        blocos.push({ poly: ret(fonte, col.u0, col.u1, Math.min(a, b), Math.max(a, b)), z0: base, z1: nivel(k0 + k + 1) })
       }
       vazio.push(ret(fonte, col.u0, col.u1, Math.min(...linhas), Math.max(...linhas)))
     }
@@ -541,7 +543,7 @@ function montaEscadas() {
       if (vaoU1 > vaoU0) patamar.push([vaoU0, vaoU1, lado > 0 ? Math.max(fimA, fimB) : Math.min(fimA, fimB)])
       for (const [u0, u1, v] of patamar) {
         const p = ret(fonte, u0, u1, Math.min(v, muro), Math.max(v, muro))
-        blocos.push({ poly: p, z0, z1: alturaPatamar })
+        blocos.push({ poly: p, z0: Math.max(z0, alturaPatamar - LAJE_ESCADA_M), z1: alturaPatamar })
         vazio.push(p)
       }
       lance(segundo, b, a.length)
